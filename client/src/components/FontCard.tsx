@@ -7,7 +7,7 @@ interface FontCardProps {
   id: string;
   name: string;
   nameArabic: string;
-  designer?: string;
+  designer?: string | null;
   category: string;
   style: string;
   fileFormat: string;

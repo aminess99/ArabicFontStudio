@@ -18,7 +18,7 @@ interface FontPreviewModalProps {
   font: {
     name: string;
     nameArabic: string;
-    designer?: string;
+    designer?: string | null;
     category: string;
     style: string;
     fileFormat: string;

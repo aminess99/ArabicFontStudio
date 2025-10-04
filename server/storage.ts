@@ -25,7 +25,12 @@ export class MemStorage implements IStorage {
 
   async createFont(insertFont: InsertFont): Promise<Font> {
     const id = randomUUID();
-    const font: Font = { ...insertFont, id };
+    const font: Font = { 
+      ...insertFont, 
+      id,
+      description: insertFont.description ?? null,
+      designer: insertFont.designer ?? null
+    };
     this.fonts.set(id, font);
     return font;
   }
