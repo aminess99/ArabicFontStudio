@@ -40,6 +40,7 @@ export async function loadFont(fontFamily: string, fontUrl: string): Promise<voi
       src: url("${encodedUrl}")${formatString};
       font-weight: normal;
       font-style: normal;
+      font-display: swap;
     }
   `;
   
@@ -48,7 +49,12 @@ export async function loadFont(fontFamily: string, fontUrl: string): Promise<voi
   
   loadedFonts.add(fontKey);
   
-  await new Promise(resolve => setTimeout(resolve, 10));
+  try {
+    await document.fonts.ready;
+    await document.fonts.load(`16px "${fontFamily}"`);
+  } catch (e) {
+    console.warn(`Font loading delayed for ${fontFamily}`);
+  }
 }
 
 export function generateFontFamily(fontName: string): string {
