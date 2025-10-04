@@ -39,10 +39,13 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
   
-  // Load fonts into storage on startup
-  import("./scripts/load-fonts").catch(err => {
+  // Load fonts into storage on startup - await to ensure fonts are loaded before serving requests
+  try {
+    const { loadFonts } = await import("./scripts/load-fonts");
+    await loadFonts();
+  } catch (err) {
     console.error("Failed to load fonts:", err);
-  });
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

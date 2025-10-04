@@ -1,0 +1,99 @@
+# Arabic Fonts Library Platform
+
+## Overview
+
+An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform allows users to discover, preview, and download Arabic fonts across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+## System Architecture
+
+### Frontend Architecture
+
+**Framework & Build System:**
+- React with TypeScript for type safety
+- Vite as the build tool and development server
+- Wouter for lightweight client-side routing
+- TanStack Query (React Query) for server state management and data fetching
+
+**UI Component Library:**
+- Shadcn/ui components built on Radix UI primitives
+- Tailwind CSS for styling with custom RTL-first design system
+- CSS variables for theming (dark/light mode support)
+- Cairo font from Google Fonts as the primary Arabic typeface
+
+**State Management:**
+- React Query for server state (fonts data)
+- Local React state for UI interactions (search, filters, preview modal)
+- Theme context for dark/light mode persistence
+
+**Key Design Decisions:**
+- RTL-first layout system to properly support Arabic text flow
+- Dynamic font loading system that injects @font-face rules at runtime
+- Category-based filtering with "All" option
+- Dual search inputs (header + hero section) for better UX
+- Toast notifications for user feedback on downloads
+
+### Backend Architecture
+
+**Server Framework:**
+- Express.js with TypeScript
+- Custom Vite middleware integration for SSR-ready setup
+- In-memory storage implementation (MemStorage class)
+
+**Data Layer:**
+- Drizzle ORM configured for PostgreSQL (schema defined, database not yet connected)
+- Schema defines fonts table with fields: id, name, nameArabic, description, designer, category, style, fileUrl, fileName, fileFormat
+- Zod validation for runtime type checking of font data
+
+**API Endpoints:**
+- GET /api/fonts - Retrieve all fonts
+- GET /api/fonts/:id - Retrieve single font by ID
+- POST /api/fonts - Create new font entry
+- DELETE /api/fonts/:id - Remove font entry
+
+**Font Loading Strategy:**
+- Server startup script (`load-fonts.ts`) scans `/client/public/fonts` directory
+- Organizes fonts by category folders (ثلث, ديواني, رقعة, كوفي, نسخ)
+- Automatically extracts metadata from file structure
+- Supports TTF, OTF, WOFF, WOFF2 formats
+
+**Key Architectural Decisions:**
+- Storage abstraction with IStorage interface enables future database migration
+- Font files stored in public directory for direct browser access
+- File-based font discovery eliminates manual database seeding
+- URL encoding handles Arabic filenames in font paths
+
+### External Dependencies
+
+**Core Libraries:**
+- @tanstack/react-query - Server state management
+- drizzle-orm & drizzle-zod - Database ORM and schema validation
+- @neondatabase/serverless - PostgreSQL driver (configured but not active)
+- zod - Runtime type validation
+
+**UI Components:**
+- @radix-ui/* - Headless UI component primitives (dialog, popover, dropdown, etc.)
+- tailwindcss - Utility-first CSS framework
+- class-variance-authority & clsx - Conditional className utilities
+- lucide-react - Icon library
+
+**Development Tools:**
+- vite - Build tool and dev server
+- typescript - Type checking
+- tsx - TypeScript execution for server
+- @replit/vite-plugin-* - Replit-specific development enhancements
+
+**Font Processing:**
+- Custom font loader utility handles dynamic @font-face injection
+- Supports URL encoding for Arabic filenames
+- Format detection from file extensions
+- Font family name generation to avoid conflicts
+
+**Notable Dependency Patterns:**
+- All Radix UI components wrapped in custom components with consistent styling
+- React Hook Form with Zod resolvers for form validation (configured but not actively used)
+- Date-fns for date formatting utilities
+- Wouter instead of React Router for smaller bundle size

@@ -12,6 +12,7 @@ export default function FontCardExample() {
           category="حديث"
           style="عادي"
           fileFormat="TTF"
+          fileUrl="/fonts/نسخ/Cairo.ttf"
           onPreview={() => console.log("Preview clicked")}
           onDownload={() => console.log("Download clicked")}
         />

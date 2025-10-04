@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Download, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 
 interface FontCardProps {
   id: string;
@@ -11,6 +13,7 @@ interface FontCardProps {
   category: string;
   style: string;
   fileFormat: string;
+  fileUrl: string;
   onPreview: () => void;
   onDownload: () => void;
 }
@@ -22,9 +25,19 @@ export function FontCard({
   category,
   style,
   fileFormat,
+  fileUrl,
   onPreview,
   onDownload,
 }: FontCardProps) {
+  const [fontLoaded, setFontLoaded] = useState(false);
+  const fontFamily = generateFontFamily(name);
+
+  useEffect(() => {
+    loadFont(fontFamily, fileUrl).then(() => {
+      setFontLoaded(true);
+    });
+  }, [fontFamily, fileUrl]);
+
   return (
     <Card className="hover-elevate transition-all" data-testid={`card-font-${name}`}>
       <CardHeader className="space-y-3">
@@ -39,10 +52,10 @@ export function FontCard({
         </div>
         <div 
           className="min-h-24 flex items-center justify-center rounded-md bg-muted/30 p-4 text-center"
-          style={{ fontFamily: nameArabic }}
+          style={{ fontFamily: fontLoaded ? fontFamily : 'inherit' }}
         >
           <p className="text-2xl" data-testid={`text-preview-${name}`}>
-            {nameArabic}
+            {fontLoaded ? nameArabic : "جاري التحميل..."}
           </p>
         </div>
       </CardHeader>

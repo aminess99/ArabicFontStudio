@@ -11,7 +11,8 @@ export default function FontPreviewModalExample() {
     designer: "محمد غالب",
     category: "حديث",
     style: "عادي",
-    fileFormat: "TTF"
+    fileFormat: "TTF",
+    fileUrl: "/fonts/نسخ/Cairo.ttf"
   };
 
   return (

@@ -24,7 +24,7 @@ function getFileFormat(fileName: string): string {
   return ext.replace(".", "").toUpperCase();
 }
 
-async function loadFonts() {
+export async function loadFonts() {
   console.log("🔄 Loading fonts from disk...");
   
   const categories = Object.keys(categoryMap);
@@ -71,5 +71,3 @@ async function loadFonts() {
   const allFonts = await storage.getAllFonts();
   console.log(`📊 Total fonts in storage: ${allFonts.length}`);
 }
-
-loadFonts().catch(console.error);

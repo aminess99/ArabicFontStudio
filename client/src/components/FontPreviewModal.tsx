@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Download, Type } from "lucide-react";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
+import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 
 interface FontPreviewModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface FontPreviewModalProps {
     category: string;
     style: string;
     fileFormat: string;
+    fileUrl: string;
   } | null;
   onDownload: () => void;
 }
@@ -29,8 +31,21 @@ interface FontPreviewModalProps {
 export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPreviewModalProps) {
   const [previewText, setPreviewText] = useState("اكتب هنا لمعاينة الخط");
   const [fontSize, setFontSize] = useState(32);
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    if (font && isOpen) {
+      const fontFamily = generateFontFamily(font.name);
+      setFontLoaded(false);
+      loadFont(fontFamily, font.fileUrl).then(() => {
+        setFontLoaded(true);
+      });
+    }
+  }, [font, isOpen]);
 
   if (!font) return null;
+
+  const fontFamily = generateFontFamily(font.name);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -91,13 +106,13 @@ export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPrev
           <div
             className="min-h-48 rounded-lg border bg-card p-6 flex items-center justify-center text-center"
             style={{ 
-              fontFamily: font.nameArabic,
+              fontFamily: fontLoaded ? fontFamily : 'inherit',
               fontSize: `${fontSize}px`,
               lineHeight: 1.5
             }}
             data-testid="text-font-preview"
           >
-            {previewText}
+            {fontLoaded ? previewText : "جاري تحميل الخط..."}
           </div>
 
           <div className="flex gap-3">
