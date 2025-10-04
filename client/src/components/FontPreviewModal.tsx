@@ -49,12 +49,12 @@ export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPrev
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="modal-font-preview">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="modal-font-preview" aria-describedby="font-preview-description">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <DialogTitle className="text-2xl">{font.nameArabic}</DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">{font.name}</p>
+              <p id="font-preview-description" className="text-sm text-muted-foreground mt-1">{font.name}</p>
             </div>
             <Button
               variant="ghost"
