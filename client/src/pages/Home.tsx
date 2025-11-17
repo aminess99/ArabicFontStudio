@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
+import { Pagination } from "@/components/Pagination";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
+
+const FONTS_PER_PAGE = 15;
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,6 +15,7 @@ export default function Home() {
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [fontSize, setFontSize] = useState(48);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
   const { data: fonts = [], isLoading } = useQuery<Font[]>({
@@ -44,6 +48,15 @@ export default function Home() {
       const dateB = new Date(b.addedAt).getTime();
       return dateB - dateA;
     });
+
+  const totalPages = Math.ceil(filteredFonts.length / FONTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * FONTS_PER_PAGE;
+  const endIndex = startIndex + FONTS_PER_PAGE;
+  const currentFonts = filteredFonts.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
 
   const handleToggleFavorite = (fontId: string) => {
     setFavorites(prev => {
@@ -109,12 +122,12 @@ export default function Home() {
           <>
             <div className="mb-4 pb-3 border-b">
               <p className="text-sm text-muted-foreground">
-                الخطوط 1 - {Math.min(filteredFonts.length, 10)} من {filteredFonts.length}
+                الخطوط {startIndex + 1} - {Math.min(endIndex, filteredFonts.length)} من {filteredFonts.length}
               </p>
             </div>
             
             <div className="space-y-0">
-              {filteredFonts.slice(0, 10).map((font) => (
+              {currentFonts.map((font) => (
                 <FontListItem
                   key={font.id}
                   {...font}
@@ -126,6 +139,14 @@ export default function Home() {
                 />
               ))}
             </div>
+
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </>
         )}
       </main>
