@@ -29,7 +29,7 @@ interface FontPreviewModalProps {
 }
 
 export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPreviewModalProps) {
-  const [previewText, setPreviewText] = useState("اكتب هنا لمعاينة الخط");
+  const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [fontSize, setFontSize] = useState(32);
   const [fontLoaded, setFontLoaded] = useState(false);
 

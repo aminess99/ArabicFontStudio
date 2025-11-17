@@ -55,7 +55,7 @@ export function FontCard({
           style={{ fontFamily: fontLoaded ? fontFamily : 'inherit' }}
         >
           <p className="text-2xl" data-testid={`text-preview-${name}`}>
-            {fontLoaded ? nameArabic : "جاري التحميل..."}
+            {fontLoaded ? "الخط العربي" : "جاري التحميل..."}
           </p>
         </div>
       </CardHeader>
