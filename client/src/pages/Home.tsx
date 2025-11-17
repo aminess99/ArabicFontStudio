@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
 import { Pagination } from "@/components/Pagination";
+import { Footer } from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
 
@@ -96,7 +97,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header 
         searchQuery={searchQuery} 
         onSearchChange={setSearchQuery}
@@ -111,7 +112,7 @@ export default function Home() {
         onCategoryChange={setSelectedCategory}
       />
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="flex-1 container mx-auto px-4 py-6">
         {filteredFonts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">
@@ -150,6 +151,8 @@ export default function Home() {
           </>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }
