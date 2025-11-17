@@ -2,17 +2,16 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { HeroSection } from "@/components/HeroSection";
-import { FontCard } from "@/components/FontCard";
-import { FontPreviewModal } from "@/components/FontPreviewModal";
+import { FontListItem } from "@/components/FontListItem";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("الكل");
-  const [selectedFont, setSelectedFont] = useState<Font | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
+  const [fontSize, setFontSize] = useState(48);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const { data: fonts = [], isLoading } = useQuery<Font[]>({
@@ -31,9 +30,16 @@ export default function Home() {
     return matchesSearch && matchesCategory;
   });
 
-  const handlePreview = (font: Font) => {
-    setSelectedFont(font);
-    setIsPreviewOpen(true);
+  const handleToggleFavorite = (fontId: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(fontId)) {
+        newFavorites.delete(fontId);
+      } else {
+        newFavorites.add(fontId);
+      }
+      return newFavorites;
+    });
   };
 
   const handleDownload = (font: Font) => {
@@ -63,15 +69,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <HeroSection searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <Header 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery}
+        previewText={previewText}
+        onPreviewTextChange={setPreviewText}
+        fontSize={fontSize}
+        onFontSizeChange={setFontSize}
+      />
       <CategoryFilter
         categories={categories}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
       />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6">
         {filteredFonts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">
@@ -80,35 +92,28 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold">
-                {selectedCategory === "الكل" ? "جميع الخطوط" : `خطوط ${selectedCategory}`}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {filteredFonts.length} خط متاح
+            <div className="mb-4 pb-3 border-b">
+              <p className="text-sm text-muted-foreground">
+                الخطوط 1 - {Math.min(filteredFonts.length, 10)} من {filteredFonts.length}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredFonts.map((font) => (
-                <FontCard
+            <div className="space-y-0">
+              {filteredFonts.slice(0, 10).map((font) => (
+                <FontListItem
                   key={font.id}
                   {...font}
-                  onPreview={() => handlePreview(font)}
+                  previewText={previewText}
+                  fontSize={fontSize}
                   onDownload={() => handleDownload(font)}
+                  isFavorite={favorites.has(font.id)}
+                  onToggleFavorite={() => handleToggleFavorite(font.id)}
                 />
               ))}
             </div>
           </>
         )}
       </main>
-
-      <FontPreviewModal
-        isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
-        font={selectedFont}
-        onDownload={() => selectedFont && handleDownload(selectedFont)}
-      />
     </div>
   );
 }
