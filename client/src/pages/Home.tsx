@@ -20,24 +20,30 @@ export default function Home() {
 
   const categories = Array.from(new Set(fonts.map(font => font.category)));
 
-  const filteredFonts = fonts.filter((font) => {
-    const matchesSearch = 
-      font.nameArabic.includes(searchQuery) || 
-      font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (font.designer && font.designer.includes(searchQuery)) ||
-      (font.description && font.description.includes(searchQuery));
-    
-    let matchesCategory = true;
-    if (selectedCategory === "الكل") {
-      matchesCategory = true;
-    } else if (selectedCategory === "الخطوط المميزة") {
-      matchesCategory = font.featured;
-    } else {
-      matchesCategory = font.category === selectedCategory;
-    }
-    
-    return matchesSearch && matchesCategory;
-  });
+  const filteredFonts = fonts
+    .filter((font) => {
+      const matchesSearch = 
+        font.nameArabic.includes(searchQuery) || 
+        font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (font.designer && font.designer.includes(searchQuery)) ||
+        (font.description && font.description.includes(searchQuery));
+      
+      let matchesCategory = true;
+      if (selectedCategory === "الكل") {
+        matchesCategory = true;
+      } else if (selectedCategory === "الخطوط المميزة") {
+        matchesCategory = font.featured;
+      } else {
+        matchesCategory = font.category === selectedCategory;
+      }
+      
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.addedAt).getTime();
+      const dateB = new Date(b.addedAt).getTime();
+      return dateB - dateA;
+    });
 
   const handleToggleFavorite = (fontId: string) => {
     setFavorites(prev => {
