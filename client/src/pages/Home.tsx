@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
 import { Header } from "@/components/Header";
+import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import type { Font } from "@shared/schema";
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("الكل");
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [fontSize, setFontSize] = useState(48);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -18,7 +18,26 @@ export default function Home() {
     queryKey: ["/api/fonts"],
   });
 
-  const featuredFonts = fonts.filter(font => font.featured);
+  const categories = Array.from(new Set(fonts.map(font => font.category)));
+
+  const filteredFonts = fonts.filter((font) => {
+    const matchesSearch = 
+      font.nameArabic.includes(searchQuery) || 
+      font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (font.designer && font.designer.includes(searchQuery)) ||
+      (font.description && font.description.includes(searchQuery));
+    
+    let matchesCategory = true;
+    if (selectedCategory === "الكل") {
+      matchesCategory = true;
+    } else if (selectedCategory === "الخطوط المميزة") {
+      matchesCategory = font.featured;
+    } else {
+      matchesCategory = font.category === selectedCategory;
+    }
+    
+    return matchesSearch && matchesCategory;
+  });
 
   const handleToggleFavorite = (fontId: string) => {
     setFavorites(prev => {
@@ -60,65 +79,49 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Header 
-        searchQuery=""
-        onSearchChange={() => {}}
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery}
         previewText={previewText}
         onPreviewTextChange={setPreviewText}
         fontSize={fontSize}
         onFontSizeChange={setFontSize}
       />
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+      />
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">الخطوط المميزة</h2>
-              <p className="text-muted-foreground">
-                تصفح مجموعتنا المختارة من أفضل الخطوط العربية
-              </p>
-            </div>
-            <Link href="/fonts">
-              <Button variant="outline" data-testid="button-view-all">
-                عرض جميع الخطوط
-                <ArrowLeft className="mr-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {featuredFonts.length === 0 ? (
+      <main className="container mx-auto px-4 py-6">
+        {filteredFonts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">
-              لا توجد خطوط مميزة حالياً
+              لم يتم العثور على خطوط تطابق البحث
             </p>
           </div>
         ) : (
-          <div className="space-y-0 border rounded-md">
-            {featuredFonts.map((font) => (
-              <FontListItem
-                key={font.id}
-                {...font}
-                previewText={previewText}
-                fontSize={fontSize}
-                onDownload={() => handleDownload(font)}
-                isFavorite={favorites.has(font.id)}
-                onToggleFavorite={() => handleToggleFavorite(font.id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="mb-4 pb-3 border-b">
+              <p className="text-sm text-muted-foreground">
+                الخطوط 1 - {Math.min(filteredFonts.length, 10)} من {filteredFonts.length}
+              </p>
+            </div>
+            
+            <div className="space-y-0">
+              {filteredFonts.slice(0, 10).map((font) => (
+                <FontListItem
+                  key={font.id}
+                  {...font}
+                  previewText={previewText}
+                  fontSize={fontSize}
+                  onDownload={() => handleDownload(font)}
+                  isFavorite={favorites.has(font.id)}
+                  onToggleFavorite={() => handleToggleFavorite(font.id)}
+                />
+              ))}
+            </div>
+          </>
         )}
-
-        <div className="mt-12 text-center">
-          <p className="text-muted-foreground mb-4">
-            هل تبحث عن المزيد من الخطوط؟
-          </p>
-          <Link href="/fonts">
-            <Button size="lg" data-testid="button-browse-all">
-              تصفح جميع الخطوط ({fonts.length} خط)
-              <ArrowLeft className="mr-2 h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
       </main>
     </div>
   );
