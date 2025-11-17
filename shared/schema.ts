@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -15,6 +15,7 @@ export const fonts = pgTable("fonts", {
   fileName: text("file_name").notNull(),
   fileFormat: text("file_format").notNull(),
   featured: boolean("featured").default(false).notNull(),
+  addedAt: timestamp("added_at").default(sql`now()`).notNull(),
 });
 
 export const insertFontSchema = createInsertSchema(fonts).omit({

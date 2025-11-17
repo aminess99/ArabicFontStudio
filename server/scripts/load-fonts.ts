@@ -70,6 +70,10 @@ export async function loadFonts() {
       const fileFormat = getFileFormat(file);
       const fileUrl = `/fonts/${category}/${file}`;
       const isFeatured = featuredFonts.has(fontName);
+      
+      const filePath = path.join(categoryPath, file);
+      const stats = fs.statSync(filePath);
+      const addedAt = stats.mtime;
 
       await storage.createFont({
         name: fontName,
@@ -82,6 +86,7 @@ export async function loadFonts() {
         fileName: file,
         fileFormat: fileFormat,
         featured: isFeatured,
+        addedAt: addedAt,
       });
 
       totalFonts++;
