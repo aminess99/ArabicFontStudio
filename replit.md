@@ -2,7 +2,20 @@
 
 ## Overview
 
-An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform allows users to discover, preview, and download Arabic fonts across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
+An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 24 high-quality Arabic fonts (reduced from 60 by removing duplicates), organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
+
+## Recent Changes (November 2025)
+
+**Font Library Cleanup:**
+- Removed 36 duplicate and similar fonts
+- Reduced total from 60 to 24 carefully selected fonts
+- Added `featured` flag to schema to mark premium fonts
+- Created curated list of 17 featured fonts showcasing best from each category
+
+**Two-Page Architecture:**
+- **Homepage (/)**: Displays only featured fonts with prominent CTAs
+- **All Fonts Page (/fonts)**: Browse complete library with search and filters
+- Clean navigation between featured showcase and full catalog
 
 ## User Preferences
 
@@ -58,8 +71,9 @@ Preferred communication style: Simple, everyday language.
 
 **Data Layer:**
 - Drizzle ORM configured for PostgreSQL (schema defined, database not yet connected)
-- Schema defines fonts table with fields: id, name, nameArabic, description, designer, category, style, fileUrl, fileName, fileFormat
+- Schema defines fonts table with fields: id, name, nameArabic, description, designer, category, style, fileUrl, fileName, fileFormat, featured (boolean)
 - Zod validation for runtime type checking of font data
+- Featured fonts system marks highest-quality fonts for homepage display
 
 **API Endpoints:**
 - GET /api/fonts - Retrieve all fonts
@@ -72,6 +86,12 @@ Preferred communication style: Simple, everyday language.
 - Organizes fonts by category folders (ثلث, ديواني, رقعة, كوفي, نسخ)
 - Automatically extracts metadata from file structure
 - Supports TTF, OTF, WOFF, WOFF2 formats
+- Curated featured fonts list: 17 premium fonts selected for quality and uniqueness
+  - ثلث: 2 fonts (GE Thuluth Light, Dthuluth)
+  - ديواني: 6 fonts (includes 51DW0SIN, al kharashi diwani 1)
+  - رقعة: 2 fonts (SH Roq'a 1, Tasees Saudi)
+  - كوفي: 6 fonts (includes DroidKufi, Noto Kufi, Pen Kufi)
+  - نسخ: 8 fonts (includes DroidNaskh, UthmanTN1, Mohammad Naskh)
 
 **Key Architectural Decisions:**
 - Storage abstraction with IStorage interface enables future database migration
