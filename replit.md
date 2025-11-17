@@ -26,15 +26,28 @@ Preferred communication style: Simple, everyday language.
 
 **State Management:**
 - React Query for server state (fonts data)
-- Local React state for UI interactions (search, filters, preview modal)
+- Local React state for UI interactions (search, filters, preview text, font size, favorites)
 - Theme context for dark/light mode persistence
+
+**UI Layout Design (November 2025 Update):**
+- **List-based interface**: Simplified vertical list layout instead of card grid
+- **Two-section header**: 
+  - Top: Logo, search bar, theme toggle
+  - Bottom toolbar: Preview text input, font size slider (16-72px), items per page selector
+- **Global preview controls**: All fonts display the same customizable preview text at the same adjustable size
+- **Horizontal category filters**: Tag/chip style category selection
+- **Font list items**: Each row displays font name, large preview, favorite heart icon, and green download button
+- **Favorites system**: Heart icons toggle to mark/unmark favorite fonts
+- **Limited display**: Shows 10 fonts at a time with counter ("الخطوط 1 - 10 من 60")
 
 **Key Design Decisions:**
 - RTL-first layout system to properly support Arabic text flow
 - Dynamic font loading system that injects @font-face rules at runtime
-- Category-based filtering with "All" option
-- Dual search inputs (header + hero section) for better UX
+- Category-based filtering with horizontal chips/tags
+- Single search input in header (removed hero section for simplicity)
+- Global preview text and font size controls in header toolbar
 - Toast notifications for user feedback on downloads
+- Minimalist list design inspired by professional font libraries
 
 ### Backend Architecture
 
