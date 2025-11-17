@@ -29,7 +29,8 @@ export class MemStorage implements IStorage {
       ...insertFont, 
       id,
       description: insertFont.description ?? null,
-      designer: insertFont.designer ?? null
+      designer: insertFont.designer ?? null,
+      featured: insertFont.featured ?? false
     };
     this.fonts.set(id, font);
     return font;

@@ -12,6 +12,26 @@ const categoryMap: Record<string, string> = {
   "نسخ": "نسخ",
 };
 
+const featuredFonts = new Set([
+  "GE Thuluth Light",
+  "Dthuluth",
+  "51DW0SIN",
+  "al kharashi diwani 1",
+  "ArbFONTS AF Diwani Normal Traditional",
+  "SH Roq'a 1",
+  "Tasees Saudi",
+  "DroidKufi Regular",
+  "Noto Kufi Arabic",
+  "Pen Kufi",
+  "Kufigraph Font",
+  "DroidNaskh Regular",
+  "UthmanTN1 Ver07",
+  "Mohammad Naskh",
+  "FS NASKH AHRAM",
+  "HSN Naskh",
+  "Al Kharashi 58 Naskh",
+]);
+
 function cleanFontName(fileName: string): string {
   return fileName
     .replace(/\.(ttf|otf|woff|woff2)$/i, "")
@@ -49,6 +69,7 @@ export async function loadFonts() {
       const fontName = cleanFontName(file);
       const fileFormat = getFileFormat(file);
       const fileUrl = `/fonts/${category}/${file}`;
+      const isFeatured = featuredFonts.has(fontName);
 
       await storage.createFont({
         name: fontName,
@@ -60,6 +81,7 @@ export async function loadFonts() {
         fileUrl: fileUrl,
         fileName: file,
         fileFormat: fileFormat,
+        featured: isFeatured,
       });
 
       totalFonts++;
