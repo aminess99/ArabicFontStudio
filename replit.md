@@ -2,7 +2,7 @@
 
 ## Overview
 
-An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 34 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
+An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 42 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
 
 ## Recent Changes (November 2025)
 
@@ -11,7 +11,8 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 - Fonts now display in reverse chronological order (newest first)
 - New fonts automatically appear at the top of the list
 - Added 10 new Kufi fonts (total now 16 Kufi fonts)
-- Total font count: 34 fonts
+- Added 8 new Thuluth fonts (total now 10 Thuluth fonts)
+- Total font count: 42 fonts
 
 **Single-Page Architecture:**
 - Consolidated to single homepage displaying all fonts
@@ -96,7 +97,7 @@ Preferred communication style: Simple, everyday language.
 - Extracts file modification time (mtime) as `addedAt` timestamp for sorting
 - Supports TTF, OTF, WOFF, WOFF2 formats
 - Current font distribution:
-  - ثلث: 2 fonts
+  - ثلث: 10 fonts (recently added 8 new fonts)
   - ديواني: 6 fonts
   - رقعة: 2 fonts
   - كوفي: 16 fonts (recently added 10 new fonts)
