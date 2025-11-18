@@ -6,7 +6,12 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 ## Recent Changes (November 2025)
 
-**Latest Update - SEO Enhancement & Additional Pages:**
+**Latest Update - Font Cleanup (November 18, 2025):**
+- Removed MCS Tholoth font family (4 fonts)
+- Updated font count: 38 total fonts
+- Thuluth category now has 6 fonts (down from 10)
+
+**Previous Update - SEO Enhancement & Additional Pages:**
 - Enhanced SEO with comprehensive meta tags (title, description, keywords)
 - Added Open Graph and Twitter Card meta tags for social media sharing
 - Implemented JSON-LD structured data for better search engine understanding
@@ -107,11 +112,12 @@ Preferred communication style: Simple, everyday language.
 - Extracts file modification time (mtime) as `addedAt` timestamp for sorting
 - Supports TTF, OTF, WOFF, WOFF2 formats
 - Current font distribution:
-  - ثلث: 10 fonts (recently added 8 new fonts)
+  - ثلث: 6 fonts
   - ديواني: 6 fonts
   - رقعة: 2 fonts
-  - كوفي: 16 fonts (recently added 10 new fonts)
+  - كوفي: 16 fonts
   - نسخ: 8 fonts
+  - Total: 38 fonts
 - Curated featured fonts list: 17 premium fonts selected for quality and uniqueness
 
 **Key Architectural Decisions:**
