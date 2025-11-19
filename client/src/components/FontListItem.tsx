@@ -32,9 +32,18 @@ export function FontListItem({
   const fontFamily = generateFontFamily(name);
 
   useEffect(() => {
-    loadFont(fontFamily, fileUrl).then(() => {
-      setFontLoaded(true);
-    });
+    setFontLoaded(false);
+    loadFont(fontFamily, fileUrl)
+      .then(() => {
+        setTimeout(() => {
+          setFontLoaded(true);
+        }, 300);
+      })
+      .catch(() => {
+        setTimeout(() => {
+          setFontLoaded(true);
+        }, 500);
+      });
   }, [fontFamily, fileUrl]);
 
   return (
