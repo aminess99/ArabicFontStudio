@@ -11,12 +11,12 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 - Updated font count: 52 total fonts
 - Naskh category now has 13 fonts (up from 8)
 - New fonts: AQEEQSANSPRO-Bold, Kaeeb-Serif, RTL-Lustrous-Bold, SIMPLEX-DISPLAY, Trox-R
+- Sorting order: newest fonts first (appear on page 1), oldest fonts on last pages
 
 **Previous Update - Added Ruqaa Fonts (November 19, 2025):**
 - Added 9 new Ruqaa fonts to the library
 - Updated font count: 47 total fonts
 - Ruqaa category now has 11 fonts (up from 2)
-- Changed sorting order: oldest fonts first, newest fonts appear on last pages (page 2+)
 
 **Previous Update - Font Cleanup (November 18, 2025):**
 - Removed MCS Tholoth font family (4 fonts)
@@ -35,8 +35,8 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 **Previous Update - Timestamp Sorting System:**
 - Added `addedAt` timestamp field to font schema for tracking when fonts are added
-- Fonts display in chronological order (oldest first)
-- New fonts automatically appear on the last pages
+- Fonts display in reverse chronological order (newest first)
+- New fonts automatically appear on the first page
 - Added 10 new Kufi fonts (total now 16 Kufi fonts)
 - Added 8 new Thuluth fonts (total now 10 Thuluth fonts)
 
@@ -107,7 +107,7 @@ Preferred communication style: Simple, everyday language.
 - Drizzle ORM configured for PostgreSQL (schema defined, database not yet connected)
 - Schema defines fonts table with fields: id, name, nameArabic, description, designer, category, style, fileUrl, fileName, fileFormat, featured (boolean), addedAt (timestamp)
 - Zod validation for runtime type checking of font data
-- Fonts sorted by addedAt in ascending order (oldest first, newest on last pages)
+- Fonts sorted by addedAt in descending order (newest first, oldest on last pages)
 - Featured fonts system marks highest-quality fonts for homepage display
 
 **API Endpoints:**
