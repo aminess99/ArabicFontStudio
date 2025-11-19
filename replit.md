@@ -2,16 +2,22 @@
 
 ## Overview
 
-An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 52 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
+An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 59 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
 
 ## Recent Changes (November 2025)
 
-**Latest Update - Added Naskh Fonts (November 19, 2025):**
+**Latest Update - Added Ruqaa Fonts Batch 2 (November 19, 2025):**
+- Added 7 new Ruqaa fonts to the library (with alfont_com_ prefix removed)
+- Updated font count: 59 total fonts
+- Ruqaa category now has 18 fonts (up from 11)
+- New fonts: 29LT-Azer-Bold, Almaghribi-Warsh-Quran, GraphicSchool-Regular, Palestine-Regular, Tasees-Bold, خط-القلعة, خط-بلاس
+- Sorting order: newest fonts first (appear on page 1), oldest fonts on last pages
+
+**Previous Update - Added Naskh Fonts (November 19, 2025):**
 - Added 5 new Naskh fonts to the library (with alfont_com_ prefix removed)
 - Updated font count: 52 total fonts
 - Naskh category now has 13 fonts (up from 8)
 - New fonts: AQEEQSANSPRO-Bold, Kaeeb-Serif, RTL-Lustrous-Bold, SIMPLEX-DISPLAY, Trox-R
-- Sorting order: newest fonts first (appear on page 1), oldest fonts on last pages
 
 **Previous Update - Added Ruqaa Fonts (November 19, 2025):**
 - Added 9 new Ruqaa fonts to the library
@@ -124,10 +130,10 @@ Preferred communication style: Simple, everyday language.
 - Current font distribution:
   - ثلث: 6 fonts
   - ديواني: 6 fonts
-  - رقعة: 11 fonts
+  - رقعة: 18 fonts
   - كوفي: 16 fonts
   - نسخ: 13 fonts
-  - Total: 52 fonts
+  - Total: 59 fonts
 - Curated featured fonts list: 17 premium fonts selected for quality and uniqueness
 
 **Key Architectural Decisions:**
