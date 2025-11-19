@@ -25,7 +25,7 @@ export default function Terms() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">قبول الشروط</h2>
               <p className="text-muted-foreground leading-relaxed">
-                باستخدامك لموقع مكتبة الخطوط العربية، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام الموقع.
+                باستخدامك لموقع xfontat، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام الموقع.
               </p>
             </section>
 

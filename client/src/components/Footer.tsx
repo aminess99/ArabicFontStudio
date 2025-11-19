@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">مكتبة الخطوط العربية</h3>
+            <h3 className="font-bold text-lg mb-4">xfontat</h3>
             <p className="text-sm text-muted-foreground">
               مكتبة شاملة للخطوط العربية الاحترافية مع إمكانية التحميل المجاني
             </p>
@@ -64,7 +64,7 @@ export function Footer() {
         </div>
 
         <div className="border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>© {currentYear} مكتبة الخطوط العربية. جميع الحقوق محفوظة.</p>
+          <p>© {currentYear} xfontat. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>

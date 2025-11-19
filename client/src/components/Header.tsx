@@ -27,11 +27,11 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <span className="text-xl font-bold">خ</span>
+                <span className="text-xl font-bold">X</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold">مكتبة الخطوط</h1>
-                <p className="text-xs text-muted-foreground">Arabic Fonts Library</p>
+                <h1 className="text-xl font-bold">xfontat</h1>
+                <p className="text-xs text-muted-foreground">إكس فونتات</p>
               </div>
             </div>
 

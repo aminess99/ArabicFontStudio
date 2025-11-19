@@ -19,9 +19,9 @@ export default function About() {
           
           <div className="prose prose-lg max-w-none space-y-6">
             <section>
-              <h2 className="text-2xl font-semibold mb-4">مرحباً بك في مكتبة الخطوط العربية</h2>
+              <h2 className="text-2xl font-semibold mb-4">مرحباً بك في xfontat</h2>
               <p className="text-muted-foreground leading-relaxed">
-                مكتبة الخطوط العربية هي منصة متخصصة في توفير مجموعة متنوعة من الخطوط العربية الاحترافية والمجانية. نهدف إلى جعل الخطوط العربية عالية الجودة متاحة للجميع، سواء كنت مصمماً محترفاً أو هاوياً.
+                xfontat هي منصة متخصصة في توفير مجموعة متنوعة من الخطوط العربية الاحترافية والمجانية. نهدف إلى جعل الخطوط العربية عالية الجودة متاحة للجميع، سواء كنت مصمماً محترفاً أو هاوياً.
               </p>
             </section>
 
