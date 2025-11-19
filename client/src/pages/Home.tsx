@@ -47,7 +47,7 @@ export default function Home() {
     .sort((a, b) => {
       const dateA = new Date(a.addedAt).getTime();
       const dateB = new Date(b.addedAt).getTime();
-      return dateB - dateA;
+      return dateA - dateB;
     });
 
   const totalPages = Math.ceil(filteredFonts.length / FONTS_PER_PAGE);
