@@ -36,8 +36,6 @@ export default function Home() {
       let matchesCategory = true;
       if (selectedCategory === "الكل") {
         matchesCategory = true;
-      } else if (selectedCategory === "الخطوط المميزة") {
-        matchesCategory = font.featured;
       } else {
         matchesCategory = font.category === selectedCategory;
       }

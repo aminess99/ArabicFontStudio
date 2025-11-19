@@ -19,14 +19,6 @@ export function CategoryFilter({ categories, selectedCategory, onCategoryChange 
           >
             الكل
           </Button>
-          <Button
-            variant={selectedCategory === "الخطوط المميزة" ? "default" : "outline"}
-            size="sm"
-            onClick={() => onCategoryChange("الخطوط المميزة")}
-            data-testid="button-category-featured"
-          >
-            الخطوط المميزة
-          </Button>
           {categories.map((category) => (
             <Button
               key={category}

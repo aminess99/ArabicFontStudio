@@ -42,8 +42,7 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 **Single-Page Architecture:**
 - Consolidated to single homepage displaying all fonts
-- "الخطوط المميزة" (Featured Fonts) integrated as a category filter
-- Category filter order: "الكل" → "الخطوط المميزة" → individual categories
+- Category filter order: "الكل" → individual categories (ثلث، ديواني، رقعة، كوفي، نسخ)
 - Removed separate /fonts page for simpler navigation
 
 **Font Library Cleanup:**
