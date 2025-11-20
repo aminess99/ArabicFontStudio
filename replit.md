@@ -6,7 +6,20 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 ## Recent Changes (November 2025)
 
-**Latest Update - Added Design Fonts Category (November 20, 2025):**
+**Latest Update - SEO Optimization (November 20, 2025):**
+- Added dynamic sitemap.xml endpoint (automatically includes all pages)
+- Added robots.txt endpoint for search engine crawlers
+- Implemented Schema Markup (JSON-LD) for all pages:
+  - Organization schema for xfontat brand
+  - WebSite schema with SearchAction
+  - CollectionPage schema for font listings (Home and Design Fonts pages)
+  - ItemList schema for font collections
+  - WebPage schema for static pages (About, Contact, Privacy, Terms)
+- Created SEOHead component for dynamic meta tags and structured data
+- Enhanced meta tags for all pages with unique titles and descriptions
+- Improved Open Graph and Twitter Card metadata
+
+**Previous Update - Added Design Fonts Category (November 20, 2025):**
 - Added new "تصميم" (Design Fonts) category with 78 professional fonts
 - Created dedicated page at /design-fonts for design fonts
 - Updated font count: 143 total fonts
