@@ -47,6 +47,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : "https://www.xfontat.com";
+
+      const staticPages = [
+        { url: "/", priority: "1.0", changefreq: "daily" },
+        { url: "/design-fonts", priority: "0.9", changefreq: "weekly" },
+        { url: "/about", priority: "0.5", changefreq: "monthly" },
+        { url: "/contact", priority: "0.5", changefreq: "monthly" },
+        { url: "/privacy", priority: "0.3", changefreq: "yearly" },
+        { url: "/terms", priority: "0.3", changefreq: "yearly" },
+      ];
+
+      const fonts = await storage.getAllFonts();
+      const now = new Date().toISOString();
+
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+      staticPages.forEach(page => {
+        xml += '  <url>\n';
+        xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
+        xml += `    <lastmod>${now}</lastmod>\n`;
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+        xml += `    <priority>${page.priority}</priority>\n`;
+        xml += '  </url>\n';
+      });
+
+      xml += '</urlset>';
+
+      res.header('Content-Type', 'application/xml');
+      res.send(xml);
+    } catch (error) {
+      res.status(500).send('Error generating sitemap');
+    }
+  });
+
+  app.get("/robots.txt", (req, res) => {
+    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+      : "https://www.xfontat.com";
+
+    const robotsTxt = `User-agent: *
+Allow: /
+
+Sitemap: ${baseUrl}/sitemap.xml`;
+
+    res.header('Content-Type', 'text/plain');
+    res.send(robotsTxt);
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
