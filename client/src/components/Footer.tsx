@@ -23,6 +23,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/design-fonts" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-design-fonts">
+                  خطوط التصميم
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-about">
                   من نحن
                 </Link>

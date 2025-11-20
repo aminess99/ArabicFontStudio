@@ -2,16 +2,23 @@
 
 ## Overview
 
-An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 65 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh) with real-time font rendering and customizable preview capabilities.
+An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 143 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh, Design) with real-time font rendering and customizable preview capabilities.
 
 ## Recent Changes (November 2025)
 
-**Latest Update - Added Diwani Fonts (November 20, 2025):**
+**Latest Update - Added Design Fonts Category (November 20, 2025):**
+- Added new "تصميم" (Design Fonts) category with 78 professional fonts
+- Created dedicated page at /design-fonts for design fonts
+- Updated font count: 143 total fonts
+- Design fonts include GE fonts collection (GE-Aridi, GE-Dinar, GE-Heritage, etc.)
+- Added navigation link in header and footer
+- Sorting order: newest fonts first (appear on page 1), oldest fonts on last pages
+
+**Previous Update - Added Diwani Fonts (November 20, 2025):**
 - Added 6 new Diwani fonts to the library
-- Updated font count: 65 total fonts
+- Updated font count: 65 total fonts (before design fonts)
 - Diwani category now has 12 fonts (up from 6)
 - New fonts: az-topaz, diwani-outline-shaded, diwani-simple-outline, hawi-t-diwany, ukij-diwani-tom-arabic, ul-amjad
-- Sorting order: newest fonts first (appear on page 1), oldest fonts on last pages
 
 **Previous Update - Added Ruqaa Fonts Batch 2 (November 19, 2025):**
 - Added 7 new Ruqaa fonts to the library (with alfont_com_ prefix removed)
@@ -139,7 +146,8 @@ Preferred communication style: Simple, everyday language.
   - رقعة: 18 fonts
   - كوفي: 16 fonts
   - نسخ: 13 fonts
-  - Total: 65 fonts
+  - تصميم: 78 fonts
+  - Total: 143 fonts
 - Curated featured fonts list: 17 premium fonts selected for quality and uniqueness
 
 **Key Architectural Decisions:**

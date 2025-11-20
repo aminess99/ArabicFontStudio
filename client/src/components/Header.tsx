@@ -1,4 +1,5 @@
 import { Search, Type } from "lucide-react";
+import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "./ThemeToggle";
 import { Slider } from "@/components/ui/slider";
@@ -25,7 +26,7 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
       <div className="border-b">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" data-testid="link-home">
               <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 <span className="text-xl font-bold">X</span>
               </div>
@@ -33,7 +34,7 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
                 <h1 className="text-xl font-bold">xfontat</h1>
                 <p className="text-xs text-muted-foreground">إكس فونتات</p>
               </div>
-            </div>
+            </Link>
 
             <div className="relative flex-1 max-w-md">
               <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
