@@ -1,9 +1,23 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
+import { createWebPageSchema } from "@/lib/schemas";
 
 export default function About() {
+  const schema = createWebPageSchema({
+    name: "من نحن - xfontat",
+    description: "تعرف على xfontat، منصة الخطوط العربية الاحترافية المجانية. مهمتنا توفير خطوط عربية عالية الجودة لجميع المصممين والمطورين.",
+    url: "https://www.xfontat.com/about"
+  });
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead 
+        title="من نحن | xfontat"
+        description="تعرف على xfontat، منصة الخطوط العربية الاحترافية المجانية. نوفر مجموعة واسعة من الخطوط العربية بأنماط متعددة: ثلث، ديواني، كوفي، نسخ، رقعة، وتصميم."
+        path="/about"
+        schema={schema}
+      />
       <Header 
         searchQuery=""
         onSearchChange={() => {}}

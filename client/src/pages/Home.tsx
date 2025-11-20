@@ -5,7 +5,9 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
 import { Pagination } from "@/components/Pagination";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
+import { createCollectionPageSchema, createItemListSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -94,8 +96,27 @@ export default function Home() {
     );
   }
 
+  const schema = fonts.length > 0 ? {
+    "@context": "https://schema.org",
+    "@graph": [
+      createCollectionPageSchema({
+        name: "xfontat - مكتبة الخطوط العربية",
+        description: "مكتبة شاملة من الخطوط العربية الاحترافية - ثلث، ديواني، رقعة، كوفي، نسخ، تصميم",
+        url: "https://www.xfontat.com",
+        numberOfItems: fonts.length
+      }),
+      createItemListSchema(fonts)
+    ]
+  } : undefined;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead 
+        title="xfontat | تحميل خطوط عربية مجانية - ثلث، ديواني، كوفي، نسخ، رقعة"
+        description="اكتشف مكتبة شاملة من 143 خط عربي احترافي بأنماط متنوعة: الثلث، الديواني، الكوفي، النسخ، الرقعة، والتصميم. حمّل خطوط عربية مجانية بصيغ TTF وOTF لمشاريعك التصميمية."
+        path="/"
+        schema={schema}
+      />
       <Header 
         searchQuery={searchQuery} 
         onSearchChange={setSearchQuery}

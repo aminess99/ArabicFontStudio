@@ -1,11 +1,25 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
+import { createWebPageSchema } from "@/lib/schemas";
 import { Mail, MessageSquare, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Contact() {
+  const schema = createWebPageSchema({
+    name: "اتصل بنا - xfontat",
+    description: "تواصل مع فريق xfontat. نحن هنا للإجابة على أسئلتك ومساعدتك في كل ما يتعلق بالخطوط العربية.",
+    url: "https://www.xfontat.com/contact"
+  });
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead 
+        title="اتصل بنا | xfontat"
+        description="تواصل مع فريق xfontat للدعم الفني والاقتراحات والاستفسارات. نحن هنا لمساعدتك في الحصول على أفضل تجربة مع الخطوط العربية."
+        path="/contact"
+        schema={schema}
+      />
       <Header 
         searchQuery=""
         onSearchChange={() => {}}

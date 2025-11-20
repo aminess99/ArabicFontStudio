@@ -1,9 +1,23 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
+import { createWebPageSchema } from "@/lib/schemas";
 
 export default function Privacy() {
+  const schema = createWebPageSchema({
+    name: "سياسة الخصوصية - xfontat",
+    description: "اطلع على سياسة الخصوصية لموقع xfontat وكيفية حماية بياناتك الشخصية عند استخدام خدماتنا.",
+    url: "https://www.xfontat.com/privacy"
+  });
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead 
+        title="سياسة الخصوصية | xfontat"
+        description="تعرف على سياسة الخصوصية الخاصة بموقع xfontat. نحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية."
+        path="/privacy"
+        schema={schema}
+      />
       <Header 
         searchQuery=""
         onSearchChange={() => {}}
