@@ -159,47 +159,47 @@ export default function Blog() {
       />
       <div className="flex flex-col min-h-screen bg-background">
         <header className="sticky top-0 z-50 w-full border-b bg-background">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="text-sm text-muted-foreground">العودة للرئيسية</span>
+          <div className="w-full px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <Link href="/" className="flex items-center gap-1 hover:opacity-80 transition-opacity flex-shrink-0">
+                <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-xs md:text-sm text-muted-foreground hidden sm:inline">العودة</span>
               </Link>
-              <h1 className="text-2xl font-bold">مدونة xfontat</h1>
+              <h1 className="text-lg md:text-2xl font-bold flex-1 text-center">مدونة</h1>
               <ThemeToggle />
             </div>
           </div>
         </header>
 
-        <main className="flex-1 container mx-auto px-4 py-12">
-          <div className="max-w-3xl mx-auto">
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold mb-4">مقالات وشروحات عن الخطوط العربية</h2>
-              <p className="text-lg text-muted-foreground">اكتشف أفضل الممارسات والنصائح لاستخدام الخطوط العربية في مشاريعك</p>
+        <main className="flex-1 w-full px-4 py-6 md:py-12">
+          <div className="max-w-2xl mx-auto">
+            <div className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">مقالات ونصائح</h2>
+              <p className="text-base md:text-lg text-muted-foreground">شروحات عن الخطوط العربية</p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {blogPosts.map((post) => (
-                <Card key={post.id} className="p-6 hover-elevate cursor-pointer transition-all" data-testid={`card-blog-post-${post.id}`}>
+                <Card key={post.id} className="p-4 md:p-6 hover-elevate cursor-pointer transition-all" data-testid={`card-blog-post-${post.id}`}>
                   <div className="space-y-3">
-                    <h3 className="text-xl font-bold text-foreground hover:text-primary transition-colors">{post.title}</h3>
+                    <h3 className="text-lg md:text-xl font-bold text-foreground hover:text-primary transition-colors">{post.title}</h3>
                     
-                    <p className="text-muted-foreground">{post.excerpt}</p>
+                    <p className="text-sm md:text-base text-muted-foreground">{post.excerpt}</p>
                     
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground pt-3 border-t">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground pt-3 border-t">
                       <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        <span>{post.author}</span>
+                        <User className="w-3 h-3 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">{post.author}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
+                        <Clock className="w-3 h-3 md:w-4 md:h-4" />
                         <span>{post.readTime} دقائق</span>
                       </div>
-                      <span>{post.date}</span>
+                      <span className="ml-auto">{post.date}</span>
                     </div>
 
-                    <div className="pt-4 border-t">
-                      <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{post.content}</p>
+                    <div className="pt-3 md:pt-4 border-t">
+                      <p className="text-xs md:text-sm text-foreground whitespace-pre-wrap leading-relaxed line-clamp-3">{post.content}</p>
                     </div>
                   </div>
                 </Card>
