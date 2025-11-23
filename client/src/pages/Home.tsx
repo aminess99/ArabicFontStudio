@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
@@ -130,7 +131,13 @@ export default function Home() {
       <CategoryFilter
         categories={categories}
         selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
+        onCategoryChange={(cat) => {
+          if (cat === "الكل") {
+            setSelectedCategory(cat);
+          } else {
+            window.location.href = `/fonts/${cat}`;
+          }
+        }}
       />
 
       <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
