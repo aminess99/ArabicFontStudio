@@ -91,3 +91,52 @@ export function createWebPageSchema(params: {
     }
   };
 }
+
+export function createFAQSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "كيف أحمل الخطوط من xfontat؟",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "يمكنك تحميل أي خط بسهولة من خلال الضغط على زر 'تحميل' الأخضر بجانب كل خط. الخطوط متاحة بصيغ TTF و OTF و WOFF و WOFF2."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "هل جميع الخطوط مجانية للتحميل؟",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "نعم، جميع الخطوط في مكتبة xfontat متاحة للتحميل مجاناً بدون أي رسوم أو اشتراكات."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ما الفرق بين صيغ الخطوط المختلفة؟",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "TTF: الصيغة الأساسية للخطوط، تعمل على معظم البرامج. OTF: صيغة متقدمة بميزات إضافية. WOFF: مصممة للويب بأحجام أصغر. WOFF2: نسخة محسّنة من WOFF بضغط أفضل."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "كيف أستخدم الخطوط في المشاريع التجارية؟",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "جميع الخطوط في xfontat متاحة للاستخدام في المشاريع الشخصية والتجارية. تحقق من رخصة كل خط للحصول على تفاصيل الاستخدام الكاملة."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "هل تدعم xfontat جميع أنظمة التشغيل؟",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "نعم، الخطوط متاحة لجميع أنظمة التشغيل: Windows و macOS و Linux وحتى الأجهزة المحمولة."
+        }
+      }
+    ]
+  };
+}

@@ -5,9 +5,10 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
 import { Pagination } from "@/components/Pagination";
 import { Footer } from "@/components/Footer";
+import { FAQ } from "@/components/FAQ";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
-import { createCollectionPageSchema, createItemListSchema } from "@/lib/schemas";
+import { createCollectionPageSchema, createItemListSchema, createFAQSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -105,7 +106,8 @@ export default function Home() {
         url: "https://www.xfontat.com",
         numberOfItems: fonts.length
       }),
-      createItemListSchema(fonts)
+      createItemListSchema(fonts),
+      createFAQSchema()
     ]
   } : undefined;
 
@@ -171,6 +173,7 @@ export default function Home() {
         )}
       </main>
 
+      <FAQ />
       <Footer />
     </div>
   );
