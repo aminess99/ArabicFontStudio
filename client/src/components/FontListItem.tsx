@@ -47,25 +47,25 @@ export function FontListItem({
   }, [fontFamily, fileUrl]);
 
   return (
-    <div className="border-b py-6" data-testid={`font-item-${name}`}>
-      <div className="flex items-start justify-between gap-4">
+    <div className="border-b py-4 md:py-6" data-testid={`font-item-${name}`}>
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-3">
-            <h3 className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 mb-2 md:mb-3">
+            <h3 className="text-xs md:text-sm text-muted-foreground truncate">
               {nameArabic}
             </h3>
             {designer && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground shrink-0">
                 +{designer.split(' ').length}
               </span>
             )}
           </div>
           
           <div 
-            className="text-4xl leading-relaxed break-words"
+            className="leading-relaxed break-words"
             style={{ 
               fontFamily: fontLoaded ? fontFamily : 'inherit',
-              fontSize: `${fontSize}px`,
+              fontSize: `${Math.min(fontSize, 48)}px`,
               lineHeight: 1.5
             }}
             data-testid={`text-preview-${name}`}
@@ -74,11 +74,11 @@ export function FontListItem({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 shrink-0 w-full md:w-auto">
           <Button
             variant="ghost"
             size="icon"
-            className={isFavorite ? "text-red-500" : ""}
+            className={`${isFavorite ? "text-red-500" : ""} h-9 w-9 md:h-10 md:w-10`}
             onClick={onToggleFavorite}
             data-testid={`button-favorite-${name}`}
           >
@@ -86,7 +86,7 @@ export function FontListItem({
           </Button>
           
           <Button
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white flex-1 md:flex-none text-sm md:text-base h-9 md:h-10"
             onClick={onDownload}
             data-testid={`button-download-${name}`}
           >

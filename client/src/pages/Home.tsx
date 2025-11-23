@@ -131,17 +131,17 @@ export default function Home() {
         onCategoryChange={setSelectedCategory}
       />
 
-      <main className="flex-1 container mx-auto px-4 py-6">
+      <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
         {filteredFonts.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground">
+          <div className="text-center py-12 md:py-16">
+            <p className="text-base md:text-lg text-muted-foreground">
               لم يتم العثور على خطوط تطابق البحث
             </p>
           </div>
         ) : (
           <>
-            <div className="mb-4 pb-3 border-b">
-              <p className="text-sm text-muted-foreground">
+            <div className="mb-3 md:mb-4 pb-3 border-b">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 الخطوط {startIndex + 1} - {Math.min(endIndex, filteredFonts.length)} من {filteredFonts.length}
               </p>
             </div>
