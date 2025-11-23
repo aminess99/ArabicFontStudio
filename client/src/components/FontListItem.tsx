@@ -65,7 +65,7 @@ export function FontListItem({
             className="leading-relaxed break-words"
             style={{ 
               fontFamily: fontLoaded ? fontFamily : 'inherit',
-              fontSize: `${Math.min(fontSize, 48)}px`,
+              fontSize: window.innerWidth < 768 ? `${Math.min(fontSize, 36)}px` : `${fontSize}px`,
               lineHeight: 1.5
             }}
             data-testid={`text-preview-${name}`}
