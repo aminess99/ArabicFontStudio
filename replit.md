@@ -6,7 +6,18 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 ## Recent Changes (November 2025)
 
-**Latest Update - SEO Optimization (November 20, 2025):**
+**Latest Update - Advanced SEO Optimization (November 23, 2025):**
+- Fixed sitemap.xml to use www.xfontat.com instead of dev domain
+- Added category pages (/fonts/:category) for each font type with dedicated SEO:
+  - Unique title and description for each category
+  - Breadcrumb navigation for better UX and SEO
+  - Individual Schema markup for each category page
+- Added FAQ Schema markup (5 common questions about fonts)
+- Added FAQ component visible on all pages below font listings
+- Updated robots.txt to exclude /api/ endpoints
+- Dynamic category pages generate priority traffic from Google
+
+**Previous Update - SEO Optimization (November 20, 2025):**
 - Added dynamic sitemap.xml endpoint (automatically includes all pages)
 - Added robots.txt endpoint for search engine crawlers
 - Implemented Schema Markup (JSON-LD) for all pages:

@@ -49,9 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/sitemap.xml", async (req, res) => {
     try {
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : "https://www.xfontat.com";
+      const baseUrl = "https://www.xfontat.com";
 
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "daily" },
@@ -63,12 +61,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ];
 
       const fonts = await storage.getAllFonts();
+      const categories = Array.from(new Set(fonts.map(font => font.category)));
+      const categoryPages = categories.map(cat => ({
+        url: `/fonts/${cat}`,
+        priority: "0.8",
+        changefreq: "weekly"
+      }));
+
       const now = new Date().toISOString();
 
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-      staticPages.forEach(page => {
+      [...staticPages, ...categoryPages].forEach(page => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
         xml += `    <lastmod>${now}</lastmod>\n`;
@@ -87,12 +92,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/robots.txt", (req, res) => {
-    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-      : "https://www.xfontat.com";
+    const baseUrl = "https://www.xfontat.com";
 
     const robotsTxt = `User-agent: *
 Allow: /
+Disallow: /api/
 
 Sitemap: ${baseUrl}/sitemap.xml`;
 
