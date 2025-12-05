@@ -26,14 +26,12 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
       <div className="border-b">
         <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
           <div className="flex items-center justify-between gap-2 md:gap-4">
-            <Link href="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity shrink-0" data-testid="link-home">
-              <div className="flex h-9 md:h-10 w-9 md:w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <span className="text-lg md:text-xl font-bold">X</span>
-              </div>
-              <div className="hidden sm:block">
-                <h1 className="text-lg md:text-xl font-bold">xfontat</h1>
-                <p className="text-xs text-muted-foreground">إكس فونتات</p>
-              </div>
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity shrink-0" data-testid="link-home">
+              <img 
+                src="/logo.png" 
+                alt="xfontat - إكس فونتات" 
+                className="h-8 md:h-10 w-auto"
+              />
             </Link>
 
             <div className="relative flex-1 max-w-xs md:max-w-md">
