@@ -11,6 +11,7 @@ const categoryMap: Record<string, string> = {
   "كوفي": "كوفي",
   "نسخ": "نسخ",
   "تصميم": "تصميم",
+  "فوتوشوب": "فوتوشوب",
 };
 
 const featuredFonts = new Set([
