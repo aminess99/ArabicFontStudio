@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Download, Heart } from "lucide-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 
@@ -15,6 +15,7 @@ interface SimilarFontItemProps {
 export function SimilarFontItem({ id, name, nameArabic, fileUrl, previewText }: SimilarFontItemProps) {
   const [fontLoaded, setFontLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [, setLocation] = useLocation();
   const fontFamily = generateFontFamily(name);
 
   useEffect(() => {
@@ -23,6 +24,10 @@ export function SimilarFontItem({ id, name, nameArabic, fileUrl, previewText }: 
       .then(() => setFontLoaded(true))
       .catch(() => setFontLoaded(true));
   }, [fontFamily, fileUrl]);
+
+  const handleNavigate = () => {
+    setLocation(`/font/${id}`);
+  };
 
   return (
     <div className="border rounded-lg p-4 mb-4">
@@ -41,13 +46,13 @@ export function SimilarFontItem({ id, name, nameArabic, fileUrl, previewText }: 
       </div>
 
       <div className="flex items-center gap-2">
-        <Link 
-          href={`/font/${id}`}
-          className="bg-green-600 hover:bg-green-700 text-white text-sm h-9 px-4 rounded-md flex items-center justify-center"
+        <Button
+          className="bg-green-600 hover:bg-green-700 text-white text-sm h-9 px-4"
+          onClick={handleNavigate}
         >
           <Download className="ml-2 h-4 w-4" />
           تحميل
-        </Link>
+        </Button>
         <Button
           variant="ghost"
           size="icon"
