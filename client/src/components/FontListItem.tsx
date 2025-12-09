@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Download, Heart } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 
@@ -18,6 +19,7 @@ interface FontListItemProps {
 }
 
 export function FontListItem({
+  id,
   name,
   nameArabic,
   designer,
@@ -85,14 +87,14 @@ export function FontListItem({
             <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
           </Button>
           
-          <Button
-            className="bg-green-600 hover:bg-green-700 text-white flex-1 md:flex-none text-sm md:text-base h-9 md:h-10"
-            onClick={onDownload}
+          <Link 
+            href={`/font/${id}`}
+            className="bg-green-600 hover:bg-green-700 text-white flex-1 md:flex-none text-sm md:text-base h-9 md:h-10 px-4 rounded-md flex items-center justify-center"
             data-testid={`button-download-${name}`}
           >
             <Download className="ml-2 h-4 w-4" />
             تحميل
-          </Button>
+          </Link>
         </div>
       </div>
     </div>
