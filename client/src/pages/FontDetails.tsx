@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
-import { Download, Heart, ArrowRight } from "lucide-react";
+import { Download, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SimilarFontItem } from "@/components/SimilarFontItem";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
@@ -238,16 +239,16 @@ export default function FontDetails() {
                 {similarFonts.length > 0 && (
                   <>
                     <h3 className="text-lg font-bold mb-4">خطوط مشابهة</h3>
-                    <div className="space-y-3">
+                    <div>
                       {similarFonts.map((similarFont) => (
-                        <Link 
-                          key={similarFont.id} 
-                          href={`/font/${similarFont.id}`}
-                          className="block p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <p className="font-medium text-sm">{similarFont.nameArabic}</p>
-                          <p className="text-xs text-muted-foreground">{similarFont.name}</p>
-                        </Link>
+                        <SimilarFontItem
+                          key={similarFont.id}
+                          id={similarFont.id}
+                          name={similarFont.name}
+                          nameArabic={similarFont.nameArabic}
+                          fileUrl={similarFont.fileUrl}
+                          previewText={previewText}
+                        />
                       ))}
                     </div>
                   </>
