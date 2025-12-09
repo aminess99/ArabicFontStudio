@@ -8,7 +8,6 @@ import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { SimilarFontItem } from "@/components/SimilarFontItem";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
@@ -89,10 +88,6 @@ export default function FontDetails() {
       </div>
     );
   }
-
-  const similarFonts = fonts
-    .filter(f => f.category === font.category && f.id !== font.id)
-    .slice(0, 4);
 
   const breadcrumbItems = [
     { label: 'الرئيسية', href: '/' },
@@ -236,23 +231,6 @@ export default function FontDetails() {
                   </Link>
                 </div>
 
-                {similarFonts.length > 0 && (
-                  <>
-                    <h3 className="text-lg font-bold mb-4">خطوط مشابهة</h3>
-                    <div>
-                      {similarFonts.map((similarFont) => (
-                        <SimilarFontItem
-                          key={similarFont.id}
-                          id={similarFont.id}
-                          name={similarFont.name}
-                          nameArabic={similarFont.nameArabic}
-                          fileUrl={similarFont.fileUrl}
-                          previewText={previewText}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
               </div>
             </div>
           </div>
