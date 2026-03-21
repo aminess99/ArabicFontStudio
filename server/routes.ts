@@ -65,6 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "daily" },
         { url: "/design-fonts", priority: "0.9", changefreq: "weekly" },
+        { url: "/blog", priority: "0.7", changefreq: "weekly" },
         { url: "/about", priority: "0.5", changefreq: "monthly" },
         { url: "/contact", priority: "0.5", changefreq: "monthly" },
         { url: "/privacy", priority: "0.3", changefreq: "yearly" },
