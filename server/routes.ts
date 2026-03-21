@@ -3,6 +3,17 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFontSchema } from "@shared/schema";
 
+function generateSlug(fontName: string): string {
+  return fontName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    + "-font";
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/fonts", async (req, res) => {
     try {
@@ -63,9 +74,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fonts = await storage.getAllFonts();
       const categories = Array.from(new Set(fonts.map(font => font.category)));
       const categoryPages = categories.map(cat => ({
-        url: `/fonts/${cat}`,
+        url: `/fonts/${encodeURIComponent(cat)}`,
         priority: "0.8",
         changefreq: "weekly"
+      }));
+
+      const fontPages = fonts.map(font => ({
+        url: `/font/${generateSlug(font.name)}`,
+        priority: "0.7",
+        changefreq: "monthly",
+        lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : new Date().toISOString(),
       }));
 
       const now = new Date().toISOString();
@@ -73,10 +91,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-      [...staticPages, ...categoryPages].forEach(page => {
+      [...staticPages, ...categoryPages, ...fontPages].forEach((page: any) => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
-        xml += `    <lastmod>${now}</lastmod>\n`;
+        xml += `    <lastmod>${page.lastmod ?? now}</lastmod>\n`;
         xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
         xml += `    <priority>${page.priority}</priority>\n`;
         xml += '  </url>\n';

@@ -4,9 +4,20 @@
 
 An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 143 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh, Design) with real-time font rendering and customizable preview capabilities.
 
-## Recent Changes (November 2025)
+## Recent Changes
 
-**Latest Update - Advanced SEO Optimization (November 23, 2025):**
+**Latest Update - SEO-Friendly URL Slugs (March 2026):**
+- Font detail pages now use SEO-friendly slug URLs: `/font/al-qassam-normal-1-font` instead of `/font/:id`
+- Created `client/src/lib/slugify.ts` with `generateSlug()` utility function
+- Font slugs are generated from the English font name: lowercase, spaces→hyphens, non-alphanumeric removed, `-font` suffix appended
+- Updated `FontListItem.tsx` to generate slug from font name for links
+- Updated `FontDetails.tsx` to use `/font/:slug` route and match fonts by slug
+- Updated `App.tsx` route from `/font/:id` to `/font/:slug`
+- Sitemap now includes all 350 individual font pages with their slug URLs
+
+## Previous Changes (November 2025)
+
+**Advanced SEO Optimization (November 23, 2025):**
 - Fixed sitemap.xml to use www.xfontat.com instead of dev domain
 - Added category pages (/fonts/:category) for each font type with dedicated SEO:
   - Unique title and description for each category

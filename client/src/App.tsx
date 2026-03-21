@@ -25,7 +25,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/design-fonts" component={DesignFonts} />
-      <Route path="/font/:id" component={FontDetails} />
+      <Route path="/font/:slug" component={FontDetails} />
       <Route path="/fonts/:category" component={CategoryFonts} />
       <Route path="/blog" component={Blog} />
       <Route path="/about" component={About} />

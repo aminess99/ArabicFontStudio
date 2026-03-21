@@ -9,6 +9,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
+import { generateSlug } from "@/lib/slugify";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
 
@@ -23,8 +24,8 @@ const characterMap = [
 ];
 
 export default function FontDetails() {
-  const [match, params] = useRoute("/font/:id");
-  const fontId = params?.id;
+  const [match, params] = useRoute("/font/:slug");
+  const slug = params?.slug;
   
   const [previewText, setPreviewText] = useState("أحب نفسك أولا");
   const [fontLoaded, setFontLoaded] = useState(false);
@@ -35,7 +36,7 @@ export default function FontDetails() {
     queryKey: ["/api/fonts"],
   });
 
-  const font = fonts.find(f => f.id.toString() === fontId);
+  const font = fonts.find(f => generateSlug(f.name) === slug);
   const fontFamily = font ? generateFontFamily(font.name) : '';
 
   useEffect(() => {
@@ -89,10 +90,12 @@ export default function FontDetails() {
     );
   }
 
+  const fontSlug = generateSlug(font.name);
+
   const breadcrumbItems = [
     { label: 'الرئيسية', href: '/' },
     { label: font.category, href: `/fonts/${font.category}` },
-    { label: font.nameArabic, href: `/font/${font.id}` }
+    { label: font.nameArabic, href: `/font/${fontSlug}` }
   ];
 
   const seoTitle = `تحميل خط ${font.nameArabic} - ${font.name} | xfontat`;
@@ -103,7 +106,7 @@ export default function FontDetails() {
       <SEOHead
         title={seoTitle}
         description={seoDescription}
-        path={`/font/${font.id}`}
+        path={`/font/${fontSlug}`}
       />
 
       <header className="sticky top-0 z-50 w-full border-b bg-background">

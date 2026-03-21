@@ -3,6 +3,7 @@ import { Download, Heart } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
+import { generateSlug } from "@/lib/slugify";
 
 interface FontListItemProps {
   id: string;
@@ -88,7 +89,7 @@ export function FontListItem({
           </Button>
           
           <Link 
-            href={`/font/${id}`}
+            href={`/font/${generateSlug(name)}`}
             className="bg-green-600 hover:bg-green-700 text-white flex-1 md:flex-none text-sm md:text-base h-9 md:h-10 px-4 rounded-md flex items-center justify-center"
             data-testid={`button-download-${name}`}
           >
