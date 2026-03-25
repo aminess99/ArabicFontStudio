@@ -93,6 +93,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { slug: "best-practices-arabic-fonts-digital-design", date: "2025-11-19" },
         { slug: "how-to-download-use-arabic-fonts", date: "2025-11-18" },
         { slug: "ethical-use-arabic-fonts", date: "2025-11-17" },
+        { slug: "afdal-10-khotot-arabiya-lil-tasmeem", date: "2025-11-16" },
+        { slug: "khotot-arabiya-lil-photoshop-majanan", date: "2025-11-15" },
+        { slug: "khotot-arabiya-lil-shiaarat-wal-logos", date: "2025-11-14" },
+        { slug: "khotot-arabiya-muzakhrafa-lil-tasmeem", date: "2025-11-13" },
+        { slug: "khotot-arabiya-lil-social-media", date: "2025-11-12" },
       ];
       const blogPages = blogPosts.map(post => ({
         url: `/blog/${post.slug}`,

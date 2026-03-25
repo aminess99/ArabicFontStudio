@@ -6,7 +6,20 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 ## Recent Changes
 
-**Latest Update - Comprehensive SEO Optimization (March 2026):**
+**Latest Update - Internal Linking & Blog Expansion (March 2026):**
+- Added "خطوط مشابهة" (Similar Fonts) section on every font detail page showing 6 random fonts from the same category
+- Added "تصفح الفئات" (Browse Categories) sidebar section linking to all category pages
+- Added 5 new blog articles targeting long-tail Arabic SEO keywords:
+  - أفضل 10 خطوط عربية للتصميم في 2025
+  - أفضل خطوط عربية للفوتوشوب - تحميل مجاني
+  - أفضل خطوط عربية للشعارات واللوجو
+  - خطوط عربية مزخرفة للتصميم
+  - أفضل خطوط عربية للسوشال ميديا والتيك توك
+- Blog now has 10 articles total (up from 5)
+- Sitemap updated to 374 URLs (350 fonts + 7 categories + 7 static + 10 blog posts)
+- Internal linking improves site structure and SEO crawlability
+
+**Previous Update - Comprehensive SEO Optimization (March 2026):**
 - Font detail pages now use SEO-friendly slug URLs: `/font/al-qassam-normal-1-font` instead of `/font/:id`
 - Created `client/src/lib/slugify.ts` with `generateSlug()` utility function
 - Individual blog post pages at `/blog/:slug` (5 articles with unique URLs)

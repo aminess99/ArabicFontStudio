@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Download, Heart } from "lucide-react";
@@ -39,6 +39,18 @@ export default function FontDetails() {
 
   const font = fonts.find(f => generateSlug(f.name) === slug);
   const fontFamily = font ? generateFontFamily(font.name) : '';
+
+  const relatedFonts = useMemo(() => {
+    if (!font) return [];
+    return fonts
+      .filter(f => f.category === font.category && f.id !== font.id)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 6);
+  }, [font?.id, font?.category, fonts.length]);
+
+  const allCategories = useMemo(() => {
+    return Array.from(new Set(fonts.map(f => f.category)));
+  }, [fonts.length]);
 
   useEffect(() => {
     if (font) {
@@ -250,19 +262,58 @@ export default function FontDetails() {
                   ))}
                 </div>
               </div>
+
+              {relatedFonts.length > 0 && (
+                <div className="border rounded-lg p-6 mb-8">
+                  <h2 className="text-xl font-bold mb-4">خطوط مشابهة من فئة {font.category}</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {relatedFonts.map((relFont) => (
+                      <Link
+                        key={relFont.id}
+                        href={`/font/${generateSlug(relFont.name)}`}
+                        className="border rounded-lg p-4 hover-elevate transition-all block"
+                        data-testid={`link-related-font-${relFont.id}`}
+                      >
+                        <h3 className="text-sm font-medium mb-1 truncate">{relFont.nameArabic}</h3>
+                        <p className="text-xs text-muted-foreground truncate">{relFont.name}</p>
+                        <span className="text-xs text-muted-foreground mt-2 inline-block">{relFont.fileFormat}</span>
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-4 text-center">
+                    <Link
+                      href={`/fonts/${font.category}`}
+                      className="text-sm text-foreground hover:underline"
+                      data-testid="link-view-all-category"
+                    >
+                      عرض جميع خطوط {font.category} →
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="lg:col-span-1">
               <div className="border rounded-lg p-6 sticky top-24">
                 <h3 className="text-lg font-bold mb-4">التصنيفات</h3>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  <Link href={`/fonts/${font.category}`}>
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm cursor-pointer hover:bg-primary/20">
+                  <Link href={`/fonts/${font.category}`} data-testid="link-font-category">
+                    <span className="px-3 py-1 bg-muted text-foreground rounded-md text-sm cursor-pointer hover:bg-muted/80">
                       {font.category}
                     </span>
                   </Link>
                 </div>
 
+                <h3 className="text-lg font-bold mb-4">تصفح الفئات</h3>
+                <div className="flex flex-wrap gap-2">
+                  {allCategories.filter(c => c !== font.category).map(cat => (
+                    <Link key={cat} href={`/fonts/${cat}`} data-testid={`link-category-${cat}`}>
+                      <span className="px-3 py-1 bg-muted/50 text-muted-foreground rounded-md text-sm cursor-pointer hover:bg-muted">
+                        {cat}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
