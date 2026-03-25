@@ -81,21 +81,22 @@ export function FontListItem({
           <Button
             variant="ghost"
             size="icon"
-            className={`${isFavorite ? "text-red-500" : ""} h-9 w-9 md:h-10 md:w-10`}
+            className={isFavorite ? "text-red-500" : ""}
             onClick={onToggleFavorite}
             data-testid={`button-favorite-${name}`}
           >
             <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
           </Button>
           
-          <Link 
-            href={`/font/${generateSlug(name)}`}
-            className="bg-green-600 hover:bg-green-700 text-white flex-1 md:flex-none text-sm md:text-base h-9 md:h-10 px-4 rounded-md flex items-center justify-center"
-            data-testid={`button-download-${name}`}
-          >
-            <Download className="ml-2 h-4 w-4" />
-            تحميل
-          </Link>
+          <Button asChild className="flex-1 md:flex-none">
+            <Link 
+              href={`/font/${generateSlug(name)}`}
+              data-testid={`button-download-${name}`}
+            >
+              <Download className="ml-2 h-4 w-4" />
+              تحميل
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

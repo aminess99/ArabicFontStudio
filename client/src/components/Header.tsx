@@ -3,13 +3,6 @@ import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "./ThemeToggle";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface HeaderProps {
   searchQuery: string;
@@ -34,11 +27,23 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
               />
             </Link>
 
+            <nav className="hidden md:flex items-center gap-4 text-sm">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-home">
+                الرئيسية
+              </Link>
+              <Link href="/design-fonts" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-design">
+                خطوط التصميم
+              </Link>
+              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-blog">
+                المدونة
+              </Link>
+            </nav>
+
             <div className="relative flex-1 max-w-xs md:max-w-md">
               <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground shrink-0" />
               <Input
                 type="search"
-                placeholder="ابحث..."
+                placeholder="ابحث عن خط..."
                 className="pr-10 text-sm md:text-base"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
@@ -51,7 +56,7 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
         </div>
       </div>
 
-      <div className="bg-muted/30 border-b">
+      <div className="bg-muted/30">
         <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
           <div className="space-y-3 md:space-y-0 md:flex md:items-center md:gap-3">
             <div className="flex-1 min-w-0 md:min-w-[200px]">
@@ -79,18 +84,6 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
               </div>
               <span className="text-xs md:text-sm text-muted-foreground shrink-0 min-w-[2.5rem]">{fontSize}px</span>
             </div>
-
-            <Select defaultValue="10">
-              <SelectTrigger className="w-16 md:w-20 bg-background text-sm md:text-base">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">الكل</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
       </div>
