@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
-import { Download, Heart } from "lucide-react";
+import { Download, Heart, Monitor, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Footer } from "@/components/Footer";
@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
 import { createBreadcrumbSchema } from "@/lib/schemas";
+import { blogPosts } from "@/lib/blogData";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
 
@@ -24,11 +25,51 @@ const characterMap = [
   ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 ];
 
+const categoryDescriptions: Record<string, string> = {
+  "ثلث": "خط الثلث من أجمل الخطوط العربية الكلاسيكية، يتميز بزخرفته الأنيقة ويُستخدم في العناوين والنصوص الدينية والتصاميم الفاخرة.",
+  "ديواني": "خط الديواني خط عربي تقليدي يتميز بانحناءاته الأنيقة وزخارفه الجميلة، مثالي للدعوات والمناسبات الرسمية والتصاميم الفنية.",
+  "رقعة": "خط الرقعة من أكثر الخطوط العربية استخداماً في الكتابة اليومية، يتميز بالبساطة والوضوح ويناسب التصاميم العصرية.",
+  "كوفي": "خط الكوفي خط عربي هندسي عصري، يتميز بزواياه الحادة وتصميمه النظيف، مثالي للشعارات والهوية البصرية والتصاميم الحديثة.",
+  "نسخ": "خط النسخ من أوضح الخطوط العربية وأسهلها قراءة، يُستخدم في الكتب والمطبوعات والمحتوى الرقمي والنصوص الطويلة.",
+  "تصميم": "خط تصميمي حديث واحترافي، يناسب الإعلانات والبوسترات والتصاميم الإبداعية ومشاريع الهوية البصرية.",
+  "فوتوشوب": "خط احترافي متوافق مع جميع برامج التصميم مثل فوتوشوب وإلستريتور، مناسب للتصاميم الاحترافية والمشاريع الإبداعية.",
+};
+
+const categoryUseCases: Record<string, string[]> = {
+  "ثلث": ["العناوين الفخمة", "التصاميم الإسلامية", "الشعارات التراثية", "أغلفة الكتب"],
+  "ديواني": ["دعوات الزفاف", "المناسبات الرسمية", "الشهادات", "التصاميم الفنية"],
+  "رقعة": ["التصاميم العصرية", "المحتوى الرقمي", "السوشال ميديا", "العناوين"],
+  "كوفي": ["الشعارات", "الهوية البصرية", "التطبيقات", "المواقع الإلكترونية"],
+  "نسخ": ["الكتب والمطبوعات", "المقالات", "المحتوى التعليمي", "التقارير"],
+  "تصميم": ["الإعلانات", "البوسترات", "السوشال ميديا", "الهوية البصرية"],
+  "فوتوشوب": ["تصاميم الفوتوشوب", "الإعلانات الرقمية", "البنرات", "منشورات السوشال ميديا"],
+};
+
+function getRelatedBlogPosts(category: string) {
+  const categoryKeywords: Record<string, string[]> = {
+    "ثلث": ["ثلث", "خطوط عربية", "تصميم", "شعارات"],
+    "ديواني": ["ديواني", "مزخرفة", "خطوط عربية"],
+    "رقعة": ["رقعة", "خطوط عربية", "سوشال"],
+    "كوفي": ["كوفي", "شعارات", "لوجو", "تصميم"],
+    "نسخ": ["نسخ", "خطوط عربية", "فوتوشوب"],
+    "تصميم": ["تصميم", "شعارات", "فوتوشوب", "سوشال"],
+    "فوتوشوب": ["فوتوشوب", "تصميم", "سوشال"],
+  };
+  const keywords = categoryKeywords[category] || ["خطوط عربية"];
+  return blogPosts
+    .filter(post =>
+      keywords.some(kw =>
+        post.title.includes(kw) || post.keywords.some(pk => pk.includes(kw))
+      )
+    )
+    .slice(0, 3);
+}
+
 export default function FontDetails() {
   const [match, params] = useRoute("/font/:slug");
   const slug = params?.slug;
   
-  const [previewText, setPreviewText] = useState("أحب نفسك أولا");
+  const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [fontLoaded, setFontLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
@@ -56,35 +97,36 @@ export default function FontDetails() {
     if (font) {
       setFontLoaded(false);
       loadFont(fontFamily, font.fileUrl)
-        .then(() => setFontLoaded(true))
-        .catch(() => setFontLoaded(true));
+        .then(() => {
+          setTimeout(() => setFontLoaded(true), 300);
+        })
+        .catch(() => {
+          setTimeout(() => setFontLoaded(true), 500);
+        });
     }
-  }, [font, fontFamily]);
+  }, [font?.id, fontFamily, font?.fileUrl]);
 
   const handleDownload = () => {
     if (!font) return;
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = font.fileUrl;
     link.download = font.fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
     toast({
-      title: "تم التحميل",
-      description: `تم تحميل خط ${font.nameArabic} بنجاح`,
+      title: "جاري التحميل",
+      description: `يتم الآن تحميل خط ${font.nameArabic}`,
     });
   };
-
-  if (!match) {
-    return <div>صفحة غير موجودة</div>;
-  }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري التحميل...</p>
+          <p className="text-muted-foreground">جاري تحميل الخط...</p>
         </div>
       </div>
     );
@@ -92,11 +134,11 @@ export default function FontDetails() {
 
   if (!font) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">الخط غير موجود</h1>
-          <Link href="/">
-            <Button>العودة للرئيسية</Button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-bold">الخط غير موجود</h1>
+        <div className="flex gap-3">
+          <Link href="/" data-testid="link-home-404">
+            <Button variant="outline">العودة للرئيسية</Button>
           </Link>
         </div>
       </div>
@@ -104,6 +146,9 @@ export default function FontDetails() {
   }
 
   const fontSlug = generateSlug(font.name);
+  const categoryDesc = categoryDescriptions[font.category] || "خط عربي احترافي مناسب للتصميم والطباعة.";
+  const useCases = categoryUseCases[font.category] || ["التصميم", "الطباعة"];
+  const relatedArticles = getRelatedBlogPosts(font.category);
 
   const breadcrumbItems = [
     { label: 'الرئيسية', href: '/' },
@@ -111,8 +156,8 @@ export default function FontDetails() {
     { label: font.nameArabic, href: `/font/${fontSlug}` }
   ];
 
-  const seoTitle = `تحميل خط ${font.nameArabic} - ${font.name} | xfontat`;
-  const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً من فئة ${font.category}. خط عربي احترافي بصيغة ${font.fileFormat} للتصميم والطباعة.`;
+  const seoTitle = `تحميل خط ${font.nameArabic} مجاناً - ${font.name} | xfontat`;
+  const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat}. خط عربي من فئة ${font.category} مناسب لـ${useCases.slice(0, 3).join(" و")}. معاينة مباشرة وتحميل فوري من مكتبة xfontat.`;
 
   const fontPageSchema = {
     "@context": "https://schema.org",
@@ -137,6 +182,35 @@ export default function FontDetails() {
         },
         "downloadUrl": `https://www.xfontat.com${font.fileUrl}`,
         "url": `https://www.xfontat.com/font/${fontSlug}`
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": `كيف أحمل خط ${font.nameArabic}؟`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `اضغط على زر "تحميل الخط" في صفحة الخط على موقع xfontat. سيتم تحميل ملف بصيغة ${font.fileFormat} مباشرة على جهازك.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `هل خط ${font.nameArabic} مجاني؟`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `نعم، خط ${font.nameArabic} متاح للتحميل المجاني من مكتبة xfontat لاستخدامه في مشاريعك التصميمية والطباعية.`
+            }
+          },
+          {
+            "@type": "Question",
+            "name": `ما هي استخدامات خط ${font.nameArabic}؟`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `خط ${font.nameArabic} من فئة ${font.category} ومناسب لـ${useCases.join("، ")}. ${categoryDesc}`
+            }
+          }
+        ]
       }
     ]
   };
@@ -173,12 +247,15 @@ export default function FontDetails() {
           <div className="grid lg:grid-cols-3 gap-8 mt-6">
             <div className="lg:col-span-2">
               <h1 className="text-2xl md:text-3xl font-bold mb-2" data-testid="text-font-name">
-                {font.nameArabic}
+                تحميل خط {font.nameArabic} مجاناً
               </h1>
-              <p className="text-muted-foreground mb-6">{font.name}</p>
+              <p className="text-muted-foreground mb-4">{font.name} - خط {font.category} عربي احترافي</p>
+              <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                {categoryDesc} يتوفر خط {font.nameArabic} بصيغة {font.fileFormat} وهو مناسب لـ{useCases.join("، ")}.
+              </p>
 
               <div 
-                className="text-4xl md:text-6xl leading-relaxed mb-6 p-6 bg-muted/30 rounded-lg min-h-[120px] flex items-center"
+                className="text-4xl md:text-6xl leading-relaxed mb-4 p-6 bg-muted/30 rounded-lg min-h-[120px] flex items-center"
                 style={{ fontFamily: fontLoaded ? fontFamily : 'inherit' }}
                 data-testid="text-font-preview"
               >
@@ -197,19 +274,38 @@ export default function FontDetails() {
                 />
               </div>
 
+              <div className="border rounded-lg p-6 mb-8">
+                <h2 className="text-lg font-bold mb-4">معاينة بأحجام مختلفة</h2>
+                <div className="space-y-4">
+                  {[{ label: "عنوان رئيسي", size: 48 }, { label: "عنوان فرعي", size: 32 }, { label: "نص عادي", size: 20 }, { label: "نص صغير", size: 14 }].map(({ label, size }) => (
+                    <div key={size}>
+                      <span className="text-xs text-muted-foreground mb-1 block">{label} ({size}px)</span>
+                      <div
+                        className="leading-relaxed break-words"
+                        style={{ fontFamily: fontLoaded ? fontFamily : 'inherit', fontSize: `${size}px`, lineHeight: 1.6 }}
+                        data-testid={`text-size-preview-${size}`}
+                      >
+                        {fontLoaded ? previewText : "جاري التحميل..."}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex gap-3 mb-8">
                 <Button
-                  className="bg-green-600 hover:bg-green-700 text-white flex-1 md:flex-none text-base h-12"
+                  size="lg"
+                  className="flex-1 md:flex-none text-base"
                   onClick={handleDownload}
                   data-testid="button-download-font"
                 >
                   <Download className="ml-2 h-5 w-5" />
-                  تحميل الخط
+                  تحميل خط {font.nameArabic}
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
-                  className={`h-12 w-12 ${isFavorite ? "text-red-500 border-red-500" : ""}`}
+                  className={isFavorite ? "text-red-500 border-red-500" : ""}
                   onClick={() => setIsFavorite(!isFavorite)}
                   data-testid="button-favorite"
                 >
@@ -218,7 +314,7 @@ export default function FontDetails() {
               </div>
 
               <div className="border rounded-lg p-6 mb-8">
-                <h2 className="text-xl font-bold mb-4">معلومات الخط</h2>
+                <h2 className="text-xl font-bold mb-4">معلومات خط {font.nameArabic}</h2>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground">اسم الخط:</span>
@@ -230,7 +326,9 @@ export default function FontDetails() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">الفئة:</span>
-                    <span className="mr-2 font-medium">{font.category}</span>
+                    <Link href={`/fonts/${font.category}`} className="mr-2 font-medium hover:underline" data-testid="link-info-category">
+                      {font.category}
+                    </Link>
                   </div>
                   <div>
                     <span className="text-muted-foreground">الصيغة:</span>
@@ -246,6 +344,55 @@ export default function FontDetails() {
                       <span className="mr-2 font-medium">{font.designer}</span>
                     </div>
                   )}
+                  <div>
+                    <span className="text-muted-foreground">السعر:</span>
+                    <span className="mr-2 font-medium text-green-600 dark:text-green-400">مجاني</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">التوافق:</span>
+                    <span className="mr-2 font-medium">ويندوز، ماك، لينكس</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-6 mb-8">
+                <h2 className="text-xl font-bold mb-4">استخدامات خط {font.nameArabic}</h2>
+                <div className="flex flex-wrap gap-2">
+                  {useCases.map((useCase) => (
+                    <span key={useCase} className="px-3 py-1.5 bg-muted text-sm rounded-md">
+                      {useCase}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-6 mb-8">
+                <h2 className="text-xl font-bold mb-4">كيفية تثبيت خط {font.nameArabic}</h2>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Monitor className="h-4 w-4 text-muted-foreground" />
+                      <h3 className="font-medium">التثبيت على ويندوز</h3>
+                    </div>
+                    <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside mr-6">
+                      <li>حمّل الخط بالضغط على زر "تحميل الخط" أعلاه</li>
+                      <li>افتح ملف الخط ({font.fileFormat})</li>
+                      <li>اضغط على زر "Install" في النافذة التي تظهر</li>
+                      <li>الخط جاهز للاستخدام في جميع البرامج</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Apple className="h-4 w-4 text-muted-foreground" />
+                      <h3 className="font-medium">التثبيت على ماك</h3>
+                    </div>
+                    <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside mr-6">
+                      <li>حمّل الخط بالضغط على زر "تحميل الخط" أعلاه</li>
+                      <li>انقر مرتين على ملف الخط ({font.fileFormat})</li>
+                      <li>اضغط "Install Font" في تطبيق Font Book</li>
+                      <li>الخط جاهز للاستخدام في جميع البرامج</li>
+                    </ol>
+                  </div>
                 </div>
               </div>
 
@@ -257,7 +404,7 @@ export default function FontDetails() {
                       {row.map((char, charIndex) => (
                         <div
                           key={charIndex}
-                          className="w-8 h-8 md:w-10 md:h-10 border rounded flex items-center justify-center text-sm md:text-base"
+                          className="w-8 h-8 md:w-10 md:h-10 border rounded-md flex items-center justify-center text-sm md:text-base"
                           style={{ fontFamily: fontLoaded ? fontFamily : 'inherit' }}
                         >
                           {char}
@@ -291,17 +438,36 @@ export default function FontDetails() {
                       className="text-sm text-foreground hover:underline"
                       data-testid="link-view-all-category"
                     >
-                      عرض جميع خطوط {font.category} →
+                      عرض جميع خطوط {font.category}
                     </Link>
+                  </div>
+                </div>
+              )}
+
+              {relatedArticles.length > 0 && (
+                <div className="border rounded-lg p-6 mb-8">
+                  <h2 className="text-xl font-bold mb-4">مقالات ذات صلة</h2>
+                  <div className="space-y-3">
+                    {relatedArticles.map((article) => (
+                      <Link
+                        key={article.slug}
+                        href={`/blog/${article.slug}`}
+                        className="block border rounded-lg p-4 hover-elevate transition-all"
+                        data-testid={`link-related-article-${article.slug}`}
+                      >
+                        <h3 className="text-sm font-medium mb-1">{article.title}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{article.excerpt}</p>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
 
             <div className="lg:col-span-1">
-              <div className="border rounded-lg p-6 sticky top-24">
-                <h3 className="text-lg font-bold mb-4">التصنيفات</h3>
-                <div className="flex flex-wrap gap-2 mb-6">
+              <div className="border rounded-lg p-6 sticky top-24 space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold mb-3">فئة الخط</h3>
                   <Link href={`/fonts/${font.category}`} data-testid="link-font-category">
                     <span className="px-3 py-1 bg-muted text-foreground rounded-md text-sm cursor-pointer hover:bg-muted/80">
                       {font.category}
@@ -309,15 +475,32 @@ export default function FontDetails() {
                   </Link>
                 </div>
 
-                <h3 className="text-lg font-bold mb-4">تصفح الفئات</h3>
-                <div className="flex flex-wrap gap-2">
-                  {allCategories.filter(c => c !== font.category).map(cat => (
-                    <Link key={cat} href={`/fonts/${cat}`} data-testid={`link-category-${cat}`}>
-                      <span className="px-3 py-1 bg-muted/50 text-muted-foreground rounded-md text-sm cursor-pointer hover:bg-muted">
-                        {cat}
-                      </span>
-                    </Link>
-                  ))}
+                <div>
+                  <h3 className="text-lg font-bold mb-3">تصفح الفئات</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {allCategories.filter(c => c !== font.category).map(cat => (
+                      <Link key={cat} href={`/fonts/${cat}`} data-testid={`link-category-${cat}`}>
+                        <span className="px-3 py-1 bg-muted/50 text-muted-foreground rounded-md text-sm cursor-pointer hover:bg-muted">
+                          {cat}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleDownload}
+                    data-testid="button-sidebar-download"
+                  >
+                    <Download className="ml-2 h-5 w-5" />
+                    تحميل مجاني
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    صيغة {font.fileFormat} - متوافق مع جميع الأنظمة
+                  </p>
                 </div>
               </div>
             </div>
