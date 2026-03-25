@@ -9,7 +9,7 @@ import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
-import { createCollectionPageSchema, createItemListSchema, createFAQSchema } from "@/lib/schemas";
+import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -116,7 +116,7 @@ export default function Home() {
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
         title="xfontat | تحميل خطوط عربية مجانية - ثلث، ديواني، كوفي، نسخ، رقعة"
-        description="اكتشف مكتبة شاملة من 143 خط عربي احترافي بأنماط متنوعة: الثلث، الديواني، الكوفي، النسخ، الرقعة، والتصميم. حمّل خطوط عربية مجانية بصيغ TTF وOTF لمشاريعك التصميمية."
+        description={`اكتشف مكتبة شاملة من ${fonts.length} خط عربي احترافي بأنماط متنوعة: الثلث، الديواني، الكوفي، النسخ، الرقعة، والتصميم. حمّل خطوط عربية مجانية بصيغ TTF وOTF لمشاريعك التصميمية.`}
         path="/"
         schema={schema}
       />
@@ -139,6 +139,13 @@ export default function Home() {
           }
         }}
       />
+
+      <section className="container mx-auto px-3 md:px-4 pt-6 pb-2">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة الخطوط العربية المجانية</h1>
+        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+          مرحباً بك في xfontat، أكبر مكتبة خطوط عربية مجانية على الإنترنت. تصفّح أكثر من {fonts.length} خط عربي احترافي من فئات متنوعة تشمل خطوط الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، والفوتوشوب. جميع الخطوط متاحة للتحميل المجاني بصيغ TTF وOTF لاستخدامها في مشاريعك التصميمية والطباعية.
+        </p>
+      </section>
 
       <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
         {filteredFonts.length === 0 ? (

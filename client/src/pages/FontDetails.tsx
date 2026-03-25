@@ -10,6 +10,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
+import { createBreadcrumbSchema } from "@/lib/schemas";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
 
@@ -101,12 +102,40 @@ export default function FontDetails() {
   const seoTitle = `تحميل خط ${font.nameArabic} - ${font.name} | xfontat`;
   const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً من فئة ${font.category}. خط عربي احترافي بصيغة ${font.fileFormat} للتصميم والطباعة.`;
 
+  const fontPageSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      createBreadcrumbSchema([
+        { name: "الرئيسية", url: "https://www.xfontat.com/" },
+        { name: font.category, url: `https://www.xfontat.com/fonts/${font.category}` },
+        { name: font.nameArabic, url: `https://www.xfontat.com/font/${fontSlug}` }
+      ]),
+      {
+        "@type": "SoftwareApplication",
+        "name": `${font.nameArabic} - ${font.name}`,
+        "description": seoDescription,
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Windows, macOS, Linux",
+        "fileFormat": font.fileFormat,
+        "inLanguage": "ar",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "downloadUrl": `https://www.xfontat.com${font.fileUrl}`,
+        "url": `https://www.xfontat.com/font/${fontSlug}`
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title={seoTitle}
         description={seoDescription}
         path={`/font/${fontSlug}`}
+        schema={fontPageSchema}
       />
 
       <header className="sticky top-0 z-50 w-full border-b bg-background">

@@ -87,12 +87,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : new Date().toISOString(),
       }));
 
+      const blogPosts = [
+        { slug: "daleel-ikhtiyar-alkhat-alarabi", date: "2025-11-21" },
+        { slug: "alfarq-bayn-thuluth-kufi-ruqaa", date: "2025-11-20" },
+        { slug: "best-practices-arabic-fonts-digital-design", date: "2025-11-19" },
+        { slug: "how-to-download-use-arabic-fonts", date: "2025-11-18" },
+        { slug: "ethical-use-arabic-fonts", date: "2025-11-17" },
+      ];
+      const blogPages = blogPosts.map(post => ({
+        url: `/blog/${post.slug}`,
+        priority: "0.6",
+        changefreq: "monthly",
+        lastmod: new Date(post.date).toISOString(),
+      }));
+
       const now = new Date().toISOString();
 
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-      [...staticPages, ...categoryPages, ...fontPages].forEach((page: any) => {
+      [...staticPages, ...categoryPages, ...fontPages, ...blogPages].forEach((page: any) => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
         xml += `    <lastmod>${page.lastmod ?? now}</lastmod>\n`;

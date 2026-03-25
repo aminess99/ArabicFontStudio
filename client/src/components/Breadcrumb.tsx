@@ -19,7 +19,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
             <li key={index} className="flex items-center gap-1 md:gap-2">
               <Link 
                 href={item.href}
-                className="text-primary hover:text-primary/80 transition-colors truncate"
+                className="text-foreground hover:text-muted-foreground transition-colors truncate"
                 data-testid={`breadcrumb-link-${index}`}
               >
                 {item.label}

@@ -12,6 +12,7 @@ import DesignFonts from "@/pages/DesignFonts";
 import CategoryFonts from "@/pages/CategoryFonts";
 import FontDetails from "@/pages/FontDetails";
 import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Privacy from "@/pages/Privacy";
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/design-fonts" component={DesignFonts} />
       <Route path="/font/:slug" component={FontDetails} />
       <Route path="/fonts/:category" component={CategoryFonts} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/blog" component={Blog} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />

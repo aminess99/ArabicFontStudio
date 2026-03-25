@@ -10,7 +10,7 @@ import { FAQ } from "@/components/FAQ";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
-import { createCollectionPageSchema, createItemListSchema, createFAQSchema } from "@/lib/schemas";
+import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -139,6 +139,10 @@ export default function CategoryFonts() {
   const schema = filteredFonts.length > 0 ? {
     "@context": "https://schema.org",
     "@graph": [
+      createBreadcrumbSchema([
+        { name: "الرئيسية", url: "https://www.xfontat.com/" },
+        { name: categoryData.arabicName, url: `https://www.xfontat.com/fonts/${category}` }
+      ]),
       createCollectionPageSchema({
         name: categoryData.arabicName,
         description: categoryData.description,
