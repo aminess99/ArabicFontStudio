@@ -94,6 +94,10 @@ export default function FontDetails() {
   }, [fonts.length]);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [slug]);
+
+  useEffect(() => {
     if (font) {
       setFontLoaded(false);
       loadFont(fontFamily, font.fileUrl)
