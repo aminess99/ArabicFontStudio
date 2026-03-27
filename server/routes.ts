@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFontSchema } from "@shared/schema";
+import { GoogleGenAI } from "@google/genai";
 
 function generateSlug(fontName: string): string {
   return fontName
