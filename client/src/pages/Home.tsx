@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Header } from "@/components/Header";
@@ -15,6 +15,45 @@ import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
 
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(s) % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function interleavedByCategory<T extends { category: string }>(fonts: T[], seed: number): T[] {
+  const byCategory: Record<string, T[]> = {};
+  fonts.forEach(f => {
+    if (!byCategory[f.category]) byCategory[f.category] = [];
+    byCategory[f.category].push(f);
+  });
+  const cats = Object.keys(byCategory);
+  const shuffledCats = seededShuffle(cats, seed);
+  const shuffledBuckets: Record<string, T[]> = {};
+  shuffledCats.forEach(cat => {
+    shuffledBuckets[cat] = seededShuffle(byCategory[cat], seed + cat.charCodeAt(0));
+  });
+  const result: T[] = [];
+  let hasMore = true;
+  let i = 0;
+  while (hasMore) {
+    hasMore = false;
+    for (const cat of shuffledCats) {
+      if (shuffledBuckets[cat][i]) {
+        result.push(shuffledBuckets[cat][i]);
+        hasMore = true;
+      }
+    }
+    i++;
+  }
+  return result;
+}
+
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("الكل");
@@ -23,6 +62,7 @@ export default function Home() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const sessionSeed = useRef(Math.floor(Math.random() * 999999));
 
   const { data: fonts = [], isLoading } = useQuery<Font[]>({
     queryKey: ["/api/fonts"],
@@ -30,8 +70,8 @@ export default function Home() {
 
   const categories = Array.from(new Set(fonts.map(font => font.category)));
 
-  const filteredFonts = fonts
-    .filter((font) => {
+  const filteredFonts = useMemo(() => {
+    const filtered = fonts.filter((font) => {
       const matchesSearch =
         font.nameArabic.includes(searchQuery) ||
         font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,12 +82,17 @@ export default function Home() {
         selectedCategory === "الكل" || font.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
-    })
-    .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+    });
+
+    if (selectedCategory === "الكل" && !searchQuery) {
+      return interleavedByCategory(filtered, sessionSeed.current);
+    }
+    return filtered.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+  }, [fonts, searchQuery, selectedCategory]);
 
   const groupedFonts = useMemo(
     () => groupFontsByFamily(filteredFonts),
-    [filteredFonts.length, selectedCategory, searchQuery]
+    [filteredFonts]
   );
 
   const totalPages = Math.ceil(groupedFonts.length / FONTS_PER_PAGE);
