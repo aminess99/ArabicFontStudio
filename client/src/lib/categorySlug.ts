@@ -1,0 +1,22 @@
+export const categoryToSlug: Record<string, string> = {
+  "ثلث": "thuluth",
+  "ديواني": "diwani",
+  "رقعة": "ruqaa",
+  "كوفي": "kufi",
+  "نسخ": "naskh",
+  "تصميم": "tasmeem",
+  "فوتوشوب": "photoshop",
+  "نستعليق": "nastaliq",
+};
+
+export const slugToCategory: Record<string, string> = Object.fromEntries(
+  Object.entries(categoryToSlug).map(([ar, slug]) => [slug, ar])
+);
+
+export function getCategorySlug(arabicName: string): string {
+  return categoryToSlug[arabicName] || arabicName;
+}
+
+export function getCategoryFromSlug(slug: string): string | undefined {
+  return slugToCategory[slug];
+}

@@ -10,6 +10,7 @@ import { FAQ } from "@/components/FAQ";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { groupFontsByFamily } from "@/lib/fontFamily";
+import { getCategorySlug } from "@/lib/categorySlug";
 import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
@@ -178,7 +179,7 @@ export default function Home() {
           if (cat === "الكل") {
             setSelectedCategory(cat);
           } else {
-            window.location.href = `/fonts/${cat}`;
+            window.location.href = `/fonts/${getCategorySlug(cat)}`;
           }
         }}
       />

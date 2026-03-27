@@ -4,6 +4,17 @@ import { storage } from "./storage";
 import { insertFontSchema } from "@shared/schema";
 import { getGeneratedPosts } from "./blogGenerator";
 
+const categoryToSlug: Record<string, string> = {
+  "ثلث": "thuluth",
+  "ديواني": "diwani",
+  "رقعة": "ruqaa",
+  "كوفي": "kufi",
+  "نسخ": "naskh",
+  "تصميم": "tasmeem",
+  "فوتوشوب": "photoshop",
+  "نستعليق": "nastaliq",
+};
+
 function generateSlug(fontName: string): string {
   return fontName
     .toLowerCase()
@@ -76,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fonts = await storage.getAllFonts();
       const categories = Array.from(new Set(fonts.map(font => font.category)));
       const categoryPages = categories.map(cat => ({
-        url: `/fonts/${encodeURIComponent(cat)}`,
+        url: `/fonts/${categoryToSlug[cat] || cat}`,
         priority: "0.8",
         changefreq: "weekly"
       }));

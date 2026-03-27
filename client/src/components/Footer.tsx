@@ -4,13 +4,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const categories = [
-    { name: "خط الثلث", path: "/fonts/ثلث" },
-    { name: "خط الديواني", path: "/fonts/ديواني" },
-    { name: "خط الكوفي", path: "/fonts/كوفي" },
-    { name: "خط النسخ", path: "/fonts/نسخ" },
-    { name: "خط الرقعة", path: "/fonts/رقعة" },
-    { name: "خطوط التصميم", path: "/fonts/تصميم" },
-    { name: "خطوط فوتوشوب", path: "/fonts/فوتوشوب" },
+    { name: "خط الثلث", path: "/fonts/thuluth" },
+    { name: "خط الديواني", path: "/fonts/diwani" },
+    { name: "خط الكوفي", path: "/fonts/kufi" },
+    { name: "خط النسخ", path: "/fonts/naskh" },
+    { name: "خط الرقعة", path: "/fonts/ruqaa" },
+    { name: "خطوط التصميم", path: "/fonts/tasmeem" },
+    { name: "خطوط فوتوشوب", path: "/fonts/photoshop" },
+    { name: "خطوط النستعليق", path: "/fonts/nastaliq" },
   ];
 
   const collections = [

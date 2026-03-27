@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute } from "wouter";
+import { getCategoryFromSlug, getCategorySlug } from "@/lib/categorySlug";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
@@ -61,7 +62,8 @@ const categoryMeta: Record<string, { title: string; description: string; arabicN
 
 export default function CategoryFonts() {
   const [match, params] = useRoute("/fonts/:category");
-  const category = params?.category as string | undefined;
+  const categorySlug = params?.category as string | undefined;
+  const arabicCategory = categorySlug ? getCategoryFromSlug(categorySlug) : undefined;
   
   const [searchQuery, setSearchQuery] = useState("");
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
@@ -76,13 +78,13 @@ export default function CategoryFonts() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, category]);
+  }, [searchQuery, categorySlug]);
 
-  if (!match || !category || !categoryMeta[category]) {
+  if (!match || !categorySlug || !arabicCategory || !categoryMeta[arabicCategory]) {
     return <div>صفحة غير موجودة</div>;
   }
 
-  const categoryData = categoryMeta[category];
+  const categoryData = categoryMeta[arabicCategory];
   const categories = Array.from(new Set(fonts.map(font => font.category)));
 
   const filteredFonts = fonts
@@ -92,7 +94,7 @@ export default function CategoryFonts() {
         font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (font.designer && font.designer.includes(searchQuery));
       
-      return matchesSearch && font.category === category;
+      return matchesSearch && font.category === arabicCategory;
     })
     .sort((a, b) => {
       const dateA = new Date(a.addedAt).getTime();
@@ -100,7 +102,7 @@ export default function CategoryFonts() {
       return dateB - dateA;
     });
 
-  const groupedFonts = useMemo(() => groupFontsByFamily(filteredFonts), [filteredFonts.length, searchQuery, category]);
+  const groupedFonts = useMemo(() => groupFontsByFamily(filteredFonts), [filteredFonts.length, searchQuery, categorySlug]);
 
   const totalPages = Math.ceil(groupedFonts.length / FONTS_PER_PAGE);
   const startIndex = (currentPage - 1) * FONTS_PER_PAGE;
@@ -149,12 +151,12 @@ export default function CategoryFonts() {
     "@graph": [
       createBreadcrumbSchema([
         { name: "الرئيسية", url: "https://www.xfontat.com/" },
-        { name: categoryData.arabicName, url: `https://www.xfontat.com/fonts/${category}` }
+        { name: categoryData.arabicName, url: `https://www.xfontat.com/fonts/${categorySlug}` }
       ]),
       createCollectionPageSchema({
         name: categoryData.arabicName,
         description: categoryData.description,
-        url: `https://www.xfontat.com/fonts/${category}`,
+        url: `https://www.xfontat.com/fonts/${categorySlug}`,
         numberOfItems: filteredFonts.length
       }),
       createItemListSchema(filteredFonts),
@@ -167,7 +169,7 @@ export default function CategoryFonts() {
       <SEOHead 
         title={categoryData.title}
         description={categoryData.description}
-        path={`/fonts/${category}`}
+        path={`/fonts/${categorySlug}`}
         schema={schema}
       />
       <Header 
@@ -182,16 +184,18 @@ export default function CategoryFonts() {
       <Breadcrumb 
         items={[
           { label: "الرئيسية", href: "/" },
-          { label: categoryData.arabicName, href: `/fonts/${category}` }
+          { label: categoryData.arabicName, href: `/fonts/${categorySlug}` }
         ]}
       />
 
       <CategoryFilter
         categories={categories}
-        selectedCategory={category}
+        selectedCategory={arabicCategory}
         onCategoryChange={(cat) => {
-          if (cat !== "الكل") {
-            window.location.href = `/fonts/${cat}`;
+          if (cat === "الكل") {
+            window.location.href = "/";
+          } else {
+            window.location.href = `/fonts/${getCategorySlug(cat)}`;
           }
         }}
       />
