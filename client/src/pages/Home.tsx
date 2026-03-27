@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Header } from "@/components/Header";
@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
+import { groupFontsByFamily } from "@/lib/fontFamily";
 import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
@@ -31,31 +32,28 @@ export default function Home() {
 
   const filteredFonts = fonts
     .filter((font) => {
-      const matchesSearch = 
-        font.nameArabic.includes(searchQuery) || 
+      const matchesSearch =
+        font.nameArabic.includes(searchQuery) ||
         font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (font.designer && font.designer.includes(searchQuery)) ||
         (font.description && font.description.includes(searchQuery));
-      
-      let matchesCategory = true;
-      if (selectedCategory === "الكل") {
-        matchesCategory = true;
-      } else {
-        matchesCategory = font.category === selectedCategory;
-      }
-      
+
+      const matchesCategory =
+        selectedCategory === "الكل" || font.category === selectedCategory;
+
       return matchesSearch && matchesCategory;
     })
-    .sort((a, b) => {
-      const dateA = new Date(a.addedAt).getTime();
-      const dateB = new Date(b.addedAt).getTime();
-      return dateB - dateA;
-    });
+    .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
 
-  const totalPages = Math.ceil(filteredFonts.length / FONTS_PER_PAGE);
+  const groupedFonts = useMemo(
+    () => groupFontsByFamily(filteredFonts),
+    [filteredFonts.length, selectedCategory, searchQuery]
+  );
+
+  const totalPages = Math.ceil(groupedFonts.length / FONTS_PER_PAGE);
   const startIndex = (currentPage - 1) * FONTS_PER_PAGE;
   const endIndex = startIndex + FONTS_PER_PAGE;
-  const currentFonts = filteredFonts.slice(startIndex, endIndex);
+  const currentGroups = groupedFonts.slice(startIndex, endIndex);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -158,20 +156,24 @@ export default function Home() {
           <>
             <div className="mb-3 md:mb-4 pb-3 border-b">
               <p className="text-xs md:text-sm text-muted-foreground">
-                الخطوط {startIndex + 1} - {Math.min(endIndex, filteredFonts.length)} من {filteredFonts.length}
+                عائلات الخطوط {startIndex + 1} - {Math.min(endIndex, groupedFonts.length)} من {groupedFonts.length}
+                {groupedFonts.length < filteredFonts.length && (
+                  <span className="mr-1">({filteredFonts.length} خط إجمالاً)</span>
+                )}
               </p>
             </div>
-            
+
             <div className="space-y-0">
-              {currentFonts.map((font) => (
+              {currentGroups.map((group) => (
                 <FontListItem
-                  key={font.id}
-                  {...font}
+                  key={group.primary.id}
+                  {...group.primary}
                   previewText={previewText}
                   fontSize={fontSize}
-                  onDownload={() => handleDownload(font)}
-                  isFavorite={favorites.has(font.id)}
-                  onToggleFavorite={() => handleToggleFavorite(font.id)}
+                  onDownload={() => handleDownload(group.primary)}
+                  isFavorite={favorites.has(group.primary.id)}
+                  onToggleFavorite={() => handleToggleFavorite(group.primary.id)}
+                  variantCount={group.variants.length}
                 />
               ))}
             </div>

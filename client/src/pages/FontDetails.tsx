@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
-import { Download, Heart, Monitor, Apple } from "lucide-react";
+import { Download, Heart, Monitor, Apple, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -10,6 +11,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
+import { detectFontFamily, getWeightLabel } from "@/lib/fontFamily";
 import { createBreadcrumbSchema } from "@/lib/schemas";
 import { blogPosts } from "@/lib/blogData";
 import { useToast } from "@/hooks/use-toast";
@@ -65,6 +67,53 @@ function getRelatedBlogPosts(category: string) {
     .slice(0, 3);
 }
 
+function FamilyVariantCard({ variant }: { variant: Font }) {
+  const [loaded, setLoaded] = useState(false);
+  const fontFam = generateFontFamily(variant.name);
+
+  useEffect(() => {
+    loadFont(fontFam, variant.fileUrl)
+      .then(() => setLoaded(true))
+      .catch(() => setLoaded(true));
+  }, [fontFam, variant.fileUrl]);
+
+  const { toast } = useToast();
+
+  const handleDl = () => {
+    const link = document.createElement('a');
+    link.href = variant.fileUrl;
+    link.download = variant.fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({ title: "جاري التحميل", description: `يتم الآن تحميل خط ${variant.nameArabic}` });
+  };
+
+  return (
+    <div className="border rounded-lg p-4">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <div className="min-w-0">
+          <Link href={`/font/${generateSlug(variant.name)}`}>
+            <h3 className="text-sm font-medium truncate hover:underline">{variant.nameArabic}</h3>
+          </Link>
+          <p className="text-xs text-muted-foreground truncate">{variant.name}</p>
+        </div>
+        <Badge variant="secondary" className="shrink-0">{getWeightLabel(variant.name)}</Badge>
+      </div>
+      <div
+        className="text-xl mb-3 leading-relaxed truncate"
+        style={{ fontFamily: loaded ? fontFam : 'inherit', direction: 'rtl' }}
+      >
+        بسم الله الرحمن الرحيم
+      </div>
+      <Button size="sm" onClick={handleDl} className="w-full" data-testid={`button-download-variant-${variant.id}`}>
+        <Download className="ml-2 h-3 w-3" />
+        تحميل
+      </Button>
+    </div>
+  );
+}
+
 export default function FontDetails() {
   const [match, params] = useRoute("/font/:slug");
   const slug = params?.slug;
@@ -81,13 +130,20 @@ export default function FontDetails() {
   const font = fonts.find(f => generateSlug(f.name) === slug);
   const fontFamily = font ? generateFontFamily(font.name) : '';
 
+  const familyVariants = useMemo(() => {
+    if (!font) return [];
+    const familyName = detectFontFamily(font.name);
+    return fonts.filter(f => detectFontFamily(f.name) === familyName && f.id !== font.id);
+  }, [font?.id, font?.name, fonts.length]);
+
   const relatedFonts = useMemo(() => {
     if (!font) return [];
+    const familyName = detectFontFamily(font.name);
     return fonts
-      .filter(f => f.category === font.category && f.id !== font.id)
+      .filter(f => f.category === font.category && f.id !== font.id && detectFontFamily(f.name) !== familyName)
       .sort(() => 0.5 - Math.random())
       .slice(0, 6);
-  }, [font?.id, font?.category, fonts.length]);
+  }, [font?.id, font?.category, font?.name, fonts.length]);
 
   const allCategories = useMemo(() => {
     return Array.from(new Set(fonts.map(f => f.category)));
@@ -418,6 +474,38 @@ export default function FontDetails() {
                   ))}
                 </div>
               </div>
+
+              {familyVariants.length > 0 && (
+                <div className="border rounded-lg p-6 mb-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Layers className="w-5 h-5 text-muted-foreground" />
+                    <h2 className="text-xl font-bold">أوزان الخط ({familyVariants.length + 1} أوزان)</h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="border rounded-lg p-4 bg-muted/30">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-medium truncate">{font.nameArabic}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{font.name}</p>
+                        </div>
+                        <Badge variant="secondary" className="shrink-0">{getWeightLabel(font.name)}</Badge>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={handleDownload}
+                        className="w-full mt-2"
+                        data-testid="button-download-current-variant"
+                      >
+                        <Download className="ml-2 h-3 w-3" />
+                        تحميل
+                      </Button>
+                    </div>
+                    {familyVariants.map((variant) => (
+                      <FamilyVariantCard key={variant.id} variant={variant} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {relatedFonts.length > 0 && (
                 <div className="border rounded-lg p-6 mb-8">

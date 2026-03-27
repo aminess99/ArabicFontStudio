@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Download, Heart } from "lucide-react";
+import { Download, Heart, Layers } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
 
@@ -17,6 +18,7 @@ interface FontListItemProps {
   onDownload: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  variantCount?: number;
 }
 
 export function FontListItem({
@@ -30,6 +32,7 @@ export function FontListItem({
   onDownload,
   isFavorite = false,
   onToggleFavorite,
+  variantCount = 1,
 }: FontListItemProps) {
   const [fontLoaded, setFontLoaded] = useState(false);
   const fontFamily = generateFontFamily(name);
@@ -53,14 +56,15 @@ export function FontListItem({
     <div className="border-b py-4 md:py-6" data-testid={`font-item-${name}`}>
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2 md:mb-3">
+          <div className="flex items-center gap-2 mb-2 md:mb-3 flex-wrap">
             <h3 className="text-xs md:text-sm text-muted-foreground truncate">
               {nameArabic}
             </h3>
-            {designer && (
-              <span className="text-xs text-muted-foreground shrink-0">
-                +{designer.split(' ').length}
-              </span>
+            {variantCount > 1 && (
+              <Badge variant="secondary" className="text-xs gap-1 shrink-0">
+                <Layers className="w-3 h-3" />
+                {variantCount} أوزان
+              </Badge>
             )}
           </div>
           
@@ -89,12 +93,12 @@ export function FontListItem({
           </Button>
           
           <Button asChild className="flex-1 md:flex-none">
-            <Link 
+            <Link
               href={`/font/${generateSlug(name)}`}
               data-testid={`button-download-${name}`}
             >
               <Download className="ml-2 h-4 w-4" />
-              تحميل
+              {variantCount > 1 ? "عرض الأوزان" : "تحميل"}
             </Link>
           </Button>
         </div>

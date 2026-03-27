@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { FontListItem } from "@/components/FontListItem";
@@ -6,6 +6,7 @@ import { Pagination } from "@/components/Pagination";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
+import { groupFontsByFamily } from "@/lib/fontFamily";
 import { createCollectionPageSchema, createItemListSchema } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
@@ -41,10 +42,12 @@ export default function DesignFonts() {
       return dateB - dateA;
     });
 
-  const totalPages = Math.ceil(filteredFonts.length / FONTS_PER_PAGE);
+  const groupedFonts = useMemo(() => groupFontsByFamily(filteredFonts), [filteredFonts.length, searchQuery]);
+
+  const totalPages = Math.ceil(groupedFonts.length / FONTS_PER_PAGE);
   const startIndex = (currentPage - 1) * FONTS_PER_PAGE;
   const endIndex = startIndex + FONTS_PER_PAGE;
-  const currentFonts = filteredFonts.slice(startIndex, endIndex);
+  const currentGroups = groupedFonts.slice(startIndex, endIndex);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -135,20 +138,24 @@ export default function DesignFonts() {
           <>
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground" data-testid="text-font-count">
-                الخطوط {startIndex + 1} - {Math.min(endIndex, filteredFonts.length)} من {filteredFonts.length}
+                عائلات الخطوط {startIndex + 1} - {Math.min(endIndex, groupedFonts.length)} من {groupedFonts.length}
+                {groupedFonts.length < filteredFonts.length && (
+                  <span className="mr-1">({filteredFonts.length} خط إجمالاً)</span>
+                )}
               </p>
             </div>
 
             <div className="space-y-0">
-              {currentFonts.map((font) => (
+              {currentGroups.map((group) => (
                 <FontListItem
-                  key={font.id}
-                  {...font}
+                  key={group.primary.id}
+                  {...group.primary}
                   previewText={previewText}
                   fontSize={fontSize}
-                  onDownload={() => handleDownload(font)}
-                  isFavorite={favorites.has(font.id)}
-                  onToggleFavorite={() => handleToggleFavorite(font.id)}
+                  onDownload={() => handleDownload(group.primary)}
+                  isFavorite={favorites.has(group.primary.id)}
+                  onToggleFavorite={() => handleToggleFavorite(group.primary.id)}
+                  variantCount={group.variants.length}
                 />
               ))}
             </div>
