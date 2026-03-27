@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFontSchema } from "@shared/schema";
-import { GoogleGenAI } from "@google/genai";
+import { getGeneratedPosts } from "./blogGenerator";
 
 function generateSlug(fontName: string): string {
   return fontName
@@ -164,6 +164,26 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
     res.header('Content-Type', 'text/plain');
     res.send(robotsTxt);
+  });
+
+  app.get("/api/blog/posts", (req, res) => {
+    try {
+      const posts = getGeneratedPosts();
+      res.json(posts);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch generated posts" });
+    }
+  });
+
+  app.get("/api/blog/posts/:slug", (req, res) => {
+    try {
+      const posts = getGeneratedPosts();
+      const post = posts.find((p) => p.slug === req.params.slug);
+      if (!post) return res.status(404).json({ error: "Post not found" });
+      res.json(post);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch post" });
+    }
   });
 
   const httpServer = createServer(app);

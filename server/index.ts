@@ -51,6 +51,14 @@ app.use((req, res, next) => {
     console.error("Failed to load fonts:", err);
   }
 
+  // Start daily AI blog generator (2 posts/day, fully automatic, no UI button)
+  try {
+    const { startBlogCron } = await import("./blogGenerator");
+    startBlogCron();
+  } catch (err) {
+    console.error("Failed to start blog generator:", err);
+  }
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";

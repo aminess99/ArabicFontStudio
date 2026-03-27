@@ -2,146 +2,7 @@
 
 ## Overview
 
-An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, designed specifically for Arabic typography with RTL (right-to-left) interface support. The platform features a curated collection of 143 Arabic fonts organized across multiple categories (Thuluth, Diwani, Ruqaa, Kufi, Naskh, Design) with real-time font rendering and customizable preview capabilities.
-
-## Recent Changes
-
-**Latest Update - Collection Pages & Blog Expansion (March 2026):**
-- Added 8 "Collection Pages" (`/collection/:slug`) targeting use-case keywords:
-  - خطوط للشعارات واللوجو
-  - خطوط للتيك توك وإنستقرام
-  - خطوط عربية مزخرفة
-  - خطوط للكتب والمطبوعات
-  - خطوط للفوتوشوب والإلستريتور
-  - خطوط لليوتيوبرز وصناع المحتوى
-  - خطوط للدعوات والمناسبات
-  - خطوط مجانية بدون حقوق
-- Each collection page: full SEO, FAQ Schema, breadcrumbs, related collections grid
-- Added 6 new blog articles (1000-1500+ words each) targeting long-tail keywords:
-  - أفضل خطوط لليوتيوبرز وصناع المحتوى
-  - خطوط للكتب والمطبوعات الاحترافية
-  - خطوط للدعوات والمناسبات الخاصة
-  - خطوط للعلامات التجارية والهوية البصرية
-  - خطوط للوشم والتاتو
-  - خطوط للمواقع والتطبيقات (دليل المطورين)
-- Blog now has 16 total articles
-- Homepage: new "تصفح الخطوط حسب الاستخدام" section with 8 collection cards
-- Footer: new "مجموعات الخطوط" column with all 8 collection links
-- Sitemap updated to 390 URLs (350 fonts + 7 categories + 8 collections + 7 static + 16 blog posts + 1 design fonts)
-
-**Previous Update - Internal Linking & Blog Expansion (March 2026):**
-- Added "خطوط مشابهة" (Similar Fonts) section on every font detail page showing 6 random fonts from the same category
-- Added "تصفح الفئات" (Browse Categories) sidebar section linking to all category pages
-- Added 5 new blog articles targeting long-tail Arabic SEO keywords:
-  - أفضل 10 خطوط عربية للتصميم في 2025
-  - أفضل خطوط عربية للفوتوشوب - تحميل مجاني
-  - أفضل خطوط عربية للشعارات واللوجو
-  - خطوط عربية مزخرفة للتصميم
-  - أفضل خطوط عربية للسوشال ميديا والتيك توك
-- Blog now has 10 articles total (up from 5)
-- Sitemap updated to 374 URLs (350 fonts + 7 categories + 7 static + 10 blog posts)
-- Internal linking improves site structure and SEO crawlability
-
-**Previous Update - Comprehensive SEO Optimization (March 2026):**
-- Font detail pages now use SEO-friendly slug URLs: `/font/al-qassam-normal-1-font` instead of `/font/:id`
-- Created `client/src/lib/slugify.ts` with `generateSlug()` utility function
-- Individual blog post pages at `/blog/:slug` (5 articles with unique URLs)
-- SoftwareApplication Schema markup on every font detail page (Rich Results)
-- BreadcrumbList JSON-LD Schema on font pages, category pages, and blog
-- Article Schema markup on individual blog post pages
-- Homepage intro section with H1 heading and keyword-rich description
-- OG image fixed to use absolute URL (`https://www.xfontat.com/logo.png`)
-- Sitemap includes all 350 font pages, 7 category pages, 5 blog posts (369 URLs total)
-- Dynamic meta description on homepage with actual font count
-
-## Previous Changes (November 2025)
-
-**Advanced SEO Optimization (November 23, 2025):**
-- Fixed sitemap.xml to use www.xfontat.com instead of dev domain
-- Added category pages (/fonts/:category) for each font type with dedicated SEO:
-  - Unique title and description for each category
-  - Breadcrumb navigation for better UX and SEO
-  - Individual Schema markup for each category page
-- Added FAQ Schema markup (5 common questions about fonts)
-- Added FAQ component visible on all pages below font listings
-- Updated robots.txt to exclude /api/ endpoints
-- Dynamic category pages generate priority traffic from Google
-
-**Previous Update - SEO Optimization (November 20, 2025):**
-- Added dynamic sitemap.xml endpoint (automatically includes all pages)
-- Added robots.txt endpoint for search engine crawlers
-- Implemented Schema Markup (JSON-LD) for all pages:
-  - Organization schema for xfontat brand
-  - WebSite schema with SearchAction
-  - CollectionPage schema for font listings (Home and Design Fonts pages)
-  - ItemList schema for font collections
-  - WebPage schema for static pages (About, Contact, Privacy, Terms)
-- Created SEOHead component for dynamic meta tags and structured data
-- Enhanced meta tags for all pages with unique titles and descriptions
-- Improved Open Graph and Twitter Card metadata
-
-**Previous Update - Added Design Fonts Category (November 20, 2025):**
-- Added new "تصميم" (Design Fonts) category with 78 professional fonts
-- Created dedicated page at /design-fonts for design fonts
-- Updated font count: 143 total fonts
-- Design fonts include GE fonts collection (GE-Aridi, GE-Dinar, GE-Heritage, etc.)
-- Added navigation link in header and footer
-- Sorting order: newest fonts first (appear on page 1), oldest fonts on last pages
-
-**Previous Update - Added Diwani Fonts (November 20, 2025):**
-- Added 6 new Diwani fonts to the library
-- Updated font count: 65 total fonts (before design fonts)
-- Diwani category now has 12 fonts (up from 6)
-- New fonts: az-topaz, diwani-outline-shaded, diwani-simple-outline, hawi-t-diwany, ukij-diwani-tom-arabic, ul-amjad
-
-**Previous Update - Added Ruqaa Fonts Batch 2 (November 19, 2025):**
-- Added 7 new Ruqaa fonts to the library (with alfont_com_ prefix removed)
-- Updated font count: 59 total fonts
-- Ruqaa category now has 18 fonts (up from 11)
-- New fonts: 29LT-Azer-Bold, Almaghribi-Warsh-Quran, GraphicSchool-Regular, Palestine-Regular, Tasees-Bold, خط-القلعة, خط-بلاس
-
-**Previous Update - Added Naskh Fonts (November 19, 2025):**
-- Added 5 new Naskh fonts to the library (with alfont_com_ prefix removed)
-- Updated font count: 52 total fonts
-- Naskh category now has 13 fonts (up from 8)
-- New fonts: AQEEQSANSPRO-Bold, Kaeeb-Serif, RTL-Lustrous-Bold, SIMPLEX-DISPLAY, Trox-R
-
-**Previous Update - Added Ruqaa Fonts (November 19, 2025):**
-- Added 9 new Ruqaa fonts to the library
-- Updated font count: 47 total fonts
-- Ruqaa category now has 11 fonts (up from 2)
-
-**Previous Update - Font Cleanup (November 18, 2025):**
-- Removed MCS Tholoth font family (4 fonts)
-- Updated font count: 38 total fonts
-- Thuluth category now has 6 fonts (down from 10)
-
-**Previous Update - SEO Enhancement & Additional Pages:**
-- Enhanced SEO with comprehensive meta tags (title, description, keywords)
-- Added Open Graph and Twitter Card meta tags for social media sharing
-- Implemented JSON-LD structured data for better search engine understanding
-- Created essential pages: About, Contact, Privacy Policy, Terms of Service
-- Added Footer component with navigation links to all pages
-- Canonical URL and proper robots meta tags configured
-
-## Previous Updates (November 2025)
-
-**Previous Update - Timestamp Sorting System:**
-- Added `addedAt` timestamp field to font schema for tracking when fonts are added
-- Fonts display in reverse chronological order (newest first)
-- New fonts automatically appear on the first page
-- Added 10 new Kufi fonts (total now 16 Kufi fonts)
-- Added 8 new Thuluth fonts (total now 10 Thuluth fonts)
-
-**Single-Page Architecture:**
-- Consolidated to single homepage displaying all fonts
-- Category filter order: "الكل" → individual categories (ثلث، ديواني، رقعة، كوفي، نسخ)
-- Removed separate /fonts page for simpler navigation
-
-**Font Library Cleanup:**
-- Removed 36 duplicate and similar fonts
-- Added `featured` flag to schema to mark premium fonts
-- Created curated list of 17 featured fonts showcasing best from each category
+An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, specifically designed for Arabic typography with comprehensive RTL (right-to-left) interface support. The platform aims to be the leading resource for high-quality Arabic fonts, offering a curated collection, real-time font rendering, and customizable preview capabilities. Key features include a wide range of categories like Thuluth, Diwani, Ruqaa, Kufi, Naskh, and Design fonts, alongside advanced SEO optimizations for discoverability and a fully automated AI blog generation system to provide continuous fresh content. The business vision is to provide designers and developers with an accessible, robust, and user-friendly platform for Arabic fonts, catering to various use cases from branding to digital content creation.
 
 ## User Preferences
 
@@ -151,113 +12,56 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Framework & Build System:**
-- React with TypeScript for type safety
-- Vite as the build tool and development server
-- Wouter for lightweight client-side routing
-- TanStack Query (React Query) for server state management and data fetching
+The frontend is built with React and TypeScript, utilizing Vite for bundling and development. Wouter handles lightweight client-side routing. Data fetching and server state management are powered by TanStack Query.
 
-**UI Component Library:**
-- Shadcn/ui components built on Radix UI primitives
-- Tailwind CSS for styling with custom RTL-first design system
-- CSS variables for theming (dark/light mode support)
-- Cairo font from Google Fonts as the primary Arabic typeface
-
-**State Management:**
-- React Query for server state (fonts data)
-- Local React state for UI interactions (search, filters, preview text, font size, favorites)
-- Theme context for dark/light mode persistence
-
-**UI Layout Design (November 2025 Update):**
-- **List-based interface**: Simplified vertical list layout instead of card grid
-- **Two-section header**: 
-  - Top: Logo, search bar, theme toggle
-  - Bottom toolbar: Preview text input, font size slider (16-72px), items per page selector
-- **Global preview controls**: All fonts display the same customizable preview text at the same adjustable size
-- **Horizontal category filters**: Tag/chip style category selection
-- **Font list items**: Each row displays font name, large preview, favorite heart icon, and green download button
-- **Favorites system**: Heart icons toggle to mark/unmark favorite fonts
-- **Limited display**: Shows 10 fonts at a time with counter ("الخطوط 1 - 10 من 60")
-
-**Key Design Decisions:**
-- RTL-first layout system to properly support Arabic text flow
-- Dynamic font loading system that injects @font-face rules at runtime
-- Category-based filtering with horizontal chips/tags
-- Single search input in header (removed hero section for simplicity)
-- Global preview text and font size controls in header toolbar
-- Toast notifications for user feedback on downloads
-- Minimalist list design inspired by professional font libraries
+**UI/UX Decisions:**
+- **RTL-first design:** The entire interface is built with right-to-left language support as a priority, ensuring a natural experience for Arabic users.
+- **Component Library:** Shadcn/ui, built on Radix UI primitives, provides accessible and customizable components.
+- **Styling:** Tailwind CSS is used for utility-first styling, with a custom RTL-first design system and CSS variables for theming (dark/light mode).
+- **Typography:** Cairo from Google Fonts is the primary Arabic typeface.
+- **Layout:** A list-based interface displays fonts, featuring a two-section header with global search, theme toggle, and a toolbar for preview text input and font size adjustment (16-72px).
+- **Interactive Elements:** Horizontal category filters, favorite font toggles, and a download button for each font are present.
+- **Preview System:** All fonts display the same customizable preview text at an adjustable size, facilitating easy comparison.
+- **SEO Elements:** Dynamic meta tags, JSON-LD schema markup (Organization, WebSite, CollectionPage, ItemList, WebPage, SoftwareApplication, Article, BreadcrumbList, FAQ), SEO-friendly slug URLs for fonts and blog posts, and sitemap generation are implemented.
+- **Blog and Collections:** Dedicated pages for blog articles and curated font collections based on use cases (e.g., "Fonts for Logos," "Fonts for Social Media") enhance content discoverability and SEO.
 
 ### Backend Architecture
 
-**Server Framework:**
-- Express.js with TypeScript
-- Custom Vite middleware integration for SSR-ready setup
-- In-memory storage implementation (MemStorage class)
+The backend is an Express.js server built with TypeScript, integrated with Vite via custom middleware for server-side rendering (SSR) compatibility.
 
-**Data Layer:**
-- Drizzle ORM configured for PostgreSQL (schema defined, database not yet connected)
-- Schema defines fonts table with fields: id, name, nameArabic, description, designer, category, style, fileUrl, fileName, fileFormat, featured (boolean), addedAt (timestamp)
-- Zod validation for runtime type checking of font data
-- Fonts sorted by addedAt in descending order (newest first, oldest on last pages)
-- Featured fonts system marks highest-quality fonts for homepage display
-
-**API Endpoints:**
-- GET /api/fonts - Retrieve all fonts
-- GET /api/fonts/:id - Retrieve single font by ID
-- POST /api/fonts - Create new font entry
-- DELETE /api/fonts/:id - Remove font entry
-
-**Font Loading Strategy:**
-- Server startup script (`load-fonts.ts`) scans `/client/public/fonts` directory
-- Organizes fonts by category folders (ثلث, ديواني, رقعة, كوفي, نسخ)
-- Automatically extracts metadata from file structure
-- Extracts file modification time (mtime) as `addedAt` timestamp for sorting
-- Supports TTF, OTF, WOFF, WOFF2 formats
-- Current font distribution:
-  - ثلث: 6 fonts
-  - ديواني: 12 fonts
-  - رقعة: 18 fonts
-  - كوفي: 16 fonts
-  - نسخ: 13 fonts
-  - تصميم: 78 fonts
-  - Total: 143 fonts
-- Curated featured fonts list: 17 premium fonts selected for quality and uniqueness
+**Data Management:**
+- **Data Storage:** While Drizzle ORM is configured for PostgreSQL (not actively connected yet), the current implementation uses an in-memory storage system (`MemStorage`).
+- **Font Data:** Fonts are defined with a schema including `id`, `name`, `nameArabic`, `description`, `designer`, `category`, `style`, `fileUrl`, `fileName`, `fileFormat`, `featured` (boolean), and `addedAt` (timestamp).
+- **Font Loading:** A server startup script (`load-fonts.ts`) scans the `/client/public/fonts` directory, categorizes fonts based on folder structure, extracts metadata, and uses file modification times for `addedAt` timestamps. It supports TTF, OTF, WOFF, and WOFF2 formats.
+- **API Endpoints:** Standard RESTful endpoints are provided for `GET /api/fonts`, `GET /api/fonts/:id`, `POST /api/fonts`, and `DELETE /api/fonts/:id`.
 
 **Key Architectural Decisions:**
-- Storage abstraction with IStorage interface enables future database migration
-- Font files stored in public directory for direct browser access
-- File-based font discovery eliminates manual database seeding
-- URL encoding handles Arabic filenames in font paths
+- **Storage Abstraction:** An `IStorage` interface facilitates future migration to a persistent database.
+- **File-based Font Discovery:** Automates the process of adding new fonts without manual database entries.
+- **Automatic AI Blog Generator:** A `node-cron` scheduled task (`server/blogGenerator.ts`) uses the Gemini model via Replit AI Integrations to generate two SEO-targeted blog articles daily. These articles are stored in `server/data/generatedPosts.json` and served via dedicated API endpoints.
 
-### External Dependencies
+## External Dependencies
 
 **Core Libraries:**
-- @tanstack/react-query - Server state management
-- drizzle-orm & drizzle-zod - Database ORM and schema validation
-- @neondatabase/serverless - PostgreSQL driver (configured but not active)
-- zod - Runtime type validation
+- **@tanstack/react-query:** For server state management and data fetching.
+- **drizzle-orm & drizzle-zod:** For database ORM and schema validation (configured for PostgreSQL).
+- **@neondatabase/serverless:** PostgreSQL driver (configured).
+- **zod:** For runtime type validation.
+- **node-cron:** For scheduling tasks (e.g., AI blog generation).
+- **Replit AI Integrations:** For accessing the Gemini model for content generation.
 
-**UI Components:**
-- @radix-ui/* - Headless UI component primitives (dialog, popover, dropdown, etc.)
-- tailwindcss - Utility-first CSS framework
-- class-variance-authority & clsx - Conditional className utilities
-- lucide-react - Icon library
+**UI Components & Styling:**
+- **@radix-ui/*:** Headless UI component primitives.
+- **tailwindcss:** Utility-first CSS framework.
+- **class-variance-authority & clsx:** Utilities for conditional class names.
+- **lucide-react:** Icon library.
 
 **Development Tools:**
-- vite - Build tool and dev server
-- typescript - Type checking
-- tsx - TypeScript execution for server
-- @replit/vite-plugin-* - Replit-specific development enhancements
+- **vite:** Build tool and development server.
+- **typescript:** For type checking.
+- **tsx:** For running TypeScript files directly.
+- **@replit/vite-plugin-*:** Replit-specific development enhancements.
 
-**Font Processing:**
-- Custom font loader utility handles dynamic @font-face injection
-- Supports URL encoding for Arabic filenames
-- Format detection from file extensions
-- Font family name generation to avoid conflicts
-
-**Notable Dependency Patterns:**
-- All Radix UI components wrapped in custom components with consistent styling
-- React Hook Form with Zod resolvers for form validation (configured but not actively used)
-- Date-fns for date formatting utilities
-- Wouter instead of React Router for smaller bundle size
+**Utilities:**
+- **wouter:** Lightweight client-side router.
+- **date-fns:** For date formatting.
