@@ -6,7 +6,30 @@ An Arabic fonts library platform inspired by Google Fonts and Adobe Fonts, desig
 
 ## Recent Changes
 
-**Latest Update - Internal Linking & Blog Expansion (March 2026):**
+**Latest Update - Collection Pages & Blog Expansion (March 2026):**
+- Added 8 "Collection Pages" (`/collection/:slug`) targeting use-case keywords:
+  - خطوط للشعارات واللوجو
+  - خطوط للتيك توك وإنستقرام
+  - خطوط عربية مزخرفة
+  - خطوط للكتب والمطبوعات
+  - خطوط للفوتوشوب والإلستريتور
+  - خطوط لليوتيوبرز وصناع المحتوى
+  - خطوط للدعوات والمناسبات
+  - خطوط مجانية بدون حقوق
+- Each collection page: full SEO, FAQ Schema, breadcrumbs, related collections grid
+- Added 6 new blog articles (1000-1500+ words each) targeting long-tail keywords:
+  - أفضل خطوط لليوتيوبرز وصناع المحتوى
+  - خطوط للكتب والمطبوعات الاحترافية
+  - خطوط للدعوات والمناسبات الخاصة
+  - خطوط للعلامات التجارية والهوية البصرية
+  - خطوط للوشم والتاتو
+  - خطوط للمواقع والتطبيقات (دليل المطورين)
+- Blog now has 16 total articles
+- Homepage: new "تصفح الخطوط حسب الاستخدام" section with 8 collection cards
+- Footer: new "مجموعات الخطوط" column with all 8 collection links
+- Sitemap updated to 390 URLs (350 fonts + 7 categories + 8 collections + 7 static + 16 blog posts + 1 design fonts)
+
+**Previous Update - Internal Linking & Blog Expansion (March 2026):**
 - Added "خطوط مشابهة" (Similar Fonts) section on every font detail page showing 6 random fonts from the same category
 - Added "تصفح الفئات" (Browse Categories) sidebar section linking to all category pages
 - Added 5 new blog articles targeting long-tail Arabic SEO keywords:

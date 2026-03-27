@@ -187,6 +187,32 @@ export default function Home() {
         )}
       </main>
 
+      <section className="container mx-auto px-3 md:px-4 py-8">
+        <h2 className="text-xl font-bold mb-4">تصفح الخطوط حسب الاستخدام</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { name: "خطوط للشعارات", slug: "khotot-lil-shiaarat", desc: "كوفي وتصميم" },
+            { name: "خطوط للتيك توك", slug: "khotot-lil-tiktok", desc: "رقعة وتصميم" },
+            { name: "خطوط مزخرفة", slug: "khotot-muzakhrafa", desc: "ثلث وديواني" },
+            { name: "خطوط للكتب", slug: "khotot-lil-kotob", desc: "نسخ كلاسيكية" },
+            { name: "خطوط للفوتوشوب", slug: "khotot-lil-photoshop", desc: "200+ خط" },
+            { name: "خطوط لليوتيوبرز", slug: "khotot-lil-youtubiyeen", desc: "كوفي ورقعة" },
+            { name: "خطوط للدعوات", slug: "khotot-lil-dawaat", desc: "ثلث وديواني" },
+            { name: "خطوط مجانية", slug: "khotot-bidoon-hoqooq", desc: "جميع الفئات" },
+          ].map(col => (
+            <Link
+              key={col.slug}
+              href={`/collection/${col.slug}`}
+              className="border rounded-lg p-4 hover-elevate text-center block"
+              data-testid={`link-home-collection-${col.slug}`}
+            >
+              <p className="font-semibold text-sm">{col.name}</p>
+              <p className="text-xs text-muted-foreground mt-1">{col.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <FAQ />
       <Footer />
     </div>

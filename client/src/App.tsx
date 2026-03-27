@@ -18,6 +18,7 @@ import Contact from "@/pages/Contact";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
+import FontCollection from "@/pages/FontCollection";
 
 function Router() {
   useAnalytics();
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/design-fonts" component={DesignFonts} />
       <Route path="/font/:slug" component={FontDetails} />
       <Route path="/fonts/:category" component={CategoryFonts} />
+      <Route path="/collection/:slug" component={FontCollection} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/blog" component={Blog} />
       <Route path="/about" component={About} />

@@ -98,6 +98,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { slug: "khotot-arabiya-lil-shiaarat-wal-logos", date: "2025-11-14" },
         { slug: "khotot-arabiya-muzakhrafa-lil-tasmeem", date: "2025-11-13" },
         { slug: "khotot-arabiya-lil-social-media", date: "2025-11-12" },
+        { slug: "khotot-arabiya-lil-youtubiyeen", date: "2026-03-15" },
+        { slug: "khotot-arabiya-lil-kotob-wal-matbooaat", date: "2026-03-16" },
+        { slug: "khotot-arabiya-lil-dawaat-wal-munasabaat", date: "2026-03-17" },
+        { slug: "khotot-arabiya-lil-alamat-al-tijariya", date: "2026-03-18" },
+        { slug: "khotot-arabiya-lil-wosham", date: "2026-03-19" },
+        { slug: "khotot-arabiya-lil-mawaqi-wal-tatbeeqat", date: "2026-03-20" },
       ];
       const blogPages = blogPosts.map(post => ({
         url: `/blog/${post.slug}`,
@@ -106,12 +112,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastmod: new Date(post.date).toISOString(),
       }));
 
+      const collectionSlugs = [
+        "khotot-lil-shiaarat",
+        "khotot-lil-tiktok",
+        "khotot-muzakhrafa",
+        "khotot-lil-kotob",
+        "khotot-lil-photoshop",
+        "khotot-lil-youtubiyeen",
+        "khotot-lil-dawaat",
+        "khotot-bidoon-hoqooq",
+      ];
+      const collectionPages = collectionSlugs.map(slug => ({
+        url: `/collection/${slug}`,
+        priority: "0.8",
+        changefreq: "weekly",
+        lastmod: new Date("2026-03-27").toISOString(),
+      }));
+
       const now = new Date().toISOString();
 
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-      [...staticPages, ...categoryPages, ...fontPages, ...blogPages].forEach((page: any) => {
+      [...staticPages, ...categoryPages, ...collectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
         xml += `    <lastmod>${page.lastmod ?? now}</lastmod>\n`;

@@ -13,10 +13,21 @@ export function Footer() {
     { name: "خطوط فوتوشوب", path: "/fonts/فوتوشوب" },
   ];
 
+  const collections = [
+    { name: "خطوط للشعارات", path: "/collection/khotot-lil-shiaarat" },
+    { name: "خطوط للتيك توك", path: "/collection/khotot-lil-tiktok" },
+    { name: "خطوط مزخرفة", path: "/collection/khotot-muzakhrafa" },
+    { name: "خطوط للكتب", path: "/collection/khotot-lil-kotob" },
+    { name: "خطوط للفوتوشوب", path: "/collection/khotot-lil-photoshop" },
+    { name: "خطوط لليوتيوبرز", path: "/collection/khotot-lil-youtubiyeen" },
+    { name: "خطوط للدعوات", path: "/collection/khotot-lil-dawaat" },
+    { name: "خطوط مجانية", path: "/collection/khotot-bidoon-hoqooq" },
+  ];
+
   return (
     <footer className="border-t bg-background mt-auto">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div>
             <h3 className="font-bold text-lg mb-4">xfontat</h3>
             <p className="text-sm text-muted-foreground">
@@ -62,6 +73,19 @@ export function Footer() {
                 <li key={cat.path}>
                   <Link href={cat.path} className="text-muted-foreground hover:text-foreground transition-colors" data-testid={`link-footer-category-${cat.name}`}>
                     {cat.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4">مجموعات الخطوط</h4>
+            <ul className="space-y-2 text-sm">
+              {collections.map((col) => (
+                <li key={col.path}>
+                  <Link href={col.path} className="text-muted-foreground hover:text-foreground transition-colors" data-testid={`link-footer-collection-${col.name}`}>
+                    {col.name}
                   </Link>
                 </li>
               ))}
