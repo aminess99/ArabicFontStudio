@@ -2,16 +2,21 @@ import type { Font } from "@shared/schema";
 
 const WEIGHT_WORDS = [
   "ExtraBold", "ExtraLight", "UltraLight", "SemiBold", "DemiBold",
+  "BoldItalic", "BoldSlanted", "BoldOblique",
+  "LightItalic", "LightSlanted",
   "Bold", "Light", "Regular", "Medium", "Black", "Thin",
   "Heavy", "Italic", "Roman", "Book", "Plain", "Normal", "Fat",
-  "Condensed", "Expanded", "Wide", "Narrow", "Oblique",
+  "Condensed", "Expanded", "Wide", "Narrow", "Oblique", "Slanted",
 ];
 
 export function detectFontFamily(fontName: string): string {
   let family = fontName;
 
+  // Strip trailing version/revision codes like " 1F", " 2B", " A", " 8", " 20" (1-3 hex chars)
+  family = family.replace(/\s+[0-9A-Fa-f]{1,3}$/, "").trim();
+
   // Strip patterns like " 45Light", " 55Roman" (number + weight)
-  family = family.replace(/\s+\d+[A-Za-z]+$/, "");
+  family = family.replace(/\s+\d+[A-Za-z]+$/, "").trim();
 
   // Iteratively strip trailing weight words (handles "Extra Bold", "Semi Bold")
   let changed = true;
