@@ -79,8 +79,8 @@ export function FontListItem({
           >
             {fontLoaded ? previewText : "جاري التحميل..."}
           </div>
-          <h2 className="text-xs text-muted-foreground mt-2" aria-label={`تحميل خط ${nameArabic} مجاناً`}>
-            تحميل خط {nameArabic} مجاناً
+          <h2 className="text-xs text-muted-foreground mt-2" aria-label={`تحميل وتنزيل خط ${nameArabic} مجاناً`}>
+            تحميل وتنزيل خط {nameArabic} مجاناً
           </h2>
         </div>
 
