@@ -108,7 +108,7 @@ function FamilyVariantCard({ variant }: { variant: Font }) {
       </div>
       <Button size="sm" onClick={handleDl} className="w-full" data-testid={`button-download-variant-${variant.id}`}>
         <Download className="ml-2 h-3 w-3" />
-        تحميل
+        تحميل الخط مجاناً
       </Button>
     </div>
   );
@@ -497,7 +497,7 @@ export default function FontDetails() {
                         data-testid="button-download-current-variant"
                       >
                         <Download className="ml-2 h-3 w-3" />
-                        تحميل
+                        تحميل الخط مجاناً
                       </Button>
                     </div>
                     {familyVariants.map((variant) => (
