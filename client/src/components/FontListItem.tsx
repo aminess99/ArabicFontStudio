@@ -101,7 +101,7 @@ export function FontListItem({
               data-testid={`button-download-${name}`}
             >
               <Download className="ml-2 h-4 w-4" />
-              {variantCount > 1 ? "عرض الأوزان" : "تحميل"}
+              تحميل الخط مجاناً
             </Link>
           </Button>
         </div>
