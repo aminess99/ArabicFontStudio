@@ -7,6 +7,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Explicitly allow indexing for all HTML pages
+app.use((req, res, next) => {
+  if (!req.path.startsWith("/api") && !req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf|txt|xml|json)$/i)) {
+    res.setHeader("X-Robots-Tag", "index, follow");
+  }
+  next();
+});
+
 // Serve static files from client/public directory (for verification files, etc.)
 app.use(express.static(path.resolve(import.meta.dirname, "..", "client", "public")));
 

@@ -8,7 +8,7 @@ interface SEOHeadProps {
 }
 
 export function SEOHead({ title, description, path, schema }: SEOHeadProps) {
-  const baseUrl = "https://www.xfontat.com";
+  const baseUrl = "https://xfontat.com";
   const fullUrl = `${baseUrl}${path}`;
 
   useEffect(() => {

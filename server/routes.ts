@@ -26,7 +26,116 @@ function generateSlug(fontName: string): string {
     + "-font";
 }
 
+const BOT_AGENTS = ['googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot', 'facebot', 'ia_archiver', 'ahrefsbot', 'semrushbot', 'mj12bot'];
+
+function isBot(userAgent: string): boolean {
+  const ua = (userAgent || '').toLowerCase();
+  return BOT_AGENTS.some(b => ua.includes(b));
+}
+
+const slugToCategory: Record<string, string> = {
+  "thuluth": "ثلث",
+  "diwani": "ديواني",
+  "ruqaa": "رقعة",
+  "kufi": "كوفي",
+  "naskh": "نسخ",
+  "tasmeem": "تصميم",
+  "photoshop": "فوتوشوب",
+  "nastaliq": "نستعليق",
+};
+
+function botHTML(title: string, description: string, canonical: string, h1: string, body: string): string {
+  return `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>${title}</title>
+<meta name="description" content="${description}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${description}">
+<meta property="og:url" content="${canonical}">
+</head>
+<body>
+<h1>${h1}</h1>
+${body}
+<nav>
+<a href="/">الرئيسية</a> |
+<a href="/fonts/thuluth">خطوط الثلث</a> |
+<a href="/fonts/diwani">خطوط الديواني</a> |
+<a href="/fonts/ruqaa">خطوط الرقعة</a> |
+<a href="/fonts/kufi">خطوط الكوفي</a> |
+<a href="/fonts/naskh">خطوط النسخ</a> |
+<a href="/fonts/tasmeem">خطوط التصميم</a> |
+<a href="/fonts/photoshop">خطوط الفوتوشوب</a> |
+<a href="/fonts/nastaliq">خطوط النستعليق</a>
+</nav>
+</body>
+</html>`;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Dynamic rendering for search engine bots
+  app.get("/font/:slug", async (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const fonts = await storage.getAllFonts();
+    const font = fonts.find(f => generateSlug(f.name) === req.params.slug);
+    if (!font) return next();
+    const canonical = `https://xfontat.com/font/${req.params.slug}`;
+    const title = `تحميل خط ${font.nameArabic} مجاناً | xfontat`;
+    const desc = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat || 'TTF'}. خط ${font.category} احترافي متاح للتحميل المباشر.`;
+    const body = `
+<p>${desc}</p>
+<p>التصنيف: <a href="/fonts/${categoryToSlug[font.category] || font.category}">${font.category}</a></p>
+<a href="${font.fileUrl}" download="${font.fileName}">تحميل الخط مجاناً</a>`;
+    res.send(botHTML(title, desc, canonical, font.nameArabic, body));
+  });
+
+  app.get("/fonts/:category", async (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const arabicCat = slugToCategory[req.params.category];
+    if (!arabicCat) return next();
+    const fonts = await storage.getAllFonts();
+    const catFonts = fonts.filter(f => f.category === arabicCat);
+    const canonical = `https://xfontat.com/fonts/${req.params.category}`;
+    const title = `خطوط ${arabicCat} العربية - تحميل مجاني | xfontat`;
+    const desc = `اكتشف ${catFonts.length} خط ${arabicCat} عربي احترافي. تحميل مجاني بصيغ TTF وOTF.`;
+    const links = catFonts.slice(0, 50).map(f =>
+      `<li><a href="/font/${generateSlug(f.name)}">${f.nameArabic} - ${f.name}</a></li>`
+    ).join('\n');
+    const body = `<p>${desc}</p><ul>${links}</ul>`;
+    res.send(botHTML(title, desc, canonical, `خطوط ${arabicCat}`, body));
+  });
+
+  app.get("/blog/:slug", async (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const posts = getGeneratedPosts();
+    const post = posts.find(p => p.slug === req.params.slug);
+    if (!post) return next();
+    const canonical = `https://xfontat.com/blog/${req.params.slug}`;
+    const body = `<p>${post.excerpt || ''}</p><div>${post.content || ''}</div>`;
+    res.send(botHTML(post.title, post.excerpt || post.title, canonical, post.title, body));
+  });
+
+  app.get("/", async (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const fonts = await storage.getAllFonts();
+    const categories = Array.from(new Set(fonts.map(f => f.category)));
+    const canonical = `https://xfontat.com/`;
+    const title = `xfontat | تحميل خطوط عربية مجانية - ${fonts.length} خط`;
+    const desc = `مكتبة شاملة من ${fonts.length} خط عربي احترافي: ثلث، ديواني، رقعة، كوفي، نسخ، تصميم، فوتوشوب، نستعليق. تحميل مجاني.`;
+    const catLinks = categories.map(c =>
+      `<li><a href="/fonts/${categoryToSlug[c] || c}">${c} (${fonts.filter(f => f.category === c).length} خط)</a></li>`
+    ).join('\n');
+    const fontLinks = fonts.slice(0, 100).map(f =>
+      `<li><a href="/font/${generateSlug(f.name)}">${f.nameArabic}</a></li>`
+    ).join('\n');
+    const body = `<p>${desc}</p><h2>التصنيفات</h2><ul>${catLinks}</ul><h2>الخطوط</h2><ul>${fontLinks}</ul>`;
+    res.send(botHTML(title, desc, canonical, 'مكتبة الخطوط العربية المجانية', body));
+  });
+
   app.get("/api/fonts", async (req, res) => {
     try {
       const fonts = await storage.getAllFonts();
@@ -72,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/sitemap.xml", async (req, res) => {
     try {
-      const baseUrl = "https://www.xfontat.com";
+      const baseUrl = "https://xfontat.com";
 
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "daily" },
@@ -165,13 +274,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/robots.txt", (req, res) => {
-    const baseUrl = "https://www.xfontat.com";
-
     const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: ${baseUrl}/sitemap.xml`;
+Sitemap: https://xfontat.com/sitemap.xml`;
 
     res.header('Content-Type', 'text/plain');
     res.send(robotsTxt);
