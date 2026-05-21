@@ -235,6 +235,98 @@ export default function Home() {
         )}
       </main>
 
+      {/* Educational content about Arabic typography */}
+      <section className="container mx-auto px-3 md:px-4 py-10 border-t">
+        <h2 className="text-2xl font-bold mb-6">ما هو الخط العربي وما أهميته للمصمم؟</h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div>
+            <p className="text-muted-foreground leading-loose mb-4">
+              الخط العربي فن بصري راقٍ يجمع بين الجمال الجمالي والوظيفة التواصلية. نشأ منذ أكثر من أربعة عشر قرناً وتطور عبر حضارات متعاقبة لينتج لنا اليوم مدرسة خطية فريدة لا مثيل لها في تنوعها وثرائها. يختلف الخط العربي عن الخط اللاتيني في كونه يُكتب من اليمين إلى اليسار، وفي أن الحرف العربي يغيّر شكله بحسب موقعه في الكلمة (بداية، وسط، نهاية)، مما يمنحه ديناميكية بصرية استثنائية.
+            </p>
+            <p className="text-muted-foreground leading-loose">
+              للمصمم العربي، اختيار الخط المناسب ليس مجرد قرار جمالي بل هو قرار استراتيجي يحدد هوية المشروع وطابعه ورسالته. خط الثلث يوحي بالأصالة والروحانية، بينما خط الكوفي الهندسي يُشعّ بالحداثة والجرأة. النسخ يُقرأ بسهولة في النصوص الطويلة، والديواني يُضفي رقياً على المناسبات الاحتفالية.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-3">لماذا تختار xfontat؟</h3>
+            <ul className="space-y-3">
+              {[
+                { title: "651+ خط عربي", desc: "أكبر مكتبة مجانية تضم ثمانية أصناف رئيسية" },
+                { title: "تحميل فوري مجاني", desc: "جميع الخطوط بصيغتي TTF وOTF متاحة بدون تسجيل" },
+                { title: "معاينة مباشرة", desc: "اكتب نصك الخاص وشاهده بأي خط قبل التحميل" },
+                { title: "متوافقة مع كل البرامج", desc: "Photoshop وIllustrator وWord وكل تطبيقات التصميم" },
+                { title: "تحديثات مستمرة", desc: "نضيف خطوطاً جديدة بانتظام لمواكبة احتياجاتك" },
+              ].map((item, i) => (
+                <li key={i} className="flex gap-3 items-start">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-primary shrink-0" />
+                  <span className="text-sm text-muted-foreground leading-relaxed"><strong className="text-foreground">{item.title}:</strong> {item.desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-3 md:px-4 py-10 border-t">
+        <h2 className="text-2xl font-bold mb-6">كيف تختار الخط العربي المناسب لمشروعك؟</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {[
+            {
+              title: "للشعارات والهوية البصرية",
+              content: "اختر خط الكوفي الهندسي إذا أردت طابعاً حديثاً جريئاً، أو خط الثلث إذا أردت إبراز الأصالة والعراقة. تجنب خطوط النسخ في الشعارات لأنها تفتقر إلى الشخصية المميزة."
+            },
+            {
+              title: "لمنشورات السوشال ميديا",
+              content: "خطوط الرقعة والتصميم الحديثة هي الأنسب لأنها جذابة بصرياً وتُقرأ بسرعة على الشاشات الصغيرة. اختر الخط الذهبي والأوزان العريضة للمنشورات التسويقية."
+            },
+            {
+              title: "للكتب والمحتوى الطويل",
+              content: "خط النسخ هو الخيار الأمثل لأي نص طويل. اختر وزناً خفيفاً أو عادياً وتباعداً سخياً بين الأسطر (1.8 على الأقل) لضمان أعلى مستوى من الراحة في القراءة."
+            },
+            {
+              title: "للدعوات والمناسبات",
+              content: "خط الديواني هو الملك هنا. يمنح الدعوات طابعاً فاخراً لا مثيل له. استخدمه مع الألوان الذهبية والفضية والتصاميم الزخرفية الأنيقة."
+            },
+            {
+              title: "للمحتوى الديني والقرآني",
+              content: "خط النسخ المحقق أو خط الثلث المناسبان لهذا الغرض. تأكد من أن الخط يدعم التشكيل الكامل (الحركات) لضمان الدقة في الكتابة القرآنية."
+            },
+            {
+              title: "للفوتوشوب والتصميم الجرافيكي",
+              content: "استخدم خطوط فئة الفوتوشوب المُحسَّنة خصيصاً للعمل مع برامج Adobe. تحقق من دعم الخط لميزة World-Ready Composer للكتابة العربية الصحيحة."
+            }
+          ].map((item, i) => (
+            <div key={i} className="border rounded-lg p-5">
+              <h3 className="font-semibold mb-2">{item.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.content}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container mx-auto px-3 md:px-4 py-10 border-t">
+        <h2 className="text-2xl font-bold mb-2">أصناف الخطوط العربية: دليل سريع</h2>
+        <p className="text-muted-foreground mb-6">الخط العربي يضم مدارس متعددة تختلف في تاريخها وأسلوبها واستخداماتها. إليك نظرة سريعة على الأصناف الرئيسية:</p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { name: "خط الثلث", count: "14 خطاً", desc: "أجمل الخطوط وأكثرها تعقيداً، للمساجد والتصاميم الراقية" },
+            { name: "خط الديواني", count: "20 خطاً", desc: "أصله ديوان السلطان العثماني، مثالي للدعوات والمناسبات" },
+            { name: "خط الرقعة", count: "23 خطاً", desc: "الأكثر استخداماً في الحياة اليومية والمحتوى الرقمي" },
+            { name: "خط الكوفي", count: "21 خطاً", desc: "أقدم الخطوط العربية، هندسي وعصري في آنٍ واحد" },
+            { name: "خط النسخ", count: "112 خطاً", desc: "عماد الطباعة والنشر، الأوضح للنصوص الطويلة" },
+            { name: "خطوط التصميم", count: "248 خطاً", desc: "تنوع إبداعي هائل للمصممين المعاصرين" },
+            { name: "خطوط الفوتوشوب", count: "202 خطاً", desc: "مُحسَّنة خصيصاً لبرامج Adobe التصميمية" },
+            { name: "خط النستعليق", count: "11 خطاً", desc: "عروس الخطوط الفارسية، للشعر والأدب الرفيع" },
+          ].map((item, i) => (
+            <div key={i} className="border rounded-lg p-4">
+              <p className="font-semibold text-sm mb-1">{item.name}</p>
+              <p className="text-xs text-primary mb-2">{item.count}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="container mx-auto px-3 md:px-4 py-8">
         <h2 className="text-xl font-bold mb-4">تصفح الخطوط حسب الاستخدام</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

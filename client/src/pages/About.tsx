@@ -5,20 +5,20 @@ import { createWebPageSchema } from "@/lib/schemas";
 
 export default function About() {
   const schema = createWebPageSchema({
-    name: "من نحن - xfontat",
+    name: "من نحن - xfontat | منصة الخطوط العربية",
     description: "تعرف على xfontat، منصة الخطوط العربية الاحترافية المجانية. مهمتنا توفير خطوط عربية عالية الجودة لجميع المصممين والمطورين.",
-    url: "https://www.xfontat.com/about"
+    url: "https://xfontat.com/about"
   });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SEOHead 
-        title="من نحن | xfontat"
-        description="تعرف على xfontat، منصة الخطوط العربية الاحترافية المجانية. نوفر مجموعة واسعة من الخطوط العربية بأنماط متعددة: ثلث، ديواني، كوفي، نسخ، رقعة، وتصميم."
+      <SEOHead
+        title="من نحن | xfontat - منصة الخطوط العربية"
+        description="تعرف على xfontat، أكبر منصة خطوط عربية مجانية على الإنترنت. نوفر 651+ خط عربي بأنماط متعددة: ثلث، ديواني، كوفي، نسخ، رقعة، تصميم، فوتوشوب، ونستعليق."
         path="/about"
         schema={schema}
       />
-      <Header 
+      <Header
         searchQuery=""
         onSearchChange={() => {}}
         previewText="بسم الله الرحمن الرحيم"
@@ -30,64 +30,139 @@ export default function About() {
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-8">من نحن</h1>
-          
-          <div className="prose prose-lg max-w-none space-y-6">
+
+          <div className="space-y-12">
             <section>
               <h2 className="text-2xl font-semibold mb-4">مرحباً بك في xfontat</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                xfontat هي منصة متخصصة في توفير مجموعة متنوعة من الخطوط العربية الاحترافية والمجانية. نهدف إلى جعل الخطوط العربية عالية الجودة متاحة للجميع، سواء كنت مصمماً محترفاً أو هاوياً.
+              <p className="text-muted-foreground leading-loose mb-4">
+                xfontat هي المنصة العربية الأولى المتخصصة في توفير مجموعة شاملة من الخطوط العربية الاحترافية والمجانية. نضع بين يديك أكثر من 651 خطاً عربياً متنوعاً في ثمانية أصناف رئيسية: الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، الفوتوشوب، والنستعليق. هدفنا الأول والأخير هو جعل الخطوط العربية عالية الجودة متاحة للجميع بلا قيود، سواء كنت مصمماً محترفاً أو طالباً مبتدئاً أو صاحب مشروع يبحث عن هوية بصرية مميزة.
+              </p>
+              <p className="text-muted-foreground leading-loose">
+                في xfontat، نؤمن بأن الخط العربي ليس مجرد أداة للكتابة، بل هو إرث حضاري عريق ومنظومة فنية بديعة تستحق أن تكون في متناول كل مبدع. لذلك، نعمل بشكل مستمر على توسيع مكتبتنا وإضافة خطوط جديدة تعكس التنوع الغني للتراث الخطي العربي وتلبي احتياجات التصميم المعاصر.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">مهمتنا</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                نؤمن بأن الخط العربي هو فن وتراث يجب الحفاظ عليه وتطويره. مهمتنا هي توفير منصة سهلة الاستخدام تمكن المصممين والمطورين من الوصول إلى خطوط عربية احترافية بأنماط متعددة تشمل الثلث، الديواني، الكوفي، النسخ، والرقعة.
+              <h2 className="text-2xl font-semibold mb-4">مهمتنا ورؤيتنا</h2>
+              <p className="text-muted-foreground leading-loose mb-4">
+                مهمة xfontat واضحة ومحددة: أن نكون المرجع الأول للمصممين والمطورين والكتّاب الباحثين عن خطوط عربية موثوقة وعالية الجودة. نسعى إلى تحقيق ذلك من خلال بناء مكتبة خطوط شاملة توثّق التراث الخطي العربي بكل مدارسه وأصنافه، ومن خلال تقديم أدوات معاينة تفاعلية تُمكّن المستخدم من اختبار الخط على نصه الخاص قبل التحميل.
+              </p>
+              <p className="text-muted-foreground leading-loose">
+                رؤيتنا المستقبلية هي أن نبني أكبر وأغنى مرجع رقمي للخطوط العربية على الإنترنت، يخدم المصممين في كل مكان ويُسهم في نشر ثقافة الخط العربي وتقديره على المستوى العالمي. نحلم بعالم يجد فيه كل من يريد التعبير بالعربية الخط المثالي الذي يعكس رسالته بدقة وجمال.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">ما نقدمه</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>مجموعة واسعة من الخطوط العربية بأنماط مختلفة</li>
-                <li>إمكانية معاينة الخطوط مباشرة مع نص قابل للتخصيص</li>
-                <li>تحميل مجاني لجميع الخطوط بصيغ TTF وOTF</li>
-                <li>تصنيف منظم حسب أنواع الخطوط التقليدية</li>
-                <li>واجهة عربية بالكامل مع دعم RTL</li>
-                <li>تحديثات منتظمة بخطوط جديدة</li>
-              </ul>
+              <h2 className="text-2xl font-semibold mb-4">تاريخ الخط العربي: جذور ضاربة في العمق</h2>
+              <p className="text-muted-foreground leading-loose mb-4">
+                يمتد تاريخ الخط العربي إلى ما قبل الإسلام، حين كانت القبائل العربية تستخدم خطاً بدائياً مشتقاً من النبطي. ومع الفتح الإسلامي في القرن السابع الميلادي، أصبح الخط العربي أداة تدوين الوحي القرآني الكريم، فأُوليَ اهتماماً بالغاً وارتقى إلى مرتبة الفن الأول في الحضارة الإسلامية.
+              </p>
+              <p className="text-muted-foreground leading-loose mb-4">
+                في القرن العاشر الميلادي، أرسى الخطاط الكبير ابن مقلة قواعد الخط العربي وضبط نسبه الهندسية بدقة رياضية مبهرة، فأصبح "أبا الخط العربي". تبعه ابن البوّاب الذي رقّى الخط إلى آفاق جمالية جديدة، ثم ياقوت المستعصمي الذي بلغ به ذروة الكمال في العصر العباسي.
+              </p>
+              <p className="text-muted-foreground leading-loose">
+                في العصر العثماني، توسّعت مدرسة الخط العربي وأسهمت فيها أقلام تركية وفارسية وكردية أثرت التراث الخطي بأساليب جديدة. ومن إسطنبول إلى سمرقند ومن بغداد إلى الأندلس، كان الخط العربي لغة الحضارة الجامعة. واليوم، يحمل الخطاطون والمصممون الرقميون هذا التراث ويطوّرونه لخدمة عصر الشاشات والتقنية.
+              </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">تصنيفات الخطوط</h2>
+              <h2 className="text-2xl font-semibold mb-6">أصناف الخطوط في مكتبتنا</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-lg mb-2">خط الثلث</h3>
-                  <p className="text-sm text-muted-foreground">خط عربي جمالي بارز، يتميز بالمرونة وتنوع الأشكال</p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-lg mb-2">خط الديواني</h3>
-                  <p className="text-sm text-muted-foreground">خط زخرفي أنيق يستخدم في الوثائق الرسمية</p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-lg mb-2">خط الكوفي</h3>
-                  <p className="text-sm text-muted-foreground">أقدم الخطوط العربية، يتميز بالهندسية والبساطة</p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-lg mb-2">خط النسخ</h3>
-                  <p className="text-sm text-muted-foreground">الخط الأكثر استخداماً، واضح وسهل القراءة</p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-lg mb-2">خط الرقعة</h3>
-                  <p className="text-sm text-muted-foreground">خط سريع الكتابة، يستخدم في الحياة اليومية</p>
-                </div>
+                {[
+                  {
+                    name: "خط الثلث",
+                    count: "14 خطاً",
+                    desc: "تاج الخطوط العربية وأجملها. نشأ في القرن العاشر الميلادي وازدهر في العصر العثماني. يُستخدم في الزخارف المعمارية للمساجد والتصاميم الفنية الراقية والشعارات التراثية."
+                  },
+                  {
+                    name: "خط الديواني",
+                    count: "20 خطاً",
+                    desc: "نشأ في ديوان السلطان العثماني في القرن الخامس عشر. يتميز بانسيابيته الجذابة وزخارفه الأنيقة، وهو الخيار الأول لبطاقات الأفراح والشهادات والمناسبات الرسمية."
+                  },
+                  {
+                    name: "خط الرقعة",
+                    count: "23 خطاً",
+                    desc: "طُوّر في القرن التاسع عشر للكتابة السريعة في الوثائق الرسمية. أصبح الأكثر شيوعاً في الحياة اليومية العربية، مثالي للمحتوى الرقمي والسوشال ميديا والواجهات العصرية."
+                  },
+                  {
+                    name: "خط الكوفي",
+                    count: "21 خطاً",
+                    desc: "أقدم الخطوط العربية، نشأ في الكوفة العراقية في القرن السابع الميلادي. زواياه الهندسية الحادة تجعله مثالياً لتصميم الشعارات والهوية البصرية والأعمال الفنية التجريدية."
+                  },
+                  {
+                    name: "خط النسخ",
+                    count: "112 خطاً",
+                    desc: "عماد الطباعة والنشر العربي منذ القرن العاشر. أوضح الخطوط وأسهلها قراءة في جميع الأحجام. به تُطبع معظم المصاحف والكتب والصحف والمواقع الإلكترونية."
+                  },
+                  {
+                    name: "خطوط التصميم",
+                    count: "248 خطاً",
+                    desc: "مجموعة واسعة من الخطوط الإبداعية المعاصرة التي ابتكرها مصممون محترفون لتلبية متطلبات التصميم الجرافيكي الحديث في الإعلانات ومنصات التواصل الاجتماعي."
+                  },
+                  {
+                    name: "خطوط الفوتوشوب",
+                    count: "202 خطاً",
+                    desc: "خطوط عربية مُحسَّنة خصيصاً للعمل مع برامج Adobe Photoshop وIllustrator وInDesign. تُعطي نتائج مثالية في مشاريع التصميم الجرافيكي والطباعة الاحترافية."
+                  },
+                  {
+                    name: "خط النستعليق",
+                    count: "11 خطاً",
+                    desc: "جوهرة الخط الفارسي، ابتكره مير علي تبريزي في القرن الرابع عشر. هو الخط الرسمي للغة الأردية ومرتبط بالشعر والأدب الكلاسيكي في الحضارة الإسلامية."
+                  }
+                ].map((cat, i) => (
+                  <div key={i} className="border rounded-lg p-5">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-semibold text-lg">{cat.name}</h3>
+                      <span className="text-xs text-primary border border-primary/30 rounded px-2 py-0.5 shrink-0">{cat.count}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{cat.desc}</p>
+                  </div>
+                ))}
               </div>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">رؤيتنا</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                نسعى لأن نكون المرجع الأول للخطوط العربية على الإنترنت، ونطمح إلى توسيع مكتبتنا باستمرار لتشمل المزيد من الخطوط العربية الأصيلة والحديثة، مع الحفاظ على أعلى معايير الجودة.
+              <h2 className="text-2xl font-semibold mb-4">الخط العربي والتصميم الرقمي الحديث</h2>
+              <p className="text-muted-foreground leading-loose mb-4">
+                أحدث التحول الرقمي ثورة في عالم الخط العربي. من الحفر على الحجر والتخطيط بالقلم والحبر، انتقلنا إلى بيكسلات الشاشة ومتجهات الـ SVG وملفات الـ OTF. هذا الانتقال لم يُلغِ جمال الخط العربي بل أتاح نشره على نطاق أوسع بكثير مما كان ممكناً في أي عصر سابق.
+              </p>
+              <p className="text-muted-foreground leading-loose mb-4">
+                لكن التصميم العربي الرقمي يطرح تحديات فريدة: اتجاه الكتابة من اليمين لليسار (RTL)، وصل الحروف وتغيّر أشكالها، دعم الحركات والتشكيل، والتوافق مع أنظمة التشغيل والمتصفحات المختلفة. في xfontat، نختار كل خط بعناية للتأكد من أنه يعمل بشكل صحيح في البيئات الرقمية.
+              </p>
+              <p className="text-muted-foreground leading-loose">
+                ينصح خبراء الـ UX/UI بالتالي عند تصميم واجهات عربية: استخدم خطوط النسخ والرقعة الحديثة لنصوص الجسم الرئيسية، واحرص على تباعد السطور السخي (1.6-2.0)، واختبر الخط على أجهزة مختلفة قبل اعتماده. هذه المعايير تضمن تجربة قراءة مريحة واحترافية على جميع الشاشات.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">ما الذي يميز xfontat؟</h2>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { title: "مجانية بلا حدود", desc: "جميع الخطوط متاحة للتحميل الفوري والمجاني. لا حساب، لا اشتراك، لا قيود." },
+                  { title: "معاينة تفاعلية فريدة", desc: "اكتب نصك الخاص وشاهده بأي خط قبل التحميل، مع إمكانية تعديل الحجم من 16 إلى 72 بكسل." },
+                  { title: "تصنيف منهجي دقيق", desc: "كل خط موضوع في تصنيفه الصحيح وفق معايير الخط العربي الكلاسيكية والمعاصرة." },
+                  { title: "مدونة تعليمية غنية", desc: "مقالات ودروس منتظمة عن الخط العربي واستخداماته في التصميم المعاصر." },
+                  { title: "واجهة عربية RTL", desc: "المنصة مُصمَّمة أصلاً للعربية بدعم كامل للاتجاه من اليمين لليسار." },
+                  { title: "تحديثات مستمرة", desc: "نضيف خطوطاً جديدة بانتظام ليظل محتوانا حديثاً وملبياً لاحتياجاتك المتطورة." },
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-4 items-start p-4 border rounded-lg">
+                    <span className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">{i + 1}</span>
+                    <div>
+                      <h3 className="font-semibold mb-1">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">رؤيتنا للمستقبل</h2>
+              <p className="text-muted-foreground leading-loose mb-4">
+                نسعى في xfontat إلى أن نكون أكثر من مجرد مكتبة خطوط. نريد أن نكون منظومة متكاملة تخدم مجتمع التصميم العربي على مختلف مستوياته: من المبتدئين الذين يبحثون عن خطهم الأول، إلى المحترفين الذين يحتاجون مكتبة واسعة وموثوقة، إلى الباحثين الذين يدرسون تطور الخط العربي عبر التاريخ.
+              </p>
+              <p className="text-muted-foreground leading-loose">
+                في الأفق القريب، نعمل على تطوير أدوات تصميم مدمجة تتيح لك تخصيص الخط مباشرة على المنصة، وبناء محرك بحث ذكي يقترح الخط الأنسب بناءً على وصفك لمشروعك. نحن هنا لنبقى ولنخدمك بأفضل ما يمكن، لأن الخط العربي يستحق منصة في مستوى عظمته.
               </p>
             </section>
           </div>

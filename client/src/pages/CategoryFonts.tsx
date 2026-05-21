@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
+import { CategoryContent } from "@/components/CategoryContent";
 import { useToast } from "@/hooks/use-toast";
 import { groupFontsByFamily } from "@/lib/fontFamily";
 import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
@@ -248,6 +249,10 @@ export default function CategoryFonts() {
           </>
         )}
       </main>
+
+      <div className="container mx-auto px-3 md:px-4">
+        <CategoryContent category={arabicCategory} />
+      </div>
 
       <FAQ />
       <Footer />
