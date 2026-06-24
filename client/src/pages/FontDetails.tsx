@@ -11,6 +11,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
+import { getCategorySlug } from "@/lib/categorySlug";
 import { detectFontFamily, getWeightLabel } from "@/lib/fontFamily";
 import { createBreadcrumbSchema } from "@/lib/schemas";
 import { blogPosts } from "@/lib/blogData";
@@ -212,7 +213,7 @@ export default function FontDetails() {
 
   const breadcrumbItems = [
     { label: 'الرئيسية', href: '/' },
-    { label: font.category, href: `/fonts/${font.category}` },
+    { label: font.category, href: `/fonts/${getCategorySlug(font.category)}` },
     { label: font.nameArabic, href: `/font/${fontSlug}` }
   ];
 
@@ -224,7 +225,7 @@ export default function FontDetails() {
     "@graph": [
       createBreadcrumbSchema([
         { name: "الرئيسية", url: "https://www.xfontat.com/" },
-        { name: font.category, url: `https://www.xfontat.com/fonts/${font.category}` },
+        { name: font.category, url: `https://www.xfontat.com/fonts/${getCategorySlug(font.category)}` },
         { name: font.nameArabic, url: `https://www.xfontat.com/font/${fontSlug}` }
       ]),
       {
@@ -386,7 +387,7 @@ export default function FontDetails() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">الفئة:</span>
-                    <Link href={`/fonts/${font.category}`} className="mr-2 font-medium hover:underline" data-testid="link-info-category">
+                    <Link href={`/fonts/${getCategorySlug(font.category)}`} className="mr-2 font-medium hover:underline" data-testid="link-info-category">
                       {font.category}
                     </Link>
                   </div>
@@ -526,7 +527,7 @@ export default function FontDetails() {
                   </div>
                   <div className="mt-4 text-center">
                     <Link
-                      href={`/fonts/${font.category}`}
+                      href={`/fonts/${getCategorySlug(font.category)}`}
                       className="text-sm text-foreground hover:underline"
                       data-testid="link-view-all-category"
                     >
@@ -560,7 +561,7 @@ export default function FontDetails() {
               <div className="border rounded-lg p-6 sticky top-24 space-y-6">
                 <div>
                   <h3 className="text-lg font-bold mb-3">فئة الخط</h3>
-                  <Link href={`/fonts/${font.category}`} data-testid="link-font-category">
+                  <Link href={`/fonts/${getCategorySlug(font.category)}`} data-testid="link-font-category">
                     <span className="px-3 py-1 bg-muted text-foreground rounded-md text-sm cursor-pointer hover:bg-muted/80">
                       {font.category}
                     </span>
@@ -571,7 +572,7 @@ export default function FontDetails() {
                   <h3 className="text-lg font-bold mb-3">تصفح الفئات</h3>
                   <div className="flex flex-wrap gap-2">
                     {allCategories.filter(c => c !== font.category).map(cat => (
-                      <Link key={cat} href={`/fonts/${cat}`} data-testid={`link-category-${cat}`}>
+                      <Link key={cat} href={`/fonts/${getCategorySlug(cat)}`} data-testid={`link-category-${cat}`}>
                         <span className="px-3 py-1 bg-muted/50 text-muted-foreground rounded-md text-sm cursor-pointer hover:bg-muted">
                           {cat}
                         </span>
