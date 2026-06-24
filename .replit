@@ -46,3 +46,7 @@ integrations = ["javascript_mem_db:1.0.0", "javascript_gemini_ai_integrations:2.
 
 [userenv.shared]
 VITE_GA_MEASUREMENT_ID = "G-PRERSDYJ5N"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
