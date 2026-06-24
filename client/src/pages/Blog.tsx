@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Clock, User, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { createBreadcrumbSchema } from "@/lib/schemas";
+import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts as staticBlogPosts } from "@/lib/blogData";
 
 interface GeneratedPost {
@@ -43,8 +43,8 @@ export default function Blog() {
   ];
 
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "الرئيسية", url: "https://www.xfontat.com/" },
-    { name: "المدونة", url: "https://www.xfontat.com/blog" },
+    { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
+    { name: "المدونة", url: `${SITE_ORIGIN}/blog` },
   ]);
 
   const blogListSchema = {
@@ -56,12 +56,12 @@ export default function Blog() {
         name: "مدونة xfontat - نصائح وشروحات عن الخطوط العربية",
         description:
           "اقرأ مقالات مفيدة عن اختيار واستخدام الخطوط العربية في التصميم والمشاريع الرقمية.",
-        url: "https://www.xfontat.com/blog",
+        url: `${SITE_ORIGIN}/blog`,
         inLanguage: "ar",
         isPartOf: {
           "@type": "WebSite",
           name: "xfontat",
-          url: "https://www.xfontat.com",
+          url: SITE_ORIGIN,
         },
       },
       {
@@ -73,7 +73,7 @@ export default function Blog() {
             "@type": "Article",
             headline: post.title,
             description: post.excerpt,
-            url: `https://www.xfontat.com/blog/${post.slug}`,
+            url: `${SITE_ORIGIN}/blog/${post.slug}`,
             datePublished: post.dateISO,
             author: { "@type": "Person", name: post.author },
           },

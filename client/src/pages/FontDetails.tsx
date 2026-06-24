@@ -13,7 +13,7 @@ import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
 import { getCategorySlug } from "@/lib/categorySlug";
 import { detectFontFamily, getWeightLabel } from "@/lib/fontFamily";
-import { createBreadcrumbSchema } from "@/lib/schemas";
+import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts } from "@/lib/blogData";
 import { useToast } from "@/hooks/use-toast";
 import type { Font } from "@shared/schema";
@@ -224,9 +224,9 @@ export default function FontDetails() {
     "@context": "https://schema.org",
     "@graph": [
       createBreadcrumbSchema([
-        { name: "الرئيسية", url: "https://www.xfontat.com/" },
-        { name: font.category, url: `https://www.xfontat.com/fonts/${getCategorySlug(font.category)}` },
-        { name: font.nameArabic, url: `https://www.xfontat.com/font/${fontSlug}` }
+        { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
+        { name: font.category, url: `${SITE_ORIGIN}/fonts/${getCategorySlug(font.category)}` },
+        { name: font.nameArabic, url: `${SITE_ORIGIN}/font/${fontSlug}` }
       ]),
       {
         "@type": "SoftwareApplication",
@@ -241,8 +241,8 @@ export default function FontDetails() {
           "price": "0",
           "priceCurrency": "USD"
         },
-        "downloadUrl": `https://www.xfontat.com${font.fileUrl}`,
-        "url": `https://www.xfontat.com/font/${fontSlug}`
+        "downloadUrl": `${SITE_ORIGIN}${font.fileUrl}`,
+        "url": `${SITE_ORIGIN}/font/${fontSlug}`
       },
       {
         "@type": "FAQPage",

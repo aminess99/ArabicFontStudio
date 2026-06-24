@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { groupFontsByFamily } from "@/lib/fontFamily";
-import { createCollectionPageSchema, createItemListSchema } from "@/lib/schemas";
+import { createCollectionPageSchema, createItemListSchema, SITE_ORIGIN } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -94,9 +94,9 @@ export default function DesignFonts() {
     "@context": "https://schema.org",
     "@graph": [
       createCollectionPageSchema({
-        name: "خطوط التصميم - xfontat",
-        description: "مجموعة من 78 خط تصميم احترافي من مجموعة GE للاستخدام في المشاريع الإبداعية",
-        url: "https://www.xfontat.com/design-fonts",
+        name: `خطوط التصميم - ${fonts.length} خط احترافي | xfontat`,
+        description: `مجموعة من ${fonts.length} خط تصميم احترافي من مجموعة GE للاستخدام في المشاريع الإبداعية`,
+        url: `${SITE_ORIGIN}/design-fonts`,
         numberOfItems: fonts.length
       }),
       createItemListSchema(fonts)
@@ -106,8 +106,8 @@ export default function DesignFonts() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title="خطوط التصميم - 78 خط احترافي | xfontat"
-        description="استكشف مجموعة من 78 خط تصميم احترافي من سلسلة GE. خطوط عربية حديثة ومميزة للمشاريع الإبداعية والتصميمات الاحترافية. تحميل مجاني بصيغ متعددة."
+        title={`خطوط التصميم - ${fonts.length} خط احترافي | xfontat`}
+        description={`استكشف مجموعة من ${fonts.length} خط تصميم احترافي من سلسلة GE. خطوط عربية حديثة ومميزة للمشاريع الإبداعية والتصميمات الاحترافية. تحميل مجاني بصيغ متعددة.`}
         path="/design-fonts"
         schema={schema}
       />

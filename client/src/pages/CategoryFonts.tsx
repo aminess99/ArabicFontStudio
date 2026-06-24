@@ -13,7 +13,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { CategoryContent } from "@/components/CategoryContent";
 import { useToast } from "@/hooks/use-toast";
 import { groupFontsByFamily } from "@/lib/fontFamily";
-import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
+
+import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -151,13 +152,13 @@ export default function CategoryFonts() {
     "@context": "https://schema.org",
     "@graph": [
       createBreadcrumbSchema([
-        { name: "الرئيسية", url: "https://www.xfontat.com/" },
-        { name: categoryData.arabicName, url: `https://www.xfontat.com/fonts/${categorySlug}` }
+        { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
+        { name: categoryData.arabicName, url: `${SITE_ORIGIN}/fonts/${categorySlug}` }
       ]),
       createCollectionPageSchema({
         name: categoryData.arabicName,
         description: categoryData.description,
-        url: `https://www.xfontat.com/fonts/${categorySlug}`,
+        url: `${SITE_ORIGIN}/fonts/${categorySlug}`,
         numberOfItems: filteredFonts.length
       }),
       createItemListSchema(filteredFonts),

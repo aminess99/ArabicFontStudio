@@ -11,7 +11,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { groupFontsByFamily } from "@/lib/fontFamily";
 import { getCategorySlug } from "@/lib/categorySlug";
-import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema } from "@/lib/schemas";
+import { createCollectionPageSchema, createItemListSchema, createFAQSchema, createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -148,7 +148,7 @@ export default function Home() {
       createCollectionPageSchema({
         name: "xfontat - مكتبة الخطوط العربية",
         description: "مكتبة شاملة من الخطوط العربية الاحترافية - ثلث، ديواني، رقعة، كوفي، نسخ، تصميم",
-        url: "https://www.xfontat.com",
+        url: SITE_ORIGIN,
         numberOfItems: fonts.length
       }),
       createItemListSchema(fonts),

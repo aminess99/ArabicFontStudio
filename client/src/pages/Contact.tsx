@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { createWebPageSchema } from "@/lib/schemas";
+import { createWebPageSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { Mail, MessageSquare, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +9,7 @@ export default function Contact() {
   const schema = createWebPageSchema({
     name: "اتصل بنا - xfontat",
     description: "تواصل مع فريق xfontat. نحن هنا للإجابة على أسئلتك ومساعدتك في كل ما يتعلق بالخطوط العربية.",
-    url: "https://www.xfontat.com/contact"
+    url: `${SITE_ORIGIN}/contact`
   });
 
   return (

@@ -1,13 +1,13 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { createWebPageSchema } from "@/lib/schemas";
+import { createWebPageSchema, SITE_ORIGIN } from "@/lib/schemas";
 
 export default function Terms() {
   const schema = createWebPageSchema({
     name: "شروط الاستخدام - xfontat",
     description: "اقرأ شروط وأحكام استخدام موقع xfontat وحقوق استخدام الخطوط العربية المتوفرة.",
-    url: "https://www.xfontat.com/terms"
+    url: `${SITE_ORIGIN}/terms`
   });
 
   return (

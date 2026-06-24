@@ -8,7 +8,7 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useToast } from "@/hooks/use-toast";
-import { createBreadcrumbSchema } from "@/lib/schemas";
+import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { getCollectionBySlug, collections } from "@/lib/collectionsData";
 import type { Font } from "@shared/schema";
 
@@ -87,14 +87,14 @@ export default function FontCollection() {
     "@context": "https://schema.org",
     "@graph": [
       createBreadcrumbSchema([
-        { name: "الرئيسية", url: "https://www.xfontat.com/" },
-        { name: collection.titleArabic, url: `https://www.xfontat.com/collection/${slug}` }
+        { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
+        { name: collection.titleArabic, url: `${SITE_ORIGIN}/collection/${slug}` }
       ]),
       {
         "@type": "CollectionPage",
         "name": collection.title,
         "description": seoDescription,
-        "url": `https://www.xfontat.com/collection/${slug}`,
+        "url": `${SITE_ORIGIN}/collection/${slug}`,
         "inLanguage": "ar",
         "numberOfItems": filteredFonts.length,
         "keywords": collection.keywords.join(", ")

@@ -5,7 +5,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ArrowLeft, Clock, User, Calendar } from "lucide-react";
-import { createBreadcrumbSchema } from "@/lib/schemas";
+import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts as staticBlogPosts } from "@/lib/blogData";
 
 interface GeneratedPost {
@@ -147,9 +147,9 @@ export default function BlogPost() {
   ];
 
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "الرئيسية", url: "https://www.xfontat.com/" },
-    { name: "المدونة", url: "https://www.xfontat.com/blog" },
-    { name: post.title, url: `https://www.xfontat.com/blog/${post.slug}` },
+    { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
+    { name: "المدونة", url: `${SITE_ORIGIN}/blog` },
+    { name: post.title, url: `${SITE_ORIGIN}/blog/${post.slug}` },
   ]);
 
   const articleSchema = {
@@ -164,13 +164,13 @@ export default function BlogPost() {
         publisher: {
           "@type": "Organization",
           name: "xfontat",
-          url: "https://www.xfontat.com",
+          url: SITE_ORIGIN,
         },
         datePublished: post.dateISO,
         dateModified: post.dateISO,
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": `https://www.xfontat.com/blog/${post.slug}`,
+          "@id": `${SITE_ORIGIN}/blog/${post.slug}`,
         },
         inLanguage: "ar",
         keywords: (post.keywords || []).join(", "),

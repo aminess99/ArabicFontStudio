@@ -1,10 +1,12 @@
+export const SITE_ORIGIN = "https://xfontat.com";
+
 export const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "xfontat",
   "alternateName": "إكس فونتات",
-  "url": "https://www.xfontat.com",
-  "logo": "https://www.xfontat.com/logo.png",
+  "url": SITE_ORIGIN,
+  "logo": `${SITE_ORIGIN}/logo.png`,
   "description": "مكتبة شاملة للخطوط العربية الاحترافية مع إمكانية التحميل المجاني",
   "inLanguage": "ar",
   "sameAs": []
@@ -39,7 +41,7 @@ export function createCollectionPageSchema(params: {
     "isPartOf": {
       "@type": "WebSite",
       "name": "xfontat",
-      "url": "https://www.xfontat.com"
+      "url": SITE_ORIGIN
     },
     "about": {
       "@type": "Thing",
@@ -87,7 +89,7 @@ export function createWebPageSchema(params: {
     "isPartOf": {
       "@type": "WebSite",
       "name": "xfontat",
-      "url": "https://www.xfontat.com"
+      "url": SITE_ORIGIN
     }
   };
 }
