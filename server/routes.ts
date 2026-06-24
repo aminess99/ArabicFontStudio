@@ -159,14 +159,19 @@ const categoryContent: Record<string, { intro: string; history: string; usageTip
   }
 };
 
+const SITE_NAME = 'xfontat';
+const FALLBACK_OG_IMAGE = 'https://xfontat.com/logo.png';
+
 function botHTML(
   title: string,
   description: string,
   canonical: string,
   h1: string,
   body: string,
-  jsonLd?: object | object[]
+  jsonLd?: object | object[],
+  image?: string
 ): string {
+  const ogImage = image || FALLBACK_OG_IMAGE;
   const jsonLdScript = jsonLd
     ? `<script type="application/ld+json">${JSON.stringify(Array.isArray(jsonLd) ? { "@context": "https://schema.org", "@graph": jsonLd } : jsonLd)}</script>`
     : '';
@@ -180,13 +185,20 @@ function botHTML(
 <meta name="description" content="${description}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="${SITE_NAME}">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${canonical}">
+<meta property="og:image" content="${ogImage}">
+<meta property="og:image:alt" content="${title}">
 <meta property="og:locale" content="ar_AR">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@xfontat">
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${description}">
+<meta name="twitter:image" content="${ogImage}">
+<meta name="twitter:image:alt" content="${title}">
+<meta name="twitter:url" content="${canonical}">
 ${jsonLdScript}
 </head>
 <body>
