@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFontSchema } from "@shared/schema";
 import { getGeneratedPosts } from "./blogGenerator";
+import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
+import { collections } from "../client/src/lib/collectionsData";
 
 const categoryToSlug: Record<string, string> = {
   "ثلث": "thuluth",
@@ -26,7 +28,18 @@ function generateSlug(fontName: string): string {
     + "-font";
 }
 
-const BOT_AGENTS = ['googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot', 'facebot', 'ia_archiver', 'ahrefsbot', 'semrushbot', 'mj12bot'];
+const BOT_AGENTS = [
+  'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider',
+  'yandexbot', 'facebot', 'ia_archiver', 'ahrefsbot', 'semrushbot',
+  'mj12bot',
+  // AI crawlers
+  'gptbot', 'claudebot', 'perplexitybot', 'applebot', 'anthropic-ai',
+  'cohere-ai', 'ai2bot', 'diffbot', 'imagesiftbot', 'omgilibot',
+  // Social / share scrapers
+  'twitterbot', 'linkedinbot', 'whatsapp', 'telegrambot', 'slackbot',
+  'discordbot', 'facebookexternalhit', 'pinterestbot', 'snapchat',
+  'vkshare', 'w3c_validator', 'embedly', 'quora link preview',
+];
 
 function markdownToHtml(content: string): string {
   const paragraphs = content.split(/\n\n+/).filter(Boolean);
@@ -146,7 +159,17 @@ const categoryContent: Record<string, { intro: string; history: string; usageTip
   }
 };
 
-function botHTML(title: string, description: string, canonical: string, h1: string, body: string): string {
+function botHTML(
+  title: string,
+  description: string,
+  canonical: string,
+  h1: string,
+  body: string,
+  jsonLd?: object | object[]
+): string {
+  const jsonLdScript = jsonLd
+    ? `<script type="application/ld+json">${JSON.stringify(Array.isArray(jsonLd) ? { "@context": "https://schema.org", "@graph": jsonLd } : jsonLd)}</script>`
+    : '';
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -156,9 +179,15 @@ function botHTML(title: string, description: string, canonical: string, h1: stri
 <title>${title}</title>
 <meta name="description" content="${description}">
 <link rel="canonical" href="${canonical}">
+<meta property="og:type" content="website">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${canonical}">
+<meta property="og:locale" content="ar_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}">
+${jsonLdScript}
 </head>
 <body>
 <h1>${h1}</h1>
@@ -173,15 +202,39 @@ ${body}
 <a href="/fonts/tasmeem">خطوط التصميم</a> |
 <a href="/fonts/photoshop">خطوط الفوتوشوب</a> |
 <a href="/fonts/nastaliq">خطوط النستعليق</a> |
+<a href="/design-fonts">خطوط التصميم الحديث</a> |
 <a href="/about">من نحن</a> |
-<a href="/blog">المدونة</a>
+<a href="/blog">المدونة</a> |
+<a href="/contact">اتصل بنا</a>
 </nav>
 </body>
 </html>`;
 }
 
+const KNOWN_ROUTE_PATTERNS = [
+  /^\/$/,
+  /^\/design-fonts$/,
+  /^\/blog$/,
+  /^\/about$/,
+  /^\/contact$/,
+  /^\/privacy$/,
+  /^\/terms$/,
+  /^\/font\/[^/]+$/,
+  /^\/fonts\/[^/]+$/,
+  /^\/blog\/[^/]+$/,
+  /^\/collection\/[^/]+$/,
+  /^\/sitemap\.xml$/,
+  /^\/robots\.txt$/,
+  /^\/api\//,
+];
+
+function isKnownRoute(path: string): boolean {
+  return KNOWN_ROUTE_PATTERNS.some(p => p.test(path));
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Dynamic rendering for search engine bots
+
   app.get("/font/:slug", async (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const fonts = await storage.getAllFonts();
@@ -194,7 +247,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 <p>${desc}</p>
 <p>التصنيف: <a href="/fonts/${categoryToSlug[font.category] || font.category}">${font.category}</a></p>
 <a href="${font.fileUrl}" download="${font.fileName}">تحميل الخط مجاناً</a>`;
-    res.send(botHTML(title, desc, canonical, font.nameArabic, body));
+    const jsonLd = [
+      {
+        "@type": "SoftwareApplication",
+        "name": font.nameArabic,
+        "alternateName": font.name,
+        "applicationCategory": "DesignApplication",
+        "url": canonical,
+        "description": desc,
+        "inLanguage": "ar",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "operatingSystem": "Windows, macOS, Linux",
+        "downloadUrl": font.fileUrl,
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+          { "@type": "ListItem", "position": 2, "name": font.category, "item": `https://xfontat.com/fonts/${categoryToSlug[font.category] || font.category}` },
+          { "@type": "ListItem", "position": 3, "name": font.nameArabic, "item": canonical },
+        ]
+      }
+    ];
+    res.send(botHTML(title, desc, canonical, font.nameArabic, body, jsonLd));
   });
 
   app.get("/fonts/:category", async (req, res, next) => {
@@ -221,18 +296,341 @@ export async function registerRoutes(app: Express): Promise<Server> {
 <p>${content.faq}</p>
 ` : '';
     const body = `<p>${desc}</p>${richContent}<h2>قائمة خطوط ${arabicCat} (${catFonts.length} خط)</h2><ul>${links}</ul>`;
-    res.send(botHTML(title, desc, canonical, `خطوط ${arabicCat}`, body));
+    const jsonLd = [
+      {
+        "@type": "CollectionPage",
+        "name": title,
+        "description": desc,
+        "url": canonical,
+        "inLanguage": "ar",
+        "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+        "numberOfItems": catFonts.length,
+      },
+      {
+        "@type": "ItemList",
+        "name": `خطوط ${arabicCat}`,
+        "numberOfItems": catFonts.length,
+        "itemListElement": catFonts.slice(0, 20).map((f, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "item": {
+            "@type": "SoftwareApplication",
+            "name": f.nameArabic,
+            "url": `https://xfontat.com/font/${generateSlug(f.name)}`,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          }
+        }))
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+          { "@type": "ListItem", "position": 2, "name": `خطوط ${arabicCat}`, "item": canonical },
+        ]
+      },
+      ...(content ? [{
+        "@type": "FAQPage",
+        "mainEntity": [{ "@type": "Question", "name": content.faq.split('؟')[0] + '؟', "acceptedAnswer": { "@type": "Answer", "text": content.faq.split('؟').slice(1).join('؟') } }]
+      }] : [])
+    ];
+    res.send(botHTML(title, desc, canonical, `خطوط ${arabicCat}`, body, jsonLd));
   });
 
   app.get("/blog/:slug", async (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
+    const slug = req.params.slug;
+
+    // Check static blog posts first
+    const staticPost = staticBlogPosts.find(p => p.slug === slug);
+    if (staticPost) {
+      const canonical = `https://xfontat.com/blog/${slug}`;
+      const contentHtml = markdownToHtml(staticPost.content || '');
+      const body = `<p>${staticPost.excerpt || ''}</p>${contentHtml}`;
+      const jsonLd = [
+        {
+          "@type": "Article",
+          "headline": staticPost.title,
+          "description": staticPost.excerpt,
+          "url": canonical,
+          "inLanguage": "ar",
+          "author": { "@type": "Person", "name": staticPost.author },
+          "datePublished": staticPost.dateISO,
+          "publisher": { "@type": "Organization", "name": "xfontat", "url": "https://xfontat.com" },
+          "keywords": staticPost.keywords?.join(', '),
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+            { "@type": "ListItem", "position": 2, "name": "المدونة", "item": "https://xfontat.com/blog" },
+            { "@type": "ListItem", "position": 3, "name": staticPost.title, "item": canonical },
+          ]
+        }
+      ];
+      return res.send(botHTML(staticPost.title, staticPost.excerpt || staticPost.title, canonical, staticPost.title, body, jsonLd));
+    }
+
+    // Then check generated posts
     const posts = getGeneratedPosts();
-    const post = posts.find(p => p.slug === req.params.slug);
+    const post = posts.find(p => p.slug === slug);
     if (!post) return next();
-    const canonical = `https://xfontat.com/blog/${req.params.slug}`;
+    const canonical = `https://xfontat.com/blog/${slug}`;
     const contentHtml = markdownToHtml(post.content || '');
     const body = `<p>${post.excerpt || ''}</p>${contentHtml}`;
-    res.send(botHTML(post.title, post.excerpt || post.title, canonical, post.title, body));
+    const jsonLd = [
+      {
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.excerpt,
+        "url": canonical,
+        "inLanguage": "ar",
+        "author": { "@type": "Person", "name": post.author || "فريق xfontat" },
+        "datePublished": post.dateISO,
+        "publisher": { "@type": "Organization", "name": "xfontat", "url": "https://xfontat.com" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+          { "@type": "ListItem", "position": 2, "name": "المدونة", "item": "https://xfontat.com/blog" },
+          { "@type": "ListItem", "position": 3, "name": post.title, "item": canonical },
+        ]
+      }
+    ];
+    res.send(botHTML(post.title, post.excerpt || post.title, canonical, post.title, body, jsonLd));
+  });
+
+  app.get("/blog", (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const canonical = 'https://xfontat.com/blog';
+    const title = 'مدونة xfontat - مقالات الخطوط العربية والتصميم';
+    const desc = 'اقرأ أحدث مقالات الخطوط العربية والتصميم الجرافيكي. نصائح للمصممين حول اختيار الخطوط، استخداماتها وتاريخها.';
+    const generatedPosts = getGeneratedPosts();
+    const allPosts = [...staticBlogPosts, ...generatedPosts];
+    const postLinks = allPosts.slice(0, 40).map(p =>
+      `<li><a href="/blog/${p.slug}">${p.title}</a></li>`
+    ).join('\n');
+    const body = `<p>${desc}</p><h2>أحدث المقالات</h2><ul>${postLinks}</ul>`;
+    const jsonLd = [
+      {
+        "@type": "CollectionPage",
+        "name": title,
+        "description": desc,
+        "url": canonical,
+        "inLanguage": "ar",
+        "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+        "numberOfItems": allPosts.length,
+      },
+      {
+        "@type": "ItemList",
+        "name": "مقالات مدونة xfontat",
+        "numberOfItems": allPosts.length,
+        "itemListElement": allPosts.slice(0, 20).map((p, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "item": { "@type": "Article", "headline": p.title, "url": `https://xfontat.com/blog/${p.slug}` }
+        }))
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+          { "@type": "ListItem", "position": 2, "name": "المدونة", "item": canonical },
+        ]
+      }
+    ];
+    res.send(botHTML(title, desc, canonical, 'مدونة xfontat', body, jsonLd));
+  });
+
+  app.get("/design-fonts", async (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const fonts = await storage.getAllFonts();
+    const designFonts = fonts.filter(f => f.category === 'تصميم' || f.category === 'رقعة' || f.category === 'كوفي');
+    const canonical = 'https://xfontat.com/design-fonts';
+    const title = 'خطوط عربية للتصميم الحديث - تحميل مجاني | xfontat';
+    const desc = `اكتشف ${designFonts.length}+ خط عربي عصري للتصميم الجرافيكي والهوية البصرية والسوشال ميديا. تحميل مجاني.`;
+    const fontLinks = designFonts.slice(0, 50).map(f =>
+      `<li><a href="/font/${generateSlug(f.name)}">${f.nameArabic}</a></li>`
+    ).join('\n');
+    const body = `
+<p>${desc}</p>
+<h2>لماذا تختار خطوط التصميم العربية الحديثة؟</h2>
+<p>خطوط التصميم العربية الحديثة تجمع بين الأصالة العربية والحداثة الرقمية. مثالية للشعارات ومنشورات السوشال ميديا والهوية البصرية.</p>
+<h2>خطوط التصميم المتاحة</h2>
+<ul>${fontLinks}</ul>
+<h2>تصنيفات خطوط التصميم</h2>
+<ul>
+<li><a href="/fonts/tasmeem">خطوط التصميم</a></li>
+<li><a href="/fonts/kufi">خطوط الكوفي الهندسي</a></li>
+<li><a href="/fonts/ruqaa">خطوط الرقعة</a></li>
+</ul>`;
+    const jsonLd = [
+      {
+        "@type": "CollectionPage",
+        "name": title,
+        "description": desc,
+        "url": canonical,
+        "inLanguage": "ar",
+        "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+        "numberOfItems": designFonts.length,
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+          { "@type": "ListItem", "position": 2, "name": "خطوط التصميم", "item": canonical },
+        ]
+      }
+    ];
+    res.send(botHTML(title, desc, canonical, 'خطوط عربية للتصميم الحديث', body, jsonLd));
+  });
+
+  app.get("/collection/:slug", (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const collection = collections.find(c => c.slug === req.params.slug);
+    if (!collection) return next();
+    const canonical = `https://xfontat.com/collection/${req.params.slug}`;
+    const title = `${collection.titleArabic} | xfontat`;
+    const desc = collection.description;
+    const faqHtml = collection.faqs.map(f =>
+      `<h3>${f.question}</h3><p>${f.answer}</p>`
+    ).join('\n');
+    const useCaseList = collection.useCases.map(u => `<li>${u}</li>`).join('\n');
+    const body = `
+<p>${collection.longDescription}</p>
+<h2>حالات الاستخدام</h2>
+<ul>${useCaseList}</ul>
+<h2>الفئات المشمولة</h2>
+<ul>${collection.categories.map(c => `<li><a href="/fonts/${categoryToSlug[c] || c}">${c}</a></li>`).join('\n')}</ul>
+<h2>أسئلة شائعة</h2>
+${faqHtml}`;
+    const jsonLd = [
+      {
+        "@type": "CollectionPage",
+        "name": collection.titleArabic,
+        "description": collection.description,
+        "url": canonical,
+        "inLanguage": "ar",
+        "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+        "keywords": collection.keywords.join(', '),
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": collection.faqs.map(f => ({
+          "@type": "Question",
+          "name": f.question,
+          "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+        }))
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
+          { "@type": "ListItem", "position": 2, "name": collection.titleArabic, "item": canonical },
+        ]
+      }
+    ];
+    res.send(botHTML(title, desc, canonical, collection.titleArabic, body, jsonLd));
+  });
+
+  app.get("/about", (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const canonical = 'https://xfontat.com/about';
+    const title = 'من نحن | xfontat - مكتبة الخطوط العربية';
+    const desc = 'تعرف على xfontat، منصة الخطوط العربية الاحترافية التي توفر أكبر مجموعة من الخطوط العربية المجانية للمصممين والمطورين.';
+    const body = `
+<p>${desc}</p>
+<h2>ما هي xfontat؟</h2>
+<p>xfontat هي منصة متخصصة في توفير الخطوط العربية الاحترافية المجانية. نسعى لأن نكون المرجع الأول للمصممين والمطورين العرب الباحثين عن خطوط عربية عالية الجودة.</p>
+<h2>مهمتنا</h2>
+<p>نؤمن بأن الوصول إلى الخطوط العربية الاحترافية يجب أن يكون سهلاً ومجانياً للجميع. لذلك، نوفر مكتبة شاملة تضم مئات الخطوط العربية بأنماط متنوعة: ثلث، ديواني، كوفي، نسخ، رقعة، وغيرها.</p>
+<h2>تواصل معنا</h2>
+<p>يسعدنا تلقي استفساراتكم واقتراحاتكم. <a href="/contact">تواصل معنا</a></p>`;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": title,
+      "description": desc,
+      "url": canonical,
+      "inLanguage": "ar",
+      "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+      "about": {
+        "@type": "Organization",
+        "name": "xfontat",
+        "url": "https://xfontat.com",
+        "description": "منصة متخصصة في توفير الخطوط العربية الاحترافية والمجانية"
+      }
+    };
+    res.send(botHTML(title, desc, canonical, 'من نحن - xfontat', body, jsonLd));
+  });
+
+  app.get("/contact", (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const canonical = 'https://xfontat.com/contact';
+    const title = 'اتصل بنا | xfontat';
+    const desc = 'تواصل مع فريق xfontat لأي استفسارات حول الخطوط العربية، الاقتراحات، أو الدعم الفني.';
+    const body = `
+<p>${desc}</p>
+<h2>طرق التواصل</h2>
+<p>يمكنك التواصل معنا عبر البريد الإلكتروني أو من خلال نموذج التواصل المتاح على الصفحة.</p>
+<h2>الدعم الفني</h2>
+<p>إذا واجهت أي مشكلة في تحميل الخطوط أو استخدامها، لا تتردد في التواصل معنا وسنرد عليك في أقرب وقت ممكن.</p>`;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": title,
+      "description": desc,
+      "url": canonical,
+      "inLanguage": "ar",
+      "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+    };
+    res.send(botHTML(title, desc, canonical, 'اتصل بنا', body, jsonLd));
+  });
+
+  app.get("/privacy", (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const canonical = 'https://xfontat.com/privacy';
+    const title = 'سياسة الخصوصية | xfontat';
+    const desc = 'اقرأ سياسة الخصوصية الخاصة بمنصة xfontat لتعرف كيف نتعامل مع بياناتك الشخصية.';
+    const body = `
+<p>${desc}</p>
+<h2>جمع البيانات</h2>
+<p>نحن نحترم خصوصيتك ولا نجمع أي بيانات شخصية دون موافقتك الصريحة.</p>
+<h2>ملفات تعريف الارتباط</h2>
+<p>نستخدم ملفات تعريف الارتباط لتحسين تجربة المستخدم وتحليل بيانات الزيارات بصورة مجمعة وغير شخصية.</p>`;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": title,
+      "description": desc,
+      "url": canonical,
+      "inLanguage": "ar",
+      "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+    };
+    res.send(botHTML(title, desc, canonical, 'سياسة الخصوصية', body, jsonLd));
+  });
+
+  app.get("/terms", (req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    const canonical = 'https://xfontat.com/terms';
+    const title = 'شروط الاستخدام | xfontat';
+    const desc = 'اقرأ شروط وأحكام استخدام منصة xfontat لمكتبة الخطوط العربية.';
+    const body = `
+<p>${desc}</p>
+<h2>استخدام الخطوط</h2>
+<p>جميع الخطوط المتاحة على xfontat مجانية للاستخدام الشخصي والتصميمي. للاستخدام التجاري، يرجى مراجعة ترخيص كل خط على حدة.</p>
+<h2>حقوق الملكية الفكرية</h2>
+<p>محتوى الموقع وتصميمه هو ملك لـ xfontat. الخطوط المتاحة للتحميل هي ملك لمصمميها الأصليين.</p>`;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": title,
+      "description": desc,
+      "url": canonical,
+      "inLanguage": "ar",
+      "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
+    };
+    res.send(botHTML(title, desc, canonical, 'شروط الاستخدام', body, jsonLd));
   });
 
   app.get("/", async (req, res, next) => {
@@ -261,7 +659,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
 <h2>أبرز الخطوط المتاحة للتحميل</h2>
 <ul>${fontLinks}</ul>
 `;
-    res.send(botHTML(title, desc, canonical, 'مكتبة الخطوط العربية المجانية - xfontat', body));
+    const jsonLd = [
+      {
+        "@type": "WebSite",
+        "name": "xfontat",
+        "alternateName": "إكس فونتات",
+        "url": "https://xfontat.com",
+        "description": desc,
+        "inLanguage": "ar",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": { "@type": "EntryPoint", "urlTemplate": "https://xfontat.com/?q={search_term_string}" },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "xfontat",
+        "alternateName": "إكس فونتات",
+        "url": "https://xfontat.com",
+        "description": "منصة متخصصة في توفير الخطوط العربية الاحترافية والمجانية",
+        "inLanguage": "ar"
+      },
+      {
+        "@type": "CollectionPage",
+        "name": title,
+        "description": desc,
+        "url": "https://xfontat.com/",
+        "inLanguage": "ar",
+        "numberOfItems": fonts.length,
+      },
+      {
+        "@type": "ItemList",
+        "name": "أبرز الخطوط العربية",
+        "numberOfItems": fonts.length,
+        "itemListElement": fonts.slice(0, 20).map((f, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "item": {
+            "@type": "SoftwareApplication",
+            "name": f.nameArabic,
+            "url": `https://xfontat.com/font/${generateSlug(f.name)}`,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          }
+        }))
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "كيف أحمل الخطوط من xfontat؟",
+            "acceptedAnswer": { "@type": "Answer", "text": "يمكنك تحميل أي خط بسهولة من خلال الضغط على زر التحميل بجانب كل خط. الخطوط متاحة بصيغ TTF و OTF." }
+          },
+          {
+            "@type": "Question",
+            "name": "هل جميع الخطوط مجانية للتحميل؟",
+            "acceptedAnswer": { "@type": "Answer", "text": "نعم، جميع الخطوط في مكتبة xfontat متاحة للتحميل مجاناً بدون أي رسوم أو اشتراكات." }
+          },
+          {
+            "@type": "Question",
+            "name": "كيف أستخدم الخطوط في المشاريع التجارية؟",
+            "acceptedAnswer": { "@type": "Answer", "text": "جميع الخطوط في xfontat متاحة للاستخدام في المشاريع الشخصية والتجارية. تحقق من رخصة كل خط للحصول على تفاصيل الاستخدام الكاملة." }
+          }
+        ]
+      }
+    ];
+    res.send(botHTML(title, desc, canonical, 'مكتبة الخطوط العربية المجانية - xfontat', body, jsonLd));
   });
 
   app.get("/api/fonts", async (req, res) => {
@@ -336,31 +800,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : new Date().toISOString(),
       }));
 
-      const staticBlogPosts = [
-        { slug: "daleel-ikhtiyar-alkhat-alarabi", date: "2025-11-21" },
-        { slug: "alfarq-bayn-thuluth-kufi-ruqaa", date: "2025-11-20" },
-        { slug: "best-practices-arabic-fonts-digital-design", date: "2025-11-19" },
-        { slug: "how-to-download-use-arabic-fonts", date: "2025-11-18" },
-        { slug: "ethical-use-arabic-fonts", date: "2025-11-17" },
-        { slug: "afdal-10-khotot-arabiya-lil-tasmeem", date: "2025-11-16" },
-        { slug: "khotot-arabiya-lil-photoshop-majanan", date: "2025-11-15" },
-        { slug: "khotot-arabiya-lil-shiaarat-wal-logos", date: "2025-11-14" },
-        { slug: "khotot-arabiya-muzakhrafa-lil-tasmeem", date: "2025-11-13" },
-        { slug: "khotot-arabiya-lil-social-media", date: "2025-11-12" },
-        { slug: "khotot-arabiya-lil-youtubiyeen", date: "2026-03-15" },
-        { slug: "khotot-arabiya-lil-kotob-wal-matbooaat", date: "2026-03-16" },
-        { slug: "khotot-arabiya-lil-dawaat-wal-munasabaat", date: "2026-03-17" },
-        { slug: "khotot-arabiya-lil-alamat-al-tijariya", date: "2026-03-18" },
-        { slug: "khotot-arabiya-lil-wosham", date: "2026-03-19" },
-        { slug: "khotot-arabiya-lil-mawaqi-wal-tatbeeqat", date: "2026-03-20" },
-      ];
       const generatedBlogPosts = getGeneratedPosts().map(post => ({
         slug: post.slug,
         date: post.dateISO,
       }));
-      const allBlogPosts = [...staticBlogPosts, ...generatedBlogPosts];
+      const allBlogPostsForSitemap = [
+        ...staticBlogPosts.map(p => ({ slug: p.slug, date: p.dateISO })),
+        ...generatedBlogPosts,
+      ];
       const seenSlugs = new Set<string>();
-      const blogPages = allBlogPosts
+      const blogPages = allBlogPostsForSitemap
         .filter(post => {
           if (seenSlugs.has(post.slug)) return false;
           seenSlugs.add(post.slug);
@@ -373,16 +822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastmod: new Date(post.date).toISOString(),
         }));
 
-      const collectionSlugs = [
-        "khotot-lil-shiaarat",
-        "khotot-lil-tiktok",
-        "khotot-muzakhrafa",
-        "khotot-lil-kotob",
-        "khotot-lil-photoshop",
-        "khotot-lil-youtubiyeen",
-        "khotot-lil-dawaat",
-        "khotot-bidoon-hoqooq",
-      ];
+      const collectionSlugs = collections.map(c => c.slug);
       const collectionPages = collectionSlugs.map(slug => ({
         url: `/collection/${slug}`,
         priority: "0.8",
@@ -442,6 +882,23 @@ Sitemap: https://xfontat.com/sitemap.xml`;
     } catch (err) {
       res.status(500).json({ error: "Failed to fetch post" });
     }
+  });
+
+  // Bot 404 catch-all: return a real 404 for bots hitting unknown routes
+  app.use((req, res, next) => {
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    if (isKnownRoute(req.path)) return next();
+    const canonical = `https://xfontat.com${req.path}`;
+    const body = `
+<p>الصفحة التي تبحث عنها غير موجودة.</p>
+<p><a href="/">العودة إلى الرئيسية</a></p>`;
+    res.status(404).send(botHTML(
+      'صفحة غير موجودة | xfontat',
+      'الصفحة التي تبحث عنها غير موجودة في مكتبة الخطوط العربية xfontat.',
+      canonical,
+      '404 - صفحة غير موجودة',
+      body
+    ));
   });
 
   const httpServer = createServer(app);
