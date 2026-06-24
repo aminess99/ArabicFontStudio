@@ -75,7 +75,8 @@ export default function CategoryFonts() {
   const { toast } = useToast();
 
   const { data: fonts = [], isLoading } = useQuery<Font[]>({
-    queryKey: ["/api/fonts"],
+    queryKey: [`/api/fonts?category=${encodeURIComponent(arabicCategory || '')}`],
+    enabled: !!arabicCategory,
   });
 
   useEffect(() => {
@@ -87,7 +88,7 @@ export default function CategoryFonts() {
   }
 
   const categoryData = categoryMeta[arabicCategory];
-  const categories = Array.from(new Set(fonts.map(font => font.category)));
+  const categories = Object.keys(categoryMeta);
 
   const filteredFonts = fonts
     .filter((font) => {
@@ -96,7 +97,7 @@ export default function CategoryFonts() {
         font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (font.designer && font.designer.includes(searchQuery));
       
-      return matchesSearch && font.category === arabicCategory;
+      return matchesSearch;
     })
     .sort((a, b) => {
       const dateA = new Date(a.addedAt).getTime();
@@ -136,17 +137,6 @@ export default function CategoryFonts() {
       description: `يتم الآن تحميل خط ${font.nameArabic}`,
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل الخطوط...</p>
-        </div>
-      </div>
-    );
-  }
 
   const schema = filteredFonts.length > 0 ? {
     "@context": "https://schema.org",
@@ -208,7 +198,25 @@ export default function CategoryFonts() {
           <p className="text-sm md:text-base text-muted-foreground">{categoryData.description}</p>
         </div>
 
-        {filteredFonts.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-0">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="border-b py-4 md:py-6 animate-pulse">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="h-3 bg-muted rounded w-24 mb-3"></div>
+                    <div className="h-10 bg-muted rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-40"></div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="h-9 w-9 bg-muted rounded"></div>
+                    <div className="h-9 w-32 bg-muted rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredFonts.length === 0 ? (
           <div className="text-center py-12 md:py-16">
             <p className="text-base md:text-lg text-muted-foreground">
               لم يتم العثور على خطوط تطابق البحث

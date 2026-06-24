@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Header } from "@/components/Header";
@@ -16,44 +16,14 @@ import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
 
-function seededShuffle<T>(arr: T[], seed: number): T[] {
-  const result = [...arr];
-  let s = seed;
-  for (let i = result.length - 1; i > 0; i--) {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    const j = Math.abs(s) % (i + 1);
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
+interface PagedFontResponse {
+  data: Font[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
-function interleavedByCategory<T extends { category: string }>(fonts: T[], seed: number): T[] {
-  const byCategory: Record<string, T[]> = {};
-  fonts.forEach(f => {
-    if (!byCategory[f.category]) byCategory[f.category] = [];
-    byCategory[f.category].push(f);
-  });
-  const cats = Object.keys(byCategory);
-  const shuffledCats = seededShuffle(cats, seed);
-  const shuffledBuckets: Record<string, T[]> = {};
-  shuffledCats.forEach(cat => {
-    shuffledBuckets[cat] = seededShuffle(byCategory[cat], seed + cat.charCodeAt(0));
-  });
-  const result: T[] = [];
-  let hasMore = true;
-  let i = 0;
-  while (hasMore) {
-    hasMore = false;
-    for (const cat of shuffledCats) {
-      if (shuffledBuckets[cat][i]) {
-        result.push(shuffledBuckets[cat][i]);
-        hasMore = true;
-      }
-    }
-    i++;
-  }
-  return result;
-}
+const KNOWN_CATEGORIES = ["ثلث", "ديواني", "رقعة", "كوفي", "نسخ", "تصميم", "فوتوشوب", "نستعليق"];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,43 +33,21 @@ export default function Home() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
-  const sessionSeed = useRef(Math.floor(Math.random() * 999999));
 
-  const { data: fonts = [], isLoading } = useQuery<Font[]>({
-    queryKey: ["/api/fonts"],
+  const queryParams = new URLSearchParams({ page: String(currentPage), limit: String(FONTS_PER_PAGE) });
+  if (searchQuery) queryParams.set("q", searchQuery);
+
+  const { data: pagedData, isLoading } = useQuery<PagedFontResponse>({
+    queryKey: [`/api/fonts?${queryParams.toString()}`],
   });
 
-  const categories = Array.from(new Set(fonts.map(font => font.category)));
+  const fonts = pagedData?.data ?? [];
+  const totalItems = pagedData?.total ?? 0;
+  const totalPages = Math.ceil(totalItems / FONTS_PER_PAGE);
 
-  const filteredFonts = useMemo(() => {
-    const filtered = fonts.filter((font) => {
-      const matchesSearch =
-        font.nameArabic.includes(searchQuery) ||
-        font.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (font.designer && font.designer.includes(searchQuery)) ||
-        (font.description && font.description.includes(searchQuery));
+  const groupedFonts = useMemo(() => groupFontsByFamily(fonts), [fonts]);
 
-      const matchesCategory =
-        selectedCategory === "الكل" || font.category === selectedCategory;
-
-      return matchesSearch && matchesCategory;
-    });
-
-    if (selectedCategory === "الكل" && !searchQuery) {
-      return interleavedByCategory(filtered, sessionSeed.current);
-    }
-    return filtered.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
-  }, [fonts, searchQuery, selectedCategory]);
-
-  const groupedFonts = useMemo(
-    () => groupFontsByFamily(filteredFonts),
-    [filteredFonts]
-  );
-
-  const totalPages = Math.ceil(groupedFonts.length / FONTS_PER_PAGE);
   const startIndex = (currentPage - 1) * FONTS_PER_PAGE;
-  const endIndex = startIndex + FONTS_PER_PAGE;
-  const currentGroups = groupedFonts.slice(startIndex, endIndex);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -130,17 +78,6 @@ export default function Home() {
       description: `يتم الآن تحميل خط ${font.nameArabic}`,
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل الخطوط...</p>
-        </div>
-      </div>
-    );
-  }
 
   const schema = fonts.length > 0 ? {
     "@context": "https://schema.org",
@@ -173,7 +110,7 @@ export default function Home() {
         onFontSizeChange={setFontSize}
       />
       <CategoryFilter
-        categories={categories}
+        categories={KNOWN_CATEGORIES}
         selectedCategory={selectedCategory}
         onCategoryChange={(cat) => {
           if (cat === "الكل") {
@@ -192,7 +129,25 @@ export default function Home() {
       </section>
 
       <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
-        {filteredFonts.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-0">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="border-b py-4 md:py-6 animate-pulse">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="h-3 bg-muted rounded w-24 mb-3"></div>
+                    <div className="h-10 bg-muted rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-40"></div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="h-9 w-9 bg-muted rounded"></div>
+                    <div className="h-9 w-32 bg-muted rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : groupedFonts.length === 0 ? (
           <div className="text-center py-12 md:py-16">
             <p className="text-base md:text-lg text-muted-foreground">
               لم يتم العثور على خطوط تطابق البحث
@@ -202,15 +157,12 @@ export default function Home() {
           <>
             <div className="mb-3 md:mb-4 pb-3 border-b">
               <p className="text-xs md:text-sm text-muted-foreground">
-                عائلات الخطوط {startIndex + 1} - {Math.min(endIndex, groupedFonts.length)} من {groupedFonts.length}
-                {groupedFonts.length < filteredFonts.length && (
-                  <span className="mr-1">({filteredFonts.length} خط إجمالاً)</span>
-                )}
+                عرض {startIndex + 1} - {startIndex + groupedFonts.length} من {totalItems} خط
               </p>
             </div>
 
             <div className="space-y-0">
-              {currentGroups.map((group) => (
+              {groupedFonts.map((group) => (
                 <FontListItem
                   key={group.primary.id}
                   {...group.primary}

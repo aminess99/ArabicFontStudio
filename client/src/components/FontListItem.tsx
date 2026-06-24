@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Download, Heart, Layers } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -36,8 +36,27 @@ export function FontListItem({
 }: FontListItemProps) {
   const [fontLoaded, setFontLoaded] = useState(false);
   const fontFamily = generateFontFamily(name);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "150px" }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
     setFontLoaded(false);
     loadFont(fontFamily, fileUrl)
       .then(() => {
@@ -50,10 +69,10 @@ export function FontListItem({
           setFontLoaded(true);
         }, 500);
       });
-  }, [fontFamily, fileUrl]);
+  }, [isVisible, fontFamily, fileUrl]);
 
   return (
-    <div className="border-b py-4 md:py-6" data-testid={`font-item-${name}`}>
+    <div ref={containerRef} className="border-b py-4 md:py-6" data-testid={`font-item-${name}`}>
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 md:mb-3 flex-wrap">
@@ -77,7 +96,7 @@ export function FontListItem({
             }}
             data-testid={`text-preview-${name}`}
           >
-            {fontLoaded ? previewText : "جاري التحميل..."}
+            {previewText}
           </div>
           <h2 className="text-xs text-muted-foreground mt-2" aria-label={`تحميل وتنزيل خط ${nameArabic} مجاناً`}>
             تحميل وتنزيل خط {nameArabic} مجاناً

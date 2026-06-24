@@ -124,31 +124,34 @@ export default function FontDetails() {
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
 
-  const { data: fonts = [], isLoading } = useQuery<Font[]>({
-    queryKey: ["/api/fonts"],
+  const { data: font, isLoading } = useQuery<Font | null>({
+    queryKey: [`/api/fonts/by-slug/${slug}`],
+    enabled: !!slug,
   });
 
-  const font = fonts.find(f => generateSlug(f.name) === slug);
+  const { data: categoryFonts = [] } = useQuery<Font[]>({
+    queryKey: [`/api/fonts?category=${encodeURIComponent(font?.category ?? '')}`],
+    enabled: !!font?.category,
+  });
+
   const fontFamily = font ? generateFontFamily(font.name) : '';
 
   const familyVariants = useMemo(() => {
     if (!font) return [];
     const familyName = detectFontFamily(font.name);
-    return fonts.filter(f => detectFontFamily(f.name) === familyName && f.id !== font.id);
-  }, [font?.id, font?.name, fonts.length]);
+    return categoryFonts.filter(f => detectFontFamily(f.name) === familyName && f.id !== font.id);
+  }, [font?.id, font?.name, categoryFonts]);
 
   const relatedFonts = useMemo(() => {
     if (!font) return [];
     const familyName = detectFontFamily(font.name);
-    return fonts
-      .filter(f => f.category === font.category && f.id !== font.id && detectFontFamily(f.name) !== familyName)
+    return categoryFonts
+      .filter(f => f.id !== font.id && detectFontFamily(f.name) !== familyName)
       .sort(() => 0.5 - Math.random())
       .slice(0, 6);
-  }, [font?.id, font?.category, font?.name, fonts.length]);
+  }, [font?.id, font?.name, categoryFonts]);
 
-  const allCategories = useMemo(() => {
-    return Array.from(new Set(fonts.map(f => f.category)));
-  }, [fonts.length]);
+  const STATIC_CATEGORIES = ["ثلث", "ديواني", "رقعة", "كوفي", "نسخ", "تصميم", "فوتوشوب", "نستعليق"];
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -184,10 +187,15 @@ export default function FontDetails() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل الخط...</p>
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="border-b p-4 flex items-center justify-between">
+          <div className="h-6 bg-muted rounded w-32 animate-pulse"></div>
+        </div>
+        <div className="container mx-auto px-4 py-6 space-y-6 animate-pulse">
+          <div className="h-4 bg-muted rounded w-64"></div>
+          <div className="h-8 bg-muted rounded w-48"></div>
+          <div className="h-24 bg-muted rounded w-full"></div>
+          <div className="h-10 bg-muted rounded w-40"></div>
         </div>
       </div>
     );
@@ -571,7 +579,7 @@ export default function FontDetails() {
                 <div>
                   <h3 className="text-lg font-bold mb-3">تصفح الفئات</h3>
                   <div className="flex flex-wrap gap-2">
-                    {allCategories.filter(c => c !== font.category).map(cat => (
+                    {STATIC_CATEGORIES.filter(c => c !== font.category).map(cat => (
                       <Link key={cat} href={`/fonts/${getCategorySlug(cat)}`} data-testid={`link-category-${cat}`}>
                         <span className="px-3 py-1 bg-muted/50 text-muted-foreground rounded-md text-sm cursor-pointer hover:bg-muted">
                           {cat}

@@ -20,11 +20,9 @@ export default function DesignFonts() {
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
 
-  const { data: allFonts = [], isLoading } = useQuery<Font[]>({
-    queryKey: ["/api/fonts"],
+  const { data: fonts = [], isLoading } = useQuery<Font[]>({
+    queryKey: ["/api/fonts?category=%D8%AA%D8%B5%D9%85%D9%8A%D9%85"],
   });
-
-  const fonts = allFonts.filter(font => font.category === "تصميم");
 
   const filteredFonts = fonts
     .filter((font) => {
@@ -79,17 +77,6 @@ export default function DesignFonts() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل الخطوط...</p>
-        </div>
-      </div>
-    );
-  }
-
   const schema = fonts.length > 0 ? {
     "@context": "https://schema.org",
     "@graph": [
@@ -130,7 +117,25 @@ export default function DesignFonts() {
       </div>
 
       <main className="flex-1 container mx-auto px-4 py-6">
-        {filteredFonts.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-0">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="border-b py-4 md:py-6 animate-pulse">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="h-3 bg-muted rounded w-24 mb-3"></div>
+                    <div className="h-10 bg-muted rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-40"></div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="h-9 w-9 bg-muted rounded"></div>
+                    <div className="h-9 w-32 bg-muted rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredFonts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">لا توجد خطوط مطابقة للبحث</p>
           </div>

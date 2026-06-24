@@ -27,17 +27,20 @@ export default function FontCollection() {
 
   const collection = slug ? getCollectionBySlug(slug) : undefined;
 
-  const { data: fonts = [], isLoading } = useQuery<Font[]>({
-    queryKey: ["/api/fonts"],
+  const categoriesParam = collection?.categories.map(c => encodeURIComponent(c)).join(',') ?? '';
+
+  const { data: allCategoryFonts = [], isLoading } = useQuery<Font[]>({
+    queryKey: [`/api/fonts?categories=${categoriesParam}`],
+    enabled: !!categoriesParam,
   });
 
-  const filteredFonts = fonts
+  const filteredFonts = allCategoryFonts
     .filter(font => {
-      const inCategory = collection?.categories.includes(font.category);
-      const matchesSearch = !searchQuery ||
+      if (!searchQuery) return true;
+      return (
         font.nameArabic.includes(searchQuery) ||
-        font.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return inCategory && matchesSearch;
+        font.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     })
     .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
 
@@ -144,9 +147,22 @@ export default function FontCollection() {
 
       <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
         {isLoading ? (
-          <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">جاري تحميل الخطوط...</p>
+          <div className="space-y-0">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="border-b py-4 md:py-6 animate-pulse">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="h-3 bg-muted rounded w-24 mb-3"></div>
+                    <div className="h-10 bg-muted rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-40"></div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="h-9 w-9 bg-muted rounded"></div>
+                    <div className="h-9 w-32 bg-muted rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredFonts.length === 0 ? (
           <div className="text-center py-16">

@@ -730,10 +730,54 @@ ${faqHtml}`;
 
   app.get("/api/fonts", async (req, res) => {
     try {
-      const fonts = await storage.getAllFonts();
-      res.json(fonts);
+      const category = req.query.category as string | undefined;
+      const categories = req.query.categories as string | undefined;
+      const page = parseInt(req.query.page as string) || 0;
+      const limit = parseInt(req.query.limit as string) || 0;
+
+      const q = req.query.q as string | undefined;
+
+      if (page > 0 && limit > 0) {
+        const [fonts, total] = await Promise.all([
+          storage.getFontsPaginated(page, limit, category, q),
+          storage.getFontsCount(category, q),
+        ]);
+        res.json({ data: fonts, total, page, limit });
+      } else if (category) {
+        const fonts = await storage.getFontsByCategory(category);
+        res.json(fonts);
+      } else if (categories) {
+        const catList = categories.split(',').map(c => decodeURIComponent(c));
+        const fonts = await storage.getFontsByCategories(catList);
+        res.json(fonts);
+      } else {
+        const fonts = await storage.getAllFonts();
+        res.json(fonts);
+      }
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch fonts" });
+    }
+  });
+
+  app.get("/api/fonts/by-slug/:slug", async (req, res) => {
+    try {
+      const font = await storage.getFontBySlug(req.params.slug, generateSlug);
+      if (!font) {
+        return res.status(404).json({ error: "Font not found" });
+      }
+      res.json(font);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch font" });
+    }
+  });
+
+  app.get("/api/fonts/count", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const total = await storage.getFontsCount(category);
+      res.json({ total });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch count" });
     }
   });
 
