@@ -28,6 +28,57 @@ function generateSlug(fontName: string): string {
 
 const BOT_AGENTS = ['googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot', 'facebot', 'ia_archiver', 'ahrefsbot', 'semrushbot', 'mj12bot'];
 
+function markdownToHtml(content: string): string {
+  const paragraphs = content.split(/\n\n+/).filter(Boolean);
+  return paragraphs.map(block => {
+    const trimmed = block.trim();
+
+    if (/^# .+/.test(trimmed)) {
+      const text = trimmed.replace(/^# /, '').replace(/\*\*/g, '');
+      return `<h1>${text}</h1>`;
+    }
+
+    if (/^## .+/.test(trimmed)) {
+      const text = trimmed.replace(/^## /, '').replace(/\*\*/g, '');
+      return `<h2>${text}</h2>`;
+    }
+
+    if (/^### .+/.test(trimmed)) {
+      const text = trimmed.replace(/^### /, '').replace(/\*\*/g, '');
+      return `<h3>${text}</h3>`;
+    }
+
+    if (trimmed.startsWith('**') && trimmed.endsWith('**:')) {
+      const text = trimmed.replace(/\*\*/g, '').replace(/:$/, '');
+      return `<h2>${text}</h2>`;
+    }
+
+    const boldHeading = trimmed.match(/^\*\*(.+?)\*\*:?\s*/);
+    if (trimmed.startsWith('**') && boldHeading) {
+      const heading = boldHeading[1];
+      const rest = trimmed.replace(/^\*\*(.+?)\*\*:?\s*/, '').replace(/\*\*/g, '');
+      return `<h3>${heading}</h3>${rest ? `<p>${rest}</p>` : ''}`;
+    }
+
+    if (/^\d+\.\s/.test(trimmed)) {
+      const items = trimmed.split('\n').filter(Boolean).map(item =>
+        `<li>${item.replace(/^\d+\.\s*/, '').replace(/\*\*/g, '')}</li>`
+      ).join('');
+      return `<ol>${items}</ol>`;
+    }
+
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      const items = trimmed.split('\n').filter(Boolean).map(item =>
+        `<li>${item.replace(/^[-*]\s/, '').replace(/\*\*/g, '')}</li>`
+      ).join('');
+      return `<ul>${items}</ul>`;
+    }
+
+    const text = trimmed.replace(/\*\*/g, '');
+    return `<p>${text}</p>`;
+  }).join('\n');
+}
+
 function isBot(userAgent: string): boolean {
   const ua = (userAgent || '').toLowerCase();
   return BOT_AGENTS.some(b => ua.includes(b));
@@ -179,7 +230,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const post = posts.find(p => p.slug === req.params.slug);
     if (!post) return next();
     const canonical = `https://xfontat.com/blog/${req.params.slug}`;
-    const body = `<p>${post.excerpt || ''}</p><div>${post.content || ''}</div>`;
+    const contentHtml = markdownToHtml(post.content || '');
+    const body = `<p>${post.excerpt || ''}</p>${contentHtml}`;
     res.send(botHTML(post.title, post.excerpt || post.title, canonical, post.title, body));
   });
 
@@ -284,7 +336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : new Date().toISOString(),
       }));
 
-      const blogPosts = [
+      const staticBlogPosts = [
         { slug: "daleel-ikhtiyar-alkhat-alarabi", date: "2025-11-21" },
         { slug: "alfarq-bayn-thuluth-kufi-ruqaa", date: "2025-11-20" },
         { slug: "best-practices-arabic-fonts-digital-design", date: "2025-11-19" },
@@ -302,12 +354,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { slug: "khotot-arabiya-lil-wosham", date: "2026-03-19" },
         { slug: "khotot-arabiya-lil-mawaqi-wal-tatbeeqat", date: "2026-03-20" },
       ];
-      const blogPages = blogPosts.map(post => ({
-        url: `/blog/${post.slug}`,
-        priority: "0.6",
-        changefreq: "monthly",
-        lastmod: new Date(post.date).toISOString(),
+      const generatedBlogPosts = getGeneratedPosts().map(post => ({
+        slug: post.slug,
+        date: post.dateISO,
       }));
+      const allBlogPosts = [...staticBlogPosts, ...generatedBlogPosts];
+      const seenSlugs = new Set<string>();
+      const blogPages = allBlogPosts
+        .filter(post => {
+          if (seenSlugs.has(post.slug)) return false;
+          seenSlugs.add(post.slug);
+          return true;
+        })
+        .map(post => ({
+          url: `/blog/${post.slug}`,
+          priority: "0.6",
+          changefreq: "monthly",
+          lastmod: new Date(post.date).toISOString(),
+        }));
 
       const collectionSlugs = [
         "khotot-lil-shiaarat",
