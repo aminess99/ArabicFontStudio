@@ -97,7 +97,7 @@ export default function Home() {
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
         title="xfontat | تحميل خطوط عربية مجانية - ثلث، ديواني، كوفي، نسخ، رقعة"
-        description={`اكتشف مكتبة شاملة من ${fonts.length} خط عربي احترافي بأنماط متنوعة: الثلث، الديواني، الكوفي، النسخ، الرقعة، والتصميم. حمّل خطوط عربية مجانية بصيغ TTF وOTF لمشاريعك التصميمية.`}
+        description="اكتشف مكتبة شاملة من الخطوط العربية الاحترافية بأنماط متنوعة: الثلث، الديواني، الكوفي، النسخ، الرقعة، والتصميم. حمّل خطوط عربية مجانية بصيغ TTF وOTF لمشاريعك التصميمية."
         path="/"
         schema={schema}
       />
@@ -124,7 +124,7 @@ export default function Home() {
       <section className="container mx-auto px-3 md:px-4 pt-6 pb-2">
         <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة الخطوط العربية المجانية</h1>
         <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-          مرحباً بك في xfontat، أكبر مكتبة خطوط عربية مجانية على الإنترنت. تصفّح أكثر من {fonts.length} خط عربي احترافي من فئات متنوعة تشمل خطوط الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، والفوتوشوب. جميع الخطوط متاحة للتحميل المجاني بصيغ TTF وOTF لاستخدامها في مشاريعك التصميمية والطباعية.
+          مرحباً بك في xfontat، أكبر مكتبة خطوط عربية مجانية على الإنترنت. تصفّح مجموعة واسعة من الخطوط العربية الاحترافية من فئات متنوعة تشمل خطوط الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، والفوتوشوب. جميع الخطوط متاحة للتحميل المجاني بصيغ TTF وOTF لاستخدامها في مشاريعك التصميمية والطباعية.
         </p>
       </section>
 
@@ -203,7 +203,7 @@ export default function Home() {
             <h3 className="text-lg font-semibold mb-3">لماذا تختار xfontat؟</h3>
             <ul className="space-y-3">
               {[
-                { title: "651+ خط عربي", desc: "أكبر مكتبة مجانية تضم ثمانية أصناف رئيسية" },
+                { title: "مكتبة خطوط شاملة", desc: "أكبر مكتبة مجانية تضم ثمانية أصناف رئيسية" },
                 { title: "تحميل فوري مجاني", desc: "جميع الخطوط بصيغتي TTF وOTF متاحة بدون تسجيل" },
                 { title: "معاينة مباشرة", desc: "اكتب نصك الخاص وشاهده بأي خط قبل التحميل" },
                 { title: "متوافقة مع كل البرامج", desc: "Photoshop وIllustrator وWord وكل تطبيقات التصميم" },
@@ -287,7 +287,7 @@ export default function Home() {
             { name: "خطوط للتيك توك", slug: "khotot-lil-tiktok", desc: "رقعة وتصميم" },
             { name: "خطوط مزخرفة", slug: "khotot-muzakhrafa", desc: "ثلث وديواني" },
             { name: "خطوط للكتب", slug: "khotot-lil-kotob", desc: "نسخ كلاسيكية" },
-            { name: "خطوط للفوتوشوب", slug: "khotot-lil-photoshop", desc: "200+ خط" },
+            { name: "خطوط للفوتوشوب", slug: "khotot-lil-photoshop", desc: "فوتوشوب وإلستريتور" },
             { name: "خطوط لليوتيوبرز", slug: "khotot-lil-youtubiyeen", desc: "كوفي ورقعة" },
             { name: "خطوط للدعوات", slug: "khotot-lil-dawaat", desc: "ثلث وديواني" },
             { name: "خطوط مجانية", slug: "khotot-bidoon-hoqooq", desc: "جميع الفئات" },

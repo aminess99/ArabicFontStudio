@@ -51,7 +51,7 @@ const categoryMeta: Record<string, { title: string; description: string; arabicN
     arabicName: 'خطوط التصميم'
   },
   'فوتوشوب': {
-    title: 'خطوط فوتوشوب عربية - أفضل 100 خط للتصميم | xfontat',
+    title: 'خطوط فوتوشوب عربية احترافية - تحميل مجاني | xfontat',
     description: 'أفضل مجموعة من خطوط الفوتوشوب العربية الاحترافية. خطوط مميزة للتصاميم والإعلانات ومشاريع الجرافيك. حمل خطوط فوتوشوب بصيغ TTF و OTF مجاناً.',
     arabicName: 'خطوط الفوتوشوب'
   },

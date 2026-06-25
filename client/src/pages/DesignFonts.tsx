@@ -81,8 +81,8 @@ export default function DesignFonts() {
     "@context": "https://schema.org",
     "@graph": [
       createCollectionPageSchema({
-        name: `خطوط التصميم - ${fonts.length} خط احترافي | xfontat`,
-        description: `مجموعة من ${fonts.length} خط تصميم احترافي من مجموعة GE للاستخدام في المشاريع الإبداعية`,
+        name: `خطوط التصميم العربية الاحترافية | xfontat`,
+        description: `مجموعة من خطوط التصميم الاحترافية للاستخدام في المشاريع الإبداعية`,
         url: `${SITE_ORIGIN}/design-fonts`,
         numberOfItems: fonts.length
       }),
@@ -93,8 +93,8 @@ export default function DesignFonts() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title={`خطوط التصميم - ${fonts.length} خط احترافي | xfontat`}
-        description={`استكشف مجموعة من ${fonts.length} خط تصميم احترافي من سلسلة GE. خطوط عربية حديثة ومميزة للمشاريع الإبداعية والتصميمات الاحترافية. تحميل مجاني بصيغ متعددة.`}
+        title="خطوط التصميم العربية الاحترافية | xfontat"
+        description="استكشف مجموعة واسعة من خطوط التصميم العربية الاحترافية. خطوط عربية حديثة ومميزة للمشاريع الإبداعية والتصميمات الاحترافية. تحميل مجاني بصيغ متعددة."
         path="/design-fonts"
         schema={schema}
       />
