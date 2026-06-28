@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -20,24 +20,35 @@ import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import FontCollection from "@/pages/FontCollection";
 
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  return null;
+}
+
 function Router() {
   useAnalytics();
-  
+
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/design-fonts" component={DesignFonts} />
-      <Route path="/font/:slug" component={FontDetails} />
-      <Route path="/fonts/:category" component={CategoryFonts} />
-      <Route path="/collection/:slug" component={FontCollection} />
-      <Route path="/blog/:slug" component={BlogPost} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/about" component={About} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/privacy" component={Privacy} />
-      <Route path="/terms" component={Terms} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <ScrollToTop />
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/design-fonts" component={DesignFonts} />
+        <Route path="/font/:slug" component={FontDetails} />
+        <Route path="/fonts/:category" component={CategoryFonts} />
+        <Route path="/collection/:slug" component={FontCollection} />
+        <Route path="/blog/:slug" component={BlogPost} />
+        <Route path="/blog" component={Blog} />
+        <Route path="/about" component={About} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 
