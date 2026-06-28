@@ -1,26 +1,32 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, boolean, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const fonts = pgTable("fonts", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
-  nameArabic: text("name_arabic").notNull(),
-  description: text("description"),
-  designer: text("designer"),
-  category: text("category").notNull(),
-  style: text("style").notNull(),
-  fileUrl: text("file_url").notNull(),
-  fileName: text("file_name").notNull(),
-  fileFormat: text("file_format").notNull(),
-  featured: boolean("featured").default(false).notNull(),
-  addedAt: timestamp("added_at").default(sql`now()`).notNull(),
-});
-
-export const insertFontSchema = createInsertSchema(fonts).omit({
-  id: true,
+export const insertFontSchema = z.object({
+  name: z.string(),
+  nameArabic: z.string(),
+  description: z.string().optional().nullable(),
+  designer: z.string().optional().nullable(),
+  category: z.string(),
+  style: z.string(),
+  fileUrl: z.string(),
+  fileName: z.string(),
+  fileFormat: z.string(),
+  featured: z.boolean().default(false),
+  addedAt: z.date().optional(),
 });
 
 export type InsertFont = z.infer<typeof insertFontSchema>;
-export type Font = typeof fonts.$inferSelect;
+
+export type Font = {
+  id: string;
+  name: string;
+  nameArabic: string;
+  description: string | null;
+  designer: string | null;
+  category: string;
+  style: string;
+  fileUrl: string;
+  fileName: string;
+  fileFormat: string;
+  featured: boolean;
+  addedAt: Date;
+};
