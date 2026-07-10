@@ -1,9 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -16,7 +18,16 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from client/public directory (for verification files, etc.)
-app.use(express.static(path.resolve(import.meta.dirname, "..", "client", "public")));
+// Fonts and other static assets rarely change, so cache them aggressively on
+// the visitor's browser to cut down on repeat bandwidth costs.
+app.use(express.static(path.resolve(import.meta.dirname, "..", "client", "public"), {
+  maxAge: "30d",
+  setHeaders: (res, filePath) => {
+    if (/\.(woff2?|ttf|otf)$/i.test(filePath)) {
+      res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+    }
+  },
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();

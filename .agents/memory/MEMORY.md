@@ -1,0 +1,1 @@
+- [Cost optimization](cost-optimization.md) — keep unused Postgres DB for deploy validation; cache fonts long-term + compression to cut bandwidth costs
