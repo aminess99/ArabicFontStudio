@@ -18,15 +18,36 @@ const categoryToSlug: Record<string, string> = {
   "نستعليق": "nastaliq",
 };
 
-function generateSlug(fontName: string): string {
-  return fontName
+function slugifyPart(value: string): string {
+  return value
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    + "-font";
+    .replace(/^-+|-+$/g, "");
+}
+
+function stableHash(value: string): string {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function generateLegacySlug(fontName: string): string {
+  return `${slugifyPart(fontName)}-font`;
+}
+
+function generateSlug(fontName: string, fileName: string, category: string): string {
+  const base = slugifyPart(fontName) || slugifyPart(fileName) || "arabic-font";
+  return `${base}-${stableHash(`${category}/${fileName}`)}-font`;
+}
+
+function getCategoryLabel(category: string): string {
+  return category.startsWith("خطوط ") ? category : `خطوط ${category}`;
 }
 
 const BOT_AGENTS = [
@@ -223,6 +244,7 @@ ${body}
 <a href="/fonts/kufi">خطوط الكوفي</a> |
 <a href="/fonts/naskh">خطوط النسخ</a> |
 <a href="/fonts/tasmeem">خطوط التصميم</a> |
+<a href="/fonts/graffiti">خطوط الحرة</a> |
 <a href="/fonts/photoshop">خطوط الفوتوشوب</a> |
 <a href="/fonts/nastaliq">خطوط النستعليق</a> |
 <a href="/design-fonts">خطوط التصميم الحديث</a> |
@@ -259,10 +281,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dynamic rendering for search engine bots
 
   app.get("/font/:slug", async (req, res, next) => {
-    if (!isBot(req.headers['user-agent'] || '')) return next();
     const fonts = await storage.getAllFonts();
-    const font = fonts.find(f => generateSlug(f.name) === req.params.slug);
-    if (!font) return next();
+    let font = fonts.find(f => generateSlug(f.name, f.fileName, f.category) === req.params.slug);
+
+    if (!font) {
+      const legacyFont = fonts.find(f => generateLegacySlug(f.name) === req.params.slug);
+      if (legacyFont) {
+        return res.redirect(301, `/font/${generateSlug(legacyFont.name, legacyFont.fileName, legacyFont.category)}`);
+      }
+    }
+
+    if (!isBot(req.headers['user-agent'] || '')) return next();
+    if (!font) return res.status(404).send("Font not found");
     const canonical = `https://xfontat.com/font/${req.params.slug}`;
     const title = `تحميل خط ${font.nameArabic} مجاناً | xfontat`;
     const desc = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat || 'TTF'}. خط ${font.category} احترافي متاح للتحميل المباشر.`;
@@ -302,23 +332,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const fonts = await storage.getAllFonts();
     const catFonts = fonts.filter(f => f.category === arabicCat);
     const canonical = `https://xfontat.com/fonts/${req.params.category}`;
-    const title = `خطوط ${arabicCat} العربية - تحميل مجاني | xfontat`;
-    const desc = `اكتشف ${catFonts.length} خط ${arabicCat} عربي احترافي. تحميل مجاني بصيغ TTF وOTF.`;
+    const categoryLabel = getCategoryLabel(arabicCat);
+    const title = `${categoryLabel} العربية - تحميل مجاني | xfontat`;
+    const desc = `اكتشف ${catFonts.length} خطاً ضمن ${categoryLabel} العربية. تحميل مجاني بصيغ TTF وOTF.`;
     const links = catFonts.slice(0, 60).map(f =>
-      `<li><a href="/font/${generateSlug(f.name)}">${f.nameArabic} - ${f.name}</a></li>`
+      `<li><a href="/font/${generateSlug(f.name, f.fileName, f.category)}">${f.nameArabic} - ${f.name}</a></li>`
     ).join('\n');
     const content = categoryContent[arabicCat];
     const richContent = content ? `
-<h2>عن خطوط ${arabicCat}</h2>
+<h2>عن ${categoryLabel}</h2>
 <p>${content.intro}</p>
-<h2>تاريخ خط ${arabicCat}</h2>
+<h2>تاريخ ${categoryLabel}</h2>
 <p>${content.history}</p>
 <h2>استخدامات ونصائح</h2>
 <p>${content.usageTips}</p>
-<h2>أسئلة شائعة عن خطوط ${arabicCat}</h2>
+<h2>أسئلة شائعة عن ${categoryLabel}</h2>
 <p>${content.faq}</p>
 ` : '';
-    const body = `<p>${desc}</p>${richContent}<h2>قائمة خطوط ${arabicCat} (${catFonts.length} خط)</h2><ul>${links}</ul>`;
+    const body = `<p>${desc}</p>${richContent}<h2>قائمة ${categoryLabel} (${catFonts.length} خط)</h2><ul>${links}</ul>`;
     const jsonLd = [
       {
         "@type": "CollectionPage",
@@ -331,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       },
       {
         "@type": "ItemList",
-        "name": `خطوط ${arabicCat}`,
+        "name": categoryLabel,
         "numberOfItems": catFonts.length,
         "itemListElement": catFonts.slice(0, 20).map((f, i) => ({
           "@type": "ListItem",
@@ -339,7 +370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "item": {
             "@type": "SoftwareApplication",
             "name": f.nameArabic,
-            "url": `https://xfontat.com/font/${generateSlug(f.name)}`,
+            "url": `https://xfontat.com/font/${generateSlug(f.name, f.fileName, f.category)}`,
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           }
         }))
@@ -348,7 +379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "@type": "BreadcrumbList",
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "https://xfontat.com/" },
-          { "@type": "ListItem", "position": 2, "name": `خطوط ${arabicCat}`, "item": canonical },
+          { "@type": "ListItem", "position": 2, "name": categoryLabel, "item": canonical },
         ]
       },
       ...(content ? [{
@@ -356,7 +387,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "mainEntity": [{ "@type": "Question", "name": content.faq.split('؟')[0] + '؟', "acceptedAnswer": { "@type": "Answer", "text": content.faq.split('؟').slice(1).join('؟') } }]
       }] : [])
     ];
-    res.send(botHTML(title, desc, canonical, `خطوط ${arabicCat}`, body, jsonLd));
+    res.send(botHTML(title, desc, canonical, categoryLabel, body, jsonLd));
   });
 
   app.get("/blog/:slug", async (req, res, next) => {
@@ -473,7 +504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const title = 'خطوط عربية للتصميم الحديث - تحميل مجاني | xfontat';
     const desc = `اكتشف ${designFonts.length}+ خط عربي عصري للتصميم الجرافيكي والهوية البصرية والسوشال ميديا. تحميل مجاني.`;
     const fontLinks = designFonts.slice(0, 50).map(f =>
-      `<li><a href="/font/${generateSlug(f.name)}">${f.nameArabic}</a></li>`
+      `<li><a href="/font/${generateSlug(f.name, f.fileName, f.category)}">${f.nameArabic}</a></li>`
     ).join('\n');
     const body = `
 <p>${desc}</p>
@@ -662,12 +693,12 @@ ${faqHtml}`;
     const categories = Array.from(new Set(fonts.map(f => f.category)));
     const canonical = `https://xfontat.com/`;
     const title = `xfontat | تحميل خطوط عربية مجانية - ${fonts.length} خط`;
-    const desc = `مكتبة شاملة من ${fonts.length} خط عربي احترافي: ثلث، ديواني، رقعة، كوفي، نسخ، تصميم، فوتوشوب، نستعليق. تحميل مجاني.`;
+    const desc = `مكتبة شاملة من ${fonts.length} خط عربي احترافي ضمن ${categories.length} تصنيفات: ${categories.join("، ")}. تحميل مجاني.`;
     const catLinks = categories.map(c =>
       `<li><a href="/fonts/${categoryToSlug[c] || c}">${c} (${fonts.filter(f => f.category === c).length} خط)</a></li>`
     ).join('\n');
     const fontLinks = fonts.slice(0, 120).map(f =>
-      `<li><a href="/font/${generateSlug(f.name)}">${f.nameArabic}</a></li>`
+      `<li><a href="/font/${generateSlug(f.name, f.fileName, f.category)}">${f.nameArabic}</a></li>`
     ).join('\n');
     const body = `
 <p>${desc}</p>
@@ -678,7 +709,7 @@ ${faqHtml}`;
 <h2>تصنيفات الخطوط العربية في xfontat</h2>
 <ul>${catLinks}</ul>
 <h2>لماذا تختار xfontat؟</h2>
-<p>xfontat هي المنصة العربية الأولى المتخصصة في توفير مجموعة شاملة من الخطوط العربية الاحترافية المجانية. نضع بين يديك أكثر من ${fonts.length} خطاً عربياً متنوعاً في ثمانية أصناف رئيسية. جميع الخطوط متاحة للتحميل الفوري بصيغتي TTF وOTF دون تسجيل أو اشتراك. تتميز منصتنا بأداة المعاينة التفاعلية التي تتيح لك كتابة نصك الخاص ومعاينته بأي خط قبل التحميل.</p>
+<p>xfontat هي منصة عربية متخصصة في توفير مجموعة شاملة من الخطوط العربية الاحترافية. نضع بين يديك ${fonts.length} خطاً عربياً متنوعاً في ${categories.length} تصنيفات رئيسية. جميع الخطوط متاحة للتحميل الفوري بصيغتي TTF وOTF دون تسجيل أو اشتراك، مع ضرورة مراجعة ترخيص كل خط قبل الاستخدام التجاري. تتميز منصتنا بأداة المعاينة التفاعلية التي تتيح لك كتابة نصك الخاص ومعاينته بأي خط قبل التحميل.</p>
 <h2>أبرز الخطوط المتاحة للتحميل</h2>
 <ul>${fontLinks}</ul>
 `;
@@ -722,7 +753,7 @@ ${faqHtml}`;
           "item": {
             "@type": "SoftwareApplication",
             "name": f.nameArabic,
-            "url": `https://xfontat.com/font/${generateSlug(f.name)}`,
+            "url": `https://xfontat.com/font/${generateSlug(f.name, f.fileName, f.category)}`,
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           }
         }))
@@ -860,12 +891,18 @@ ${faqHtml}`;
         changefreq: "weekly"
       }));
 
-      const fontPages = fonts.map(font => ({
-        url: `/font/${generateSlug(font.name)}`,
-        priority: "0.7",
-        changefreq: "monthly",
-        lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : new Date().toISOString(),
-      }));
+      const seenFontUrls = new Set<string>();
+      const fontPages = fonts.flatMap(font => {
+        const url = `/font/${generateSlug(font.name, font.fileName, font.category)}`;
+        if (seenFontUrls.has(url)) return [];
+        seenFontUrls.add(url);
+        return [{
+          url,
+          priority: "0.7",
+          changefreq: "monthly",
+          lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : undefined,
+        }];
+      });
 
       const generatedBlogPosts = getGeneratedPosts().map(post => ({
         slug: post.slug,
@@ -894,10 +931,7 @@ ${faqHtml}`;
         url: `/collection/${slug}`,
         priority: "0.8",
         changefreq: "weekly",
-        lastmod: new Date("2026-03-27").toISOString(),
       }));
-
-      const now = new Date().toISOString();
 
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
@@ -905,7 +939,9 @@ ${faqHtml}`;
       [...staticPages, ...categoryPages, ...collectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
-        xml += `    <lastmod>${page.lastmod ?? now}</lastmod>\n`;
+        if (page.lastmod) {
+          xml += `    <lastmod>${page.lastmod}</lastmod>\n`;
+        }
         xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
         xml += `    <priority>${page.priority}</priority>\n`;
         xml += '  </url>\n';

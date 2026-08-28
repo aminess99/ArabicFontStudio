@@ -13,6 +13,7 @@ interface FontListItemProps {
   designer?: string | null;
   category: string;
   fileUrl: string;
+  fileName: string;
   previewText: string;
   fontSize: number;
   onDownload: () => void;
@@ -26,7 +27,9 @@ export function FontListItem({
   name,
   nameArabic,
   designer,
+  category,
   fileUrl,
+  fileName,
   previewText,
   fontSize,
   onDownload,
@@ -116,7 +119,7 @@ export function FontListItem({
           
           <Button asChild className="flex-1 md:flex-none">
             <Link
-              href={`/font/${generateSlug(name)}`}
+              href={`/font/${generateSlug(name, fileName, category)}`}
               data-testid={`button-download-${name}`}
             >
               <Download className="ml-2 h-4 w-4" />

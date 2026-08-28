@@ -6,7 +6,7 @@ export interface IStorage {
   getFontById(id: string): Promise<Font | undefined>;
   getFontsByCategory(category: string): Promise<Font[]>;
   getFontsByCategories(categories: string[]): Promise<Font[]>;
-  getFontBySlug(slug: string, generateSlugFn: (name: string) => string): Promise<Font | undefined>;
+  getFontBySlug(slug: string, generateSlugFn: (name: string, fileName: string, category: string) => string): Promise<Font | undefined>;
   getFontsCount(category?: string, q?: string): Promise<number>;
   getFontsPaginated(page: number, limit: number, category?: string, q?: string): Promise<Font[]>;
   createFont(font: InsertFont): Promise<Font>;
@@ -47,8 +47,8 @@ export class MemStorage implements IStorage {
     return Array.from(this.fonts.values()).filter(f => catSet.has(f.category));
   }
 
-  async getFontBySlug(slug: string, generateSlugFn: (name: string) => string): Promise<Font | undefined> {
-    return Array.from(this.fonts.values()).find(f => generateSlugFn(f.name) === slug);
+  async getFontBySlug(slug: string, generateSlugFn: (name: string, fileName: string, category: string) => string): Promise<Font | undefined> {
+    return Array.from(this.fonts.values()).find(f => generateSlugFn(f.name, f.fileName, f.category) === slug);
   }
 
   async getFontsCount(category?: string, q?: string): Promise<number> {

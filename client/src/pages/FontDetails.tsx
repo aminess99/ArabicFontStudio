@@ -35,7 +35,9 @@ const categoryDescriptions: Record<string, string> = {
   "كوفي": "خط الكوفي خط عربي هندسي عصري، يتميز بزواياه الحادة وتصميمه النظيف، مثالي للشعارات والهوية البصرية والتصاميم الحديثة.",
   "نسخ": "خط النسخ من أوضح الخطوط العربية وأسهلها قراءة، يُستخدم في الكتب والمطبوعات والمحتوى الرقمي والنصوص الطويلة.",
   "تصميم": "خط تصميمي حديث واحترافي، يناسب الإعلانات والبوسترات والتصاميم الإبداعية ومشاريع الهوية البصرية.",
+  "خطوط الحرة": "خط عربي حر وغرافيتي ذو طابع تعبيري، مناسب للعناوين والملصقات والشعارات والتصاميم الإبداعية.",
   "فوتوشوب": "خط احترافي متوافق مع جميع برامج التصميم مثل فوتوشوب وإلستريتور، مناسب للتصاميم الاحترافية والمشاريع الإبداعية.",
+  "نستعليق": "خط نستعليق عربي وفارسي انسيابي مناسب للشعر والمخطوطات والعناوين والتصاميم الراقية.",
 };
 
 const categoryUseCases: Record<string, string[]> = {
@@ -45,7 +47,9 @@ const categoryUseCases: Record<string, string[]> = {
   "كوفي": ["الشعارات", "الهوية البصرية", "التطبيقات", "المواقع الإلكترونية"],
   "نسخ": ["الكتب والمطبوعات", "المقالات", "المحتوى التعليمي", "التقارير"],
   "تصميم": ["الإعلانات", "البوسترات", "السوشال ميديا", "الهوية البصرية"],
+  "خطوط الحرة": ["العناوين", "الغرافيتي", "الملصقات", "الشعارات"],
   "فوتوشوب": ["تصاميم الفوتوشوب", "الإعلانات الرقمية", "البنرات", "منشورات السوشال ميديا"],
+  "نستعليق": ["الشعر", "المخطوطات", "الأغلفة", "التصاميم الراقية"],
 };
 
 function getRelatedBlogPosts(category: string) {
@@ -56,7 +60,9 @@ function getRelatedBlogPosts(category: string) {
     "كوفي": ["كوفي", "شعارات", "لوجو", "تصميم"],
     "نسخ": ["نسخ", "خطوط عربية", "فوتوشوب"],
     "تصميم": ["تصميم", "شعارات", "فوتوشوب", "سوشال"],
+    "خطوط الحرة": ["غرافيتي", "خطوط حرة", "تصميم", "شعارات"],
     "فوتوشوب": ["فوتوشوب", "تصميم", "سوشال"],
+    "نستعليق": ["نستعليق", "فارسي", "خطوط عربية"],
   };
   const keywords = categoryKeywords[category] || ["خطوط عربية"];
   return blogPosts
@@ -94,7 +100,7 @@ function FamilyVariantCard({ variant }: { variant: Font }) {
     <div className="border rounded-lg p-4">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="min-w-0">
-          <Link href={`/font/${generateSlug(variant.name)}`}>
+          <Link href={`/font/${generateSlug(variant.name, variant.fileName, variant.category)}`}>
             <h3 className="text-sm font-medium truncate hover:underline">{variant.nameArabic}</h3>
           </Link>
           <p className="text-xs text-muted-foreground truncate">{variant.name}</p>
@@ -151,7 +157,7 @@ export default function FontDetails() {
       .slice(0, 6);
   }, [font?.id, font?.name, categoryFonts]);
 
-  const STATIC_CATEGORIES = ["ثلث", "ديواني", "رقعة", "كوفي", "نسخ", "تصميم", "فوتوشوب", "نستعليق"];
+  const STATIC_CATEGORIES = ["ثلث", "ديواني", "رقعة", "كوفي", "نسخ", "تصميم", "خطوط الحرة", "فوتوشوب", "نستعليق"];
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -214,7 +220,7 @@ export default function FontDetails() {
     );
   }
 
-  const fontSlug = generateSlug(font.name);
+  const fontSlug = generateSlug(font.name, font.fileName, font.category);
   const categoryDesc = categoryDescriptions[font.category] || "خط عربي احترافي مناسب للتصميم والطباعة.";
   const useCases = categoryUseCases[font.category] || ["التصميم", "الطباعة"];
   const relatedArticles = getRelatedBlogPosts(font.category);
@@ -523,7 +529,7 @@ export default function FontDetails() {
                     {relatedFonts.map((relFont) => (
                       <Link
                         key={relFont.id}
-                        href={`/font/${generateSlug(relFont.name)}`}
+                        href={`/font/${generateSlug(relFont.name, relFont.fileName, relFont.category)}`}
                         className="border rounded-lg p-4 hover-elevate transition-all block"
                         data-testid={`link-related-font-${relFont.id}`}
                       >

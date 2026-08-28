@@ -203,7 +203,7 @@ export default function Home() {
             <h3 className="text-lg font-semibold mb-3">لماذا تختار xfontat؟</h3>
             <ul className="space-y-3">
               {[
-                { title: "مكتبة خطوط شاملة", desc: "أكبر مكتبة مجانية تضم ثمانية أصناف رئيسية" },
+                { title: "مكتبة خطوط شاملة", desc: "مكتبة مجانية تضم تسعة أصناف رئيسية" },
                 { title: "تحميل فوري مجاني", desc: "جميع الخطوط بصيغتي TTF وOTF متاحة بدون تسجيل" },
                 { title: "معاينة مباشرة", desc: "اكتب نصك الخاص وشاهده بأي خط قبل التحميل" },
                 { title: "متوافقة مع كل البرامج", desc: "Photoshop وIllustrator وWord وكل تطبيقات التصميم" },
