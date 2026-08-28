@@ -5,6 +5,7 @@ export const categoryToSlug: Record<string, string> = {
   "كوفي": "kufi",
   "نسخ": "naskh",
   "تصميم": "tasmeem",
+  "خطوط الحرة": "graffiti",
   "فوتوشوب": "photoshop",
   "نستعليق": "nastaliq",
 };
