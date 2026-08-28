@@ -1,0 +1,9 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "hdx76Z9CMQ7UGGuBjQbUA"
+uri = "file://exports/modern-arabic-fonts-10.zip"
+type = "unspecified"
+title = "10 خطوط عربية حديثة"
+description = "حزمة ZIP تضم 10 خطوط عربية حديثة ومتنوعة وغير مطابقة لخطوط الموقع الحالية، مع ملاحظة عن المصدر والتراخيص."
