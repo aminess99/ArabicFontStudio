@@ -130,14 +130,19 @@ export function registerThumbnailRoutes(app: Express): void {
         basePrompt,
       });
       const promptCompletedAt = Date.now();
-      const image = await generateThumbnailImage(refined.prompt);
+      const imagePrompt = [
+        refined.prompt,
+        `Mandatory Arabic headline inside the generated image: "${idea}"`,
+        "Render this exact Arabic headline as large, correct right-to-left typography. Do not translate, paraphrase, omit, or replace it with fake glyphs. Do not add any other text.",
+      ].join("\n\n");
+      const image = await generateThumbnailImage(imagePrompt);
       const completedAt = Date.now();
       return res.json({
         image,
-        prompt: refined.prompt,
+        prompt: imagePrompt,
         creativeDirection: refined.creativeDirection,
         promptModel: "google/gemini-3.7-flash via OpenRouter",
-        imageModel: "openai/gpt-image-2 via OpenRouter",
+        imageModel: "google/gemini-3.1-flash-image-preview (Nano Banana 2) via OpenRouter",
         timings: {
           promptMs: promptCompletedAt - startedAt,
           imageMs: completedAt - promptCompletedAt,

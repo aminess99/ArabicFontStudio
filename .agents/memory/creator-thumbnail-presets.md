@@ -9,7 +9,7 @@ Named creator presets are references for thumbnail composition conventions—sca
 
 **How to apply:** Keep the named preset visible in the selector, translate it into generic visual directions in the generation prompt, explicitly request original generic people, and pass the exact Arabic headline to the image model for rendering inside the artwork.
 
-The thumbnail pipeline uses `google/gemini-3.7-flash` through OpenRouter for style-aware prompt refinement, followed by `openai/gpt-image-2` through OpenRouter for the actual 16:9 image.
+The thumbnail pipeline uses `google/gemini-3.7-flash` through OpenRouter for style-aware prompt refinement, followed by `google/gemini-3.1-flash-image-preview` (Nano Banana 2) through OpenRouter for the actual 16:9 image.
 
 **Why:** Separating prompt direction from image rendering makes creator-style rules reusable while allowing the image model to focus on composition and visual fidelity.
 

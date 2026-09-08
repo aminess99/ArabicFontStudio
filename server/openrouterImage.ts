@@ -1,5 +1,5 @@
 const OPENROUTER_IMAGE_URL = "https://openrouter.ai/api/v1/images";
-const OPENROUTER_IMAGE_MODEL = "openai/gpt-image-2";
+const OPENROUTER_IMAGE_MODEL = "google/gemini-3.1-flash-image-preview";
 
 export async function generateThumbnailImage(prompt: string): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -19,9 +19,8 @@ export async function generateThumbnailImage(prompt: string): Promise<string> {
       model: OPENROUTER_IMAGE_MODEL,
       prompt,
       n: 1,
+      resolution: "1K",
       aspect_ratio: "16:9",
-      quality: "high",
-      output_format: "png",
     }),
   });
 
