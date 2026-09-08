@@ -273,7 +273,7 @@ export default function YouTubeThumbnailStudio() {
           <div className="mt-5">
             <div className="mb-2 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">أضف بطل الصورة</p>
+                <p className="text-sm font-medium">أضف الشخصية أو المنتج</p>
                 <p className="mt-1 text-xs text-[#71837a]">
                   صورة شخص أو منتج تريد أن يظهر كعنصر رئيسي
                 </p>
