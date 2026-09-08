@@ -284,13 +284,13 @@ export default function YouTubeThumbnailStudio() {
             حوّل الفكرة إلى صورة تتوقف عندها العين
           </div>
           <h1 className="max-w-xl text-4xl font-semibold leading-[1.12] tracking-[-.06em] sm:text-6xl">
-            اكتب الفكرة،
+            أنشئ صورة مصغّرة
             <br />
-            <span className="text-[#65f2c0]">ونحن نصنع المشهد.</span>
+            <span className="text-[#65f2c0]">احترافية لليوتيوب.</span>
           </h1>
           <p className="mt-5 max-w-lg text-sm leading-8 text-[#91a49b]">
-            اكتب وصفاً بسيطاً لفيديوك، اختر أسلوب الصورة، وسنحوّل فكرتك إلى
-            prompt احترافي ثم نولّد لك صورة مصغّرة بمقاس يوتيوب.
+            اكتب فكرة فيديو يوتيوب، اختر أسلوب الصورة، وسنحوّلها إلى prompt
+            احترافي ثم نولّد لك صورة مصغّرة جذابة بمقاس 1280×720.
           </p>
           <div className="mt-8 grid max-w-lg grid-cols-3 gap-3 border-t border-white/[.08] pt-5 text-xs text-[#71837a]">
             <div>
