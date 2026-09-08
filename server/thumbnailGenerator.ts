@@ -79,7 +79,7 @@ export function buildThumbnailPrompt(idea: string, styleId: ThumbnailStyleId): s
     `Video concept from the creator: "${idea}"`,
     `Visual direction: ${style.label}. ${style.description}`,
     "Make one clear hero subject the first thing the eye sees. Use an exaggerated but believable visual moment, strong foreground/background separation, cinematic lighting, vivid controlled color, and a composition that reads instantly at small size.",
-    `Design for an Arabic-speaking YouTube audience. Render this exact Arabic headline inside the image: "${idea}". Use large bold Arabic typography with correct right-to-left direction, strong contrast, and a clean placement that remains readable at thumbnail size.`,
+    `Design for an Arabic-speaking YouTube audience. Render this locked Arabic headline inside the image: "${idea}". Copy it character by character with no spelling changes, translation, paraphrase, missing letters, extra letters, or invented glyphs. Preserve correct right-to-left Arabic shaping, and wrap or resize the headline if needed instead of changing its text.`,
     "Use the requested creator-thumbnail conventions as a broad visual reference only. Do not depict, imitate, reconstruct, or identify any real creator's face, body, voice, logo, branding, signature marks, or exact thumbnail composition. Use generic people and original visual elements.",
     "Do not add unrelated words, logos, watermarks, UI, fake extra text, or gibberish. The supplied Arabic headline must be the only text in the artwork.",
     "Avoid clutter, generic stock-photo composition, tiny details, duplicate subjects, distorted hands, and low-contrast shadows. Output only the finished thumbnail artwork.",
@@ -132,8 +132,10 @@ export function registerThumbnailRoutes(app: Express): void {
       const promptCompletedAt = Date.now();
       const imagePrompt = [
         refined.prompt,
-        `Mandatory Arabic headline inside the generated image: "${idea}"`,
-        "Render this exact Arabic headline as large, correct right-to-left typography. Do not translate, paraphrase, omit, or replace it with fake glyphs. Do not add any other text.",
+        "=== LOCKED ARABIC HEADLINE — COPY EXACTLY ===",
+        idea,
+        "=== END LOCKED ARABIC HEADLINE ===",
+        "Text accuracy is the highest priority. Copy the locked headline character by character, preserving every Arabic letter, word order, space, punctuation mark, and diacritic. Use correct right-to-left connected Arabic shaping. If it does not fit, wrap it or reduce the font size; never alter, translate, shorten, omit, or invent any character. Do not add any other text.",
       ].join("\n\n");
       const image = await generateThumbnailImage(imagePrompt);
       const completedAt = Date.now();
