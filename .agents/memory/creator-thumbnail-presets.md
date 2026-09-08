@@ -8,3 +8,9 @@ Named creator presets are references for thumbnail composition conventions—sca
 **Why:** Users want recognizable YouTube packaging patterns, but generated Arabic text and creator likenesses reduce control and can make the product feel derivative.
 
 **How to apply:** Keep the named preset visible in the selector, translate it into generic visual directions in the generation prompt, explicitly request original generic people, and render final Arabic titles programmatically as editable overlays.
+
+The thumbnail pipeline uses `google/gemini-3.7-flash` through OpenRouter for style-aware prompt refinement, followed by `openai/gpt-image-2` through OpenRouter for the actual 16:9 image.
+
+**Why:** Separating prompt direction from image rendering makes creator-style rules reusable while allowing the image model to focus on composition and visual fidelity.
+
+**How to apply:** Keep both stages server-side behind `OPENROUTER_API_KEY`; do not expose the key or move either model call into the browser.

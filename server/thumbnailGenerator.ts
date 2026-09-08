@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
-import { generateImage } from "./replit_integrations/image";
 import { refineThumbnailPrompt } from "./openrouterPrompt";
+import { generateThumbnailImage } from "./openrouterImage";
 
 export const thumbnailStyles = {
   mrbeast: {
@@ -128,12 +128,13 @@ export function registerThumbnailRoutes(app: Express): void {
         styleDescription: thumbnailStyles[styleId].description,
         basePrompt,
       });
-      const image = await generateImage(refined.prompt);
+      const image = await generateThumbnailImage(refined.prompt);
       return res.json({
         image,
         prompt: refined.prompt,
         creativeDirection: refined.creativeDirection,
         promptModel: "google/gemini-3.7-flash via OpenRouter",
+        imageModel: "openai/gpt-image-2 via OpenRouter",
         style: thumbnailStyles[styleId],
         overlayText: idea,
       });
