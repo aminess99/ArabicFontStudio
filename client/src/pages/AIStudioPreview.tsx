@@ -1,3 +1,5 @@
+import YouTubeThumbnailStudio from "./YouTubeThumbnailStudio";
+
 type StudioPreviewProps = {
   src: string;
   title: string;
@@ -20,12 +22,7 @@ function StudioPreview({ src, title }: StudioPreviewProps) {
 }
 
 export function YouTubeThumbnailPreview() {
-  return (
-    <StudioPreview
-      src={`${MOCKUP_PREVIEW_ORIGIN}/__mockup/preview/xfontat-ai-tools/YouTubeThumbnailMaker`}
-      title="xfontat YouTube Thumbnail Maker preview"
-    />
-  );
+  return <YouTubeThumbnailStudio />;
 }
 
 export function PurpleLogoPreview() {

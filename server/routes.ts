@@ -5,6 +5,7 @@ import { insertFontSchema } from "@shared/schema";
 import { getGeneratedPosts } from "./blogGenerator";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { collections } from "../client/src/lib/collectionsData";
+import { registerThumbnailRoutes } from "./thumbnailGenerator";
 
 const categoryToSlug: Record<string, string> = {
   "ثلث": "thuluth",
@@ -278,6 +279,8 @@ function isKnownRoute(path: string): boolean {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  registerThumbnailRoutes(app);
+
   // Dynamic rendering for search engine bots
 
   app.get("/font/:slug", async (req, res, next) => {
