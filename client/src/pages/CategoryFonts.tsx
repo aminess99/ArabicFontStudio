@@ -197,9 +197,10 @@ export default function CategoryFonts() {
         }}
       />
 
-      <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
+       <main className="flex-1 container mx-auto px-4 md:px-8 py-6 md:py-10">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">{categoryData.arabicName}</h1>
+           <p className="editorial-kicker mb-3">CATEGORY / {arabicCategory}</p>
+           <h1 className="text-3xl md:text-5xl font-bold mb-3">{categoryData.arabicName}</h1>
           <p className="text-sm md:text-base text-muted-foreground">{categoryData.description}</p>
         </div>
 
@@ -222,7 +223,8 @@ export default function CategoryFonts() {
             ))}
           </div>
         ) : filteredFonts.length === 0 ? (
-          <div className="text-center py-12 md:py-16">
+           <div className="specimen-surface text-center py-16 md:py-24 rounded-sm">
+             <p className="editorial-kicker mb-3">NO MATCHES</p>
             <p className="text-base md:text-lg text-muted-foreground">
               لم يتم العثور على خطوط تطابق البحث
             </p>

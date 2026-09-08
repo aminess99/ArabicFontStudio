@@ -107,16 +107,17 @@ export default function DesignFonts() {
         onFontSizeChange={setFontSize}
       />
 
-      <div className="border-b bg-background py-4">
-        <div className="container mx-auto px-4">
-          <h1 className="text-2xl font-bold">خطوط التصميم</h1>
+       <div className="border-b editorial-rule bg-background/60 py-8 md:py-12">
+         <div className="container mx-auto px-4 md:px-8">
+           <p className="editorial-kicker mb-3">CURATED / VISUAL VOICE</p>
+           <h1 className="text-3xl md:text-5xl font-bold">خطوط التصميم</h1>
           <p className="text-sm text-muted-foreground mt-1">
             مجموعة من الخطوط الاحترافية المناسبة للتصميم والإبداع ({fonts.length} خط)
           </p>
         </div>
       </div>
 
-      <main className="flex-1 container mx-auto px-4 py-6">
+       <main className="flex-1 container mx-auto px-4 md:px-8 py-6 md:py-10">
         {isLoading ? (
           <div className="space-y-0">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -136,7 +137,8 @@ export default function DesignFonts() {
             ))}
           </div>
         ) : filteredFonts.length === 0 ? (
-          <div className="text-center py-12">
+           <div className="specimen-surface text-center py-16 rounded-sm">
+             <p className="editorial-kicker mb-3">NO MATCHES</p>
             <p className="text-muted-foreground">لا توجد خطوط مطابقة للبحث</p>
           </div>
         ) : (

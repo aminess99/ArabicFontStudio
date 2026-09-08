@@ -121,14 +121,16 @@ export default function Home() {
         }}
       />
 
-      <section className="container mx-auto px-3 md:px-4 pt-6 pb-2">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة الخطوط العربية المجانية</h1>
-        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+      <section className="container mx-auto px-4 md:px-8 pt-10 md:pt-16 pb-7">
+        <div className="max-w-3xl">
+        <p className="editorial-kicker mb-3">XFONTAT / 988 SPECIMENS</p>
+        <h1 className="text-4xl md:text-6xl font-bold leading-[1.08] mb-5">الحرف العربي،<br /><span className="text-primary">بكل احتمالاته.</span></h1>
+        <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
           مرحباً بك في xfontat، أكبر مكتبة خطوط عربية مجانية على الإنترنت. تصفّح مجموعة واسعة من الخطوط العربية الاحترافية من فئات متنوعة تشمل خطوط الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، والفوتوشوب. جميع الخطوط متاحة للتحميل المجاني بصيغ TTF وOTF لاستخدامها في مشاريعك التصميمية والطباعية.
-        </p>
+        </p></div>
       </section>
 
-      <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">
+       <main className="flex-1 container mx-auto px-4 md:px-8 py-4 md:py-6">
         {isLoading ? (
           <div className="space-y-0">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -148,8 +150,9 @@ export default function Home() {
             ))}
           </div>
         ) : groupedFonts.length === 0 ? (
-          <div className="text-center py-12 md:py-16">
-            <p className="text-base md:text-lg text-muted-foreground">
+           <div className="specimen-surface text-center py-16 md:py-24 rounded-sm">
+             <p className="editorial-kicker mb-3">NO MATCHES</p>
+             <p className="text-base md:text-lg text-muted-foreground">
               لم يتم العثور على خطوط تطابق البحث
             </p>
           </div>

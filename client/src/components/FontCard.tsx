@@ -39,7 +39,7 @@ export function FontCard({
   }, [fontFamily, fileUrl]);
 
   return (
-    <Card className="hover-elevate transition-all" data-testid={`card-font-${name}`}>
+    <Card className="specimen-surface hover-elevate transition-all rounded-sm" data-testid={`card-font-${name}`}>
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
@@ -54,8 +54,8 @@ export function FontCard({
           className="min-h-24 flex items-center justify-center rounded-md bg-muted/30 p-4 text-center"
           style={{ fontFamily: fontLoaded ? fontFamily : 'inherit' }}
         >
-          <p className="text-2xl" data-testid={`text-preview-${name}`}>
-            {fontLoaded ? "الخط العربي" : "جاري التحميل..."}
+           <p className="text-2xl" data-testid={`text-preview-${name}`}>
+             {fontLoaded ? "الخط العربي" : "…"}
           </p>
         </div>
       </CardHeader>

@@ -75,15 +75,15 @@ export function FontListItem({
   }, [isVisible, fontFamily, fileUrl]);
 
   return (
-    <div ref={containerRef} className="border-b py-4 md:py-6" data-testid={`font-item-${name}`}>
+    <div ref={containerRef} className="group border-b editorial-rule py-5 md:py-8 transition-colors hover:bg-primary/[0.035]" data-testid={`font-item-${name}`}>
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 md:mb-3 flex-wrap">
-            <h3 className="text-xs md:text-sm text-muted-foreground truncate">
+             <h3 className="editorial-kicker truncate">
               {nameArabic}
             </h3>
             {variantCount > 1 && (
-              <Badge variant="secondary" className="text-xs gap-1 shrink-0">
+                 <Badge variant="secondary" className="text-xs gap-1 shrink-0 rounded-full">
                 <Layers className="w-3 h-3" />
                 {variantCount} أوزان
               </Badge>
@@ -91,7 +91,7 @@ export function FontListItem({
           </div>
           
           <div 
-            className="leading-relaxed break-words"
+             className="leading-relaxed break-words text-foreground/90"
             style={{ 
               fontFamily: fontLoaded ? fontFamily : 'inherit',
               fontSize: window.innerWidth < 768 ? `${Math.min(fontSize, 36)}px` : `${fontSize}px`,
@@ -101,7 +101,7 @@ export function FontListItem({
           >
             {previewText}
           </div>
-          <h2 className="text-xs text-muted-foreground mt-2" aria-label={`تحميل وتنزيل خط ${nameArabic} مجاناً`}>
+           <h2 className="text-xs text-muted-foreground mt-3" aria-label={`تحميل وتنزيل خط ${nameArabic} مجاناً`}>
             تحميل وتنزيل خط {nameArabic} مجاناً
           </h2>
         </div>
@@ -110,7 +110,7 @@ export function FontListItem({
           <Button
             variant="ghost"
             size="icon"
-            className={isFavorite ? "text-red-500" : ""}
+             className={isFavorite ? "text-primary" : "text-muted-foreground"}
             onClick={onToggleFavorite}
             data-testid={`button-favorite-${name}`}
           >

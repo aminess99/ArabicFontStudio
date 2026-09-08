@@ -8,13 +8,13 @@ interface CategoryFilterProps {
 
 export function CategoryFilter({ categories, selectedCategory, onCategoryChange }: CategoryFilterProps) {
   return (
-    <div className="border-b bg-background">
-      <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
-        <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="border-b editorial-rule bg-background/60">
+      <div className="container mx-auto px-4 md:px-8 py-3">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           <Button
             variant={selectedCategory === "الكل" ? "default" : "outline"}
             size="sm"
-            className="text-xs md:text-sm whitespace-nowrap shrink-0"
+             className="text-xs md:text-sm whitespace-nowrap shrink-0 rounded-full px-4"
             onClick={() => onCategoryChange("الكل")}
             data-testid="button-category-all"
           >
@@ -25,7 +25,7 @@ export function CategoryFilter({ categories, selectedCategory, onCategoryChange 
               key={category}
               variant={selectedCategory === category ? "default" : "outline"}
               size="sm"
-              className="text-xs md:text-sm whitespace-nowrap shrink-0"
+               className="text-xs md:text-sm whitespace-nowrap shrink-0 rounded-full px-4"
               onClick={() => onCategoryChange(category)}
               data-testid={`button-category-${category}`}
             >
