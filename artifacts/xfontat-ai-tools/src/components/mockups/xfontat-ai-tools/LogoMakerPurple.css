@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+.violet-lab {
+  --ink: #09080d;
+  --ink-2: #100d16;
+  --panel: rgba(24, 18, 31, .86);
+  --line: rgba(218, 198, 255, .14);
+  --muted: #9c95a7;
+  --violet: #9c55ff;
+  --violet-2: #bd7aff;
+  --paper: #f4efff;
+  min-height: 100dvh;
+  color: var(--paper);
+  background:
+    radial-gradient(ellipse at 78% -15%, rgba(141, 59, 239, .28), transparent 34rem),
+    radial-gradient(ellipse at 4% 55%, rgba(84, 31, 139, .15), transparent 28rem),
+    var(--ink);
+  font-family: 'Space Grotesk', 'IBM Plex Sans Arabic', sans-serif;
+}
+.violet-lab * { box-sizing: border-box; }
+.violet-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+.violet-grid {
+  background-image: linear-gradient(rgba(190, 126, 255, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(190, 126, 255, .045) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.violet-noise::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .035; z-index: 20; mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+.violet-panel { background: var(--panel); border: 1px solid var(--line); box-shadow: 0 28px 80px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.05); backdrop-filter: blur(18px); }
+.violet-field { background: #0d0a12; border: 1px solid rgba(218,198,255,.13); transition: border-color .2s ease, background-color .2s ease; }
+.violet-field:focus { border-color: rgba(189,122,255,.8); background: #110c18; outline: none; }
+.violet-button { transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease; }
+.violet-button:hover { transform: translateY(-2px); }
+.violet-pulse { animation: violetPulse 3s ease-in-out infinite; }
+@keyframes violetPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(156,85,255,.18); } 50% { box-shadow: 0 0 0 12px rgba(156,85,255,0); } }
+@keyframes violetRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.violet-rise { animation: violetRise .6s ease both; }
+@keyframes violetShimmer { from { opacity: .65; } 50% { opacity: 1; } to { opacity: .65; } }
+.violet-shimmer { animation: violetShimmer 1.15s ease-in-out infinite; }

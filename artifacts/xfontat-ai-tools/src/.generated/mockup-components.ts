@@ -2,5 +2,6 @@
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/xfontat-ai-tools/LogoMaker.tsx": () => import("../components/mockups/xfontat-ai-tools/LogoMaker.tsx"),
+  "./components/mockups/xfontat-ai-tools/LogoMakerPurple.tsx": () => import("../components/mockups/xfontat-ai-tools/LogoMakerPurple.tsx"),
   "./components/mockups/xfontat-ai-tools/YouTubeThumbnailMaker.tsx": () => import("../components/mockups/xfontat-ai-tools/YouTubeThumbnailMaker.tsx")
 };
