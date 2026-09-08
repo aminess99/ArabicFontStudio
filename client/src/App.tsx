@@ -62,6 +62,7 @@ function Router() {
       <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
         <Route path="/design-fonts" component={DesignFonts} />
         <Route path="/font/:slug" component={FontDetails} />
         <Route path="/fonts/:category" component={CategoryFonts} />

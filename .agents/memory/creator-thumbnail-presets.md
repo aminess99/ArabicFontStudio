@@ -20,3 +20,9 @@ Arabic headline text is passed to the image model as locked source data after pr
 **Why:** The prompt model may paraphrase Arabic, and OpenRouter's image API rejects a raw reference string; both behaviors can silently break the user's intended thumbnail.
 
 **How to apply:** Append the original headline after refinement, accept only bounded PNG/JPEG/WebP data URLs, and send references using the API's typed `image_url` object.
+
+YouTube SEO copy should position thumbnails as a tool for visual relevance and click-through rate, not as a replacement for the video's title, description, or keywords.
+
+**Why:** A thumbnail can influence whether viewers click, but it does not directly provide the video's searchable metadata.
+
+**How to apply:** Pair the thumbnail tool with honest, readable headline text and explain the distinction in page content without keyword stuffing or clickbait claims.

@@ -10,6 +10,7 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 const styles = [
   {
@@ -63,6 +64,60 @@ const styles = [
     description: "تعبير شديد وZoom على الوجه وعناصر غريبة",
   },
 ] as const;
+
+const youtubeThumbnailDescription =
+  "منشئ صور مصغرة لليوتيوب بالذكاء الاصطناعي باللغة العربية. حوّل فكرة الفيديو إلى Thumbnail احترافي بمقاس 1280×720 مع عنوان عربي واضح وتصميم مناسب لرفع نسبة النقر.";
+
+const youtubeThumbnailSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      name: "منشئ الصور المصغرة لليوتيوب",
+      alternateName: "AI YouTube Thumbnail Maker",
+      applicationCategory: "MultimediaApplication",
+      operatingSystem: "Web",
+      url: "https://xfontat.com/youtube-thumbnail-maker",
+      description: youtubeThumbnailDescription,
+      inLanguage: "ar",
+      featureList: [
+        "إنشاء صور مصغرة لليوتيوب بمقاس 1280×720",
+        "دعم النصوص العربية واتجاه الكتابة من اليمين إلى اليسار",
+        "رفع صورة شخصية أو منتج كعنصر رئيسي",
+        "اختيار أسلوب بصري مناسب لمحتوى الفيديو",
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "كيف أصنع صورة مصغرة احترافية لليوتيوب؟",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "اكتب فكرة الفيديو أو عنوانه، اختر الأسلوب البصري، وأضف صورة الشخصية أو المنتج عند الحاجة، ثم أنشئ صورة مصغرة بمقاس 1280×720.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "ما المقاس المناسب لصورة Thumbnail في يوتيوب؟",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "المقاس المستخدم هنا هو 1280×720 بنسبة 16:9، وهو مناسب لعرض الصور المصغرة على يوتيوب والأجهزة المختلفة.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "هل يدعم منشئ الصور المصغرة الكتابة العربية؟",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "نعم، صُمم المنشئ لدعم العناوين العربية واتجاه الكتابة من اليمين إلى اليسار مع الحفاظ على النص الذي تدخله.",
+          },
+        },
+      ],
+    },
+  ],
+};
 
 type StyleId = (typeof styles)[number]["id"];
 
@@ -191,10 +246,17 @@ export default function YouTubeThumbnailStudio() {
   }
 
   return (
-    <main
-      dir="rtl"
-      className="min-h-screen overflow-hidden bg-[#070b0b] text-[#eef6f0]"
-    >
+    <>
+      <SEOHead
+        title="منشئ الصور المصغرة لليوتيوب بالذكاء الاصطناعي | xfontat"
+        description={youtubeThumbnailDescription}
+        path="/youtube-thumbnail-maker"
+        schema={youtubeThumbnailSchema}
+      />
+      <main
+        dir="rtl"
+        className="min-h-screen overflow-hidden bg-[#070b0b] text-[#eef6f0]"
+      >
       <div className="pointer-events-none fixed inset-0 opacity-30 [background-image:linear-gradient(rgba(132,255,211,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(132,255,211,.05)_1px,transparent_1px)] [background-size:44px_44px]" />
       <header className="relative z-10 mx-auto flex max-w-[1240px] items-center justify-between border-b border-white/[.07] px-5 py-5 sm:px-9">
         <div className="flex items-center gap-3">
@@ -559,6 +621,132 @@ export default function YouTubeThumbnailStudio() {
           ) : null}
         </section>
       )}
-    </main>
+        <section
+          aria-labelledby="youtube-thumbnail-seo-title"
+          className="relative z-10 mx-auto max-w-[1240px] px-5 pb-20 sm:px-9"
+        >
+          <div className="rounded-[28px] border border-white/[.08] bg-[#0d1513]/90 p-6 sm:p-9">
+            <p className="mb-3 text-[10px] uppercase tracking-[.2em] text-[#65f2c0]">
+              YouTube Thumbnail Maker بالعربي
+            </p>
+            <h2
+              id="youtube-thumbnail-seo-title"
+              className="max-w-3xl text-2xl font-semibold leading-[1.4] tracking-tight sm:text-3xl"
+            >
+              منشئ الصور المصغرة لليوتيوب بالذكاء الاصطناعي
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-8 text-[#9aaca3]">
+              أنشئ صورة مصغّرة احترافية لليوتيوب من فكرة بسيطة. يساعدك xfontat
+              على تحويل عنوان الفيديو إلى تصميم Thumbnail واضح وجذاب بمقاس
+              1280×720، مع دعم العناوين العربية، الألوان المتباينة، وترتيب
+              بصري يجعل موضوع الفيديو مفهوماً من النظرة الأولى.
+            </p>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <article className="rounded-2xl border border-white/[.07] bg-black/15 p-5">
+                <h3 className="text-sm font-medium text-[#e9f5ee]">
+                  صورة مصغرة واضحة وقابلة للنقر
+                </h3>
+                <p className="mt-2 text-xs leading-7 text-[#81948a]">
+                  تكوين بسيط، عنصر رئيسي واضح، وتباين قوي يساعد المشاهد على
+                  فهم موضوع الفيديو بسرعة من نتائج البحث والاقتراحات.
+                </p>
+              </article>
+              <article className="rounded-2xl border border-white/[.07] bg-black/15 p-5">
+                <h3 className="text-sm font-medium text-[#e9f5ee]">
+                  دعم كامل للخط العربي
+                </h3>
+                <p className="mt-2 text-xs leading-7 text-[#81948a]">
+                  أضف عنوان الفيديو بالعربية، وسيحافظ التصميم على اتجاه النص
+                  من اليمين إلى اليسار مع إبقائه مقروءاً على الهاتف.
+                </p>
+              </article>
+              <article className="rounded-2xl border border-white/[.07] bg-black/15 p-5">
+                <h3 className="text-sm font-medium text-[#e9f5ee]">
+                  تصميم مرتبط بفكرة الفيديو
+                </h3>
+                <p className="mt-2 text-xs leading-7 text-[#81948a]">
+                  لا يضيف كلمات عشوائية أو شعارات مضللة؛ بل يربط المشهد بعنوان
+                  الفيديو ليساعد على تحسين الصلة ورفع فرصة النقر.
+                </p>
+              </article>
+            </div>
+
+            <div className="mt-9 grid gap-8 border-t border-white/[.08] pt-8 lg:grid-cols-2">
+              <div>
+                <h3 className="text-lg font-medium text-[#e9f5ee]">
+                  كيف تنشئ Thumbnail مناسبة لفيديو يوتيوب؟
+                </h3>
+                <ol className="mt-4 space-y-3 text-sm leading-7 text-[#9aaca3]">
+                  <li>
+                    <span className="ml-2 font-mono text-[#65f2c0]">01</span>
+                    اكتب فكرة الفيديو أو عنوانه الأساسي بوضوح.
+                  </li>
+                  <li>
+                    <span className="ml-2 font-mono text-[#65f2c0]">02</span>
+                    أضف صورة الشخصية أو المنتج إذا كان جزءاً مهماً من المحتوى.
+                  </li>
+                  <li>
+                    <span className="ml-2 font-mono text-[#65f2c0]">03</span>
+                    اختر أسلوباً مناسباً لمجال القناة والجمهور المستهدف.
+                  </li>
+                  <li>
+                    <span className="ml-2 font-mono text-[#65f2c0]">04</span>
+                    راجع الصورة وتأكد من وضوحها قبل استخدامها على يوتيوب.
+                  </li>
+                </ol>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-[#e9f5ee]">
+                  هل الصورة المصغرة تحسن SEO لليوتيوب؟
+                </h3>
+                <p className="mt-4 text-sm leading-8 text-[#9aaca3]">
+                  الصورة المصغرة لا تستبدل عنوان الفيديو أو وصفه أو الكلمات
+                  المفتاحية، لكنها تساعد على تحسين الصلة البصرية ورفع نسبة
+                  النقر عندما تعكس محتوى الفيديو بصدق. لذلك يجمع هذا المنشئ
+                  بين عنوان عربي واضح ومشهد مرتبط بفكرة الفيديو، بدلاً من
+                  استخدام Clickbait مضلل.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-9 border-t border-white/[.08] pt-8">
+              <h3 className="text-lg font-medium text-[#e9f5ee]">
+                أسئلة شائعة عن صور YouTube المصغرة
+              </h3>
+              <div className="mt-4 grid gap-3">
+                <details className="rounded-2xl border border-white/[.07] bg-black/15 p-4">
+                  <summary className="cursor-pointer text-sm text-[#dcebe2]">
+                    كيف أصنع صورة مصغرة احترافية لليوتيوب؟
+                  </summary>
+                  <p className="mt-3 text-xs leading-7 text-[#81948a]">
+                    اكتب فكرة الفيديو، اختر الأسلوب البصري، وأضف صورة الشخصية
+                    أو المنتج عند الحاجة، ثم أنشئ الصورة بمقاس 1280×720.
+                  </p>
+                </details>
+                <details className="rounded-2xl border border-white/[.07] bg-black/15 p-4">
+                  <summary className="cursor-pointer text-sm text-[#dcebe2]">
+                    ما المقاس المناسب لصورة Thumbnail في يوتيوب؟
+                  </summary>
+                  <p className="mt-3 text-xs leading-7 text-[#81948a]">
+                    المقاس المناسب هنا هو 1280×720 بنسبة 16:9، ليظهر جيداً على
+                    الهاتف والكمبيوتر وصفحات الاقتراحات.
+                  </p>
+                </details>
+                <details className="rounded-2xl border border-white/[.07] bg-black/15 p-4">
+                  <summary className="cursor-pointer text-sm text-[#dcebe2]">
+                    هل يدعم المنشئ العناوين العربية؟
+                  </summary>
+                  <p className="mt-3 text-xs leading-7 text-[#81948a]">
+                    نعم، يدعم النص العربي واتجاه الكتابة من اليمين إلى اليسار
+                    ويحافظ على العنوان الذي تدخله داخل التصميم.
+                  </p>
+                </details>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }

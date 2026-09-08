@@ -878,6 +878,7 @@ ${faqHtml}`;
 
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "daily" },
+        { url: "/youtube-thumbnail-maker", priority: "0.9", changefreq: "weekly" },
         { url: "/design-fonts", priority: "0.9", changefreq: "weekly" },
         { url: "/blog", priority: "0.7", changefreq: "weekly" },
         { url: "/about", priority: "0.5", changefreq: "monthly" },
