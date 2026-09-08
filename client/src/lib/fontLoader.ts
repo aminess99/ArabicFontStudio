@@ -50,9 +50,10 @@ export async function loadFont(fontFamily: string, fontUrl: string): Promise<voi
   loadedFonts.add(fontKey);
   
   try {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    await document.fonts.ready;
-    await document.fonts.load(`normal 16px "${fontFamily}"`);
+    await document.fonts.load(
+      `normal 16px "${fontFamily}"`,
+      "بسم الله الرحمن الرحيم"
+    );
   } catch (e) {
     console.warn(`Font loading delayed for ${fontFamily}`);
   }

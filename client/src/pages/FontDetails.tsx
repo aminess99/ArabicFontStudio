@@ -170,16 +170,22 @@ export default function FontDetails() {
   }, [slug]);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (font) {
       setFontLoaded(false);
       loadFont(fontFamily, font.fileUrl)
         .then(() => {
-          setTimeout(() => setFontLoaded(true), 300);
+          if (!cancelled) setFontLoaded(true);
         })
         .catch(() => {
-          setTimeout(() => setFontLoaded(true), 500);
+          if (!cancelled) setFontLoaded(true);
         });
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [font?.id, fontFamily, font?.fileUrl]);
 
   const handleDownload = () => {
@@ -340,7 +346,7 @@ export default function FontDetails() {
                 style={{ fontFamily: fontLoaded ? fontFamily : 'inherit' }}
                 data-testid="text-font-preview"
               >
-                {fontLoaded ? previewText : "جاري تحميل الخط..."}
+                {previewText}
               </div>
 
               <div className="mb-6">
@@ -366,7 +372,7 @@ export default function FontDetails() {
                         style={{ fontFamily: fontLoaded ? fontFamily : 'inherit', fontSize: `${size}px`, lineHeight: 1.6 }}
                         data-testid={`text-size-preview-${size}`}
                       >
-                        {fontLoaded ? previewText : "جاري التحميل..."}
+                        {previewText}
                       </div>
                     </div>
                   ))}
