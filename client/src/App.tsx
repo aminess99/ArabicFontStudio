@@ -19,6 +19,10 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import FontCollection from "@/pages/FontCollection";
+import {
+  PurpleLogoPreview,
+  YouTubeThumbnailPreview,
+} from "@/pages/AIStudioPreview";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -30,6 +34,28 @@ function ScrollToTop() {
 
 function Router() {
   useAnalytics();
+  const previewPath =
+    typeof window !== "undefined" ? window.location.pathname : "";
+
+  if (import.meta.env.DEV) {
+    if (previewPath === "/__preview/youtube-thumbnail-maker") {
+      return (
+        <>
+          <ScrollToTop />
+          <YouTubeThumbnailPreview />
+        </>
+      );
+    }
+
+    if (previewPath === "/__preview/logo-maker") {
+      return (
+        <>
+          <ScrollToTop />
+          <PurpleLogoPreview />
+        </>
+      );
+    }
+  }
 
   return (
     <>

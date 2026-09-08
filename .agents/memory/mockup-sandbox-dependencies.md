@@ -7,4 +7,4 @@ Isolated mockup artifacts can be created without a local dependency tree even th
 
 **Why:** Visual verification depends on the artifact preview server, and a running workflow alone does not prove the iframe can compile its CSS.
 
-**How to apply:** Before presenting a new mockup, confirm the artifact workflow logs are clean and capture the preview. If dependency resolution is missing, keep the fix isolated to the mockup artifact rather than changing the main app's toolchain.
+**How to apply:** Before presenting a new mockup, confirm the artifact workflow logs are clean and capture the preview. If dependency resolution is missing, keep the fix isolated to the mockup artifact rather than changing the main app's toolchain. When embedding an artifact preview from the main app, a relative /__mockup URL may resolve against the wrong workflow; use the artifact preview origin only in the development-only bridge.
