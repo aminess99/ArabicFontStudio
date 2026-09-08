@@ -79,9 +79,9 @@ export function buildThumbnailPrompt(idea: string, styleId: ThumbnailStyleId): s
     `Video concept from the creator: "${idea}"`,
     `Visual direction: ${style.label}. ${style.description}`,
     "Make one clear hero subject the first thing the eye sees. Use an exaggerated but believable visual moment, strong foreground/background separation, cinematic lighting, vivid controlled color, and a composition that reads instantly at small size.",
-    "Design for an Arabic-speaking YouTube audience. Reserve generous clean negative space on the right side for a later Arabic HTML title overlay, and keep the main subject away from that text-safe area.",
+    `Design for an Arabic-speaking YouTube audience. Render this exact Arabic headline inside the image: "${idea}". Use large bold Arabic typography with correct right-to-left direction, strong contrast, and a clean placement that remains readable at thumbnail size.`,
     "Use the requested creator-thumbnail conventions as a broad visual reference only. Do not depict, imitate, reconstruct, or identify any real creator's face, body, voice, logo, branding, signature marks, or exact thumbnail composition. Use generic people and original visual elements.",
-    "Do not render any readable words, letters, numbers, logos, watermarks, UI, fake Arabic text, or gibberish inside the image. The final Arabic title will be placed programmatically after generation.",
+    "Do not add unrelated words, logos, watermarks, UI, fake extra text, or gibberish. The supplied Arabic headline must be the only text in the artwork.",
     "Avoid clutter, generic stock-photo composition, tiny details, duplicate subjects, distorted hands, and low-contrast shadows. Output only the finished thumbnail artwork.",
   ].join("\n");
 }
@@ -136,7 +136,6 @@ export function registerThumbnailRoutes(app: Express): void {
         promptModel: "google/gemini-3.7-flash via OpenRouter",
         imageModel: "openai/gpt-image-2 via OpenRouter",
         style: thumbnailStyles[styleId],
-        overlayText: idea,
       });
     } catch (error) {
       console.error("Thumbnail generation failed:", error);

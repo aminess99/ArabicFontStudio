@@ -67,7 +67,6 @@ type StyleId = (typeof styles)[number]["id"];
 type GenerationResult = {
   image: string;
   prompt: string;
-  overlayText: string;
   style: {
     label: string;
     arabicLabel: string;
@@ -79,9 +78,9 @@ function createPreviewPrompt(idea: string, style: (typeof styles)[number]) {
     "إنشاء صورة مصغرة احترافية لليوتيوب بمقاس 1280×720.",
     `فكرة الفيديو: ${idea || "اكتب فكرة الفيديو هنا"}`,
     `الأسلوب: ${style.label} — ${style.description}.`,
-    "لقطة بصرية واحدة واضحة، موضوع رئيسي قوي، إضاءة سينمائية، تباين عالٍ، ومساحة نظيفة لعنوان عربي يضاف لاحقاً.",
+    `لقطة بصرية واحدة واضحة، موضوع رئيسي قوي، إضاءة سينمائية، وتباين عالٍ. اكتب هذا العنوان العربي داخل الصورة بخط كبير وواضح: «${idea || "اكتب فكرة الفيديو هنا"}»`,
     "استخدم قواعد تغليف صور صناع المحتوى كمرجع عام فقط، بدون نسخ وجه المشهور أو شعاره أو هويته أو تكوين صورته حرفياً.",
-    "بدون نصوص أو شعارات داخل الصورة؛ سيتم وضع النص العربي برمجياً للحفاظ على وضوحه.",
+    "لا تضف أي كلمات أو شعارات أو علامات مائية أخرى. يجب أن يكون العنوان العربي هو النص الوحيد داخل الصورة.",
   ].join("\n");
 }
 
@@ -380,7 +379,7 @@ export default function YouTubeThumbnailStudio() {
                   size={32}
                   className="mx-auto mb-3 animate-spin text-[#65f2c0]"
                 />
-                <p className="text-sm">نولّد المشهد ونترك مساحة للنص العربي…</p>
+                 <p className="text-sm">نولّد المشهد والعنوان العربي داخله…</p>
               </div>
             </div>
           ) : result ? (
@@ -391,11 +390,6 @@ export default function YouTubeThumbnailStudio() {
                   alt={`صورة مصغرة بأسلوب ${result.style.arabicLabel}`}
                   className="h-full w-full object-cover"
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-20">
-                  <p className="max-w-[78%] text-right text-2xl font-black leading-tight text-white drop-shadow-[0_3px_10px_rgba(0,0,0,.75)] sm:text-4xl">
-                    {result.overlayText}
-                  </p>
-                </div>
               </div>
               <div className="rounded-3xl border border-white/[.08] bg-[#111918] p-5">
                 <p className="text-xs uppercase tracking-[.15em] text-[#65f2c0]">
