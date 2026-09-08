@@ -4,10 +4,11 @@ import {
   Check,
   ChevronDown,
   Clipboard,
+  Download,
   ImagePlus,
   LoaderCircle,
+  RotateCcw,
   Sparkles,
-  WandSparkles,
   X,
 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
@@ -142,6 +143,152 @@ function formatDuration(milliseconds: number): string {
   return `${minutes} د ${String(seconds % 60).padStart(2, "0")} ث`;
 }
 
+type WorkspacePreviewProps = {
+  result: GenerationResult | null;
+  isGenerating: boolean;
+  elapsedMs: number;
+  style: (typeof styles)[number];
+  copied: boolean;
+  onGenerate: () => void;
+  onCopy: () => void;
+};
+
+function WorkspacePreview({
+  result,
+  isGenerating,
+  elapsedMs,
+  style,
+  copied,
+  onGenerate,
+  onCopy,
+}: WorkspacePreviewProps) {
+  return (
+    <div className="order-2 rounded-[26px] border border-white/[.09] bg-[#111918]/90 p-4 shadow-2xl shadow-black/20 backdrop-blur sm:p-6">
+      <div className="mb-5 flex items-center justify-between border-b border-white/[.08] pb-4">
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-[#65f2c0]/15 text-xs text-[#65f2c0]">
+            2
+          </span>
+          مساحة النتيجة
+        </div>
+        <span className="font-mono text-[10px] text-[#566760]">
+          WORKSPACE / 16:9
+        </span>
+      </div>
+
+      {isGenerating ? (
+        <div className="grid min-h-[420px] place-items-center rounded-3xl border border-white/[.08] bg-[#0b1110] text-[#8da198]">
+          <div className="text-center">
+            <LoaderCircle
+              size={34}
+              className="mx-auto mb-3 animate-spin text-[#65f2c0]"
+            />
+            <p className="text-sm">نولّد الصورة المصغرة الآن…</p>
+            <p className="mt-2 font-mono text-[11px] text-[#65f2c0]">
+              الوقت المنقضي: {formatDuration(elapsedMs)}
+            </p>
+          </div>
+        </div>
+      ) : result ? (
+        <div className="grid gap-4 xl:grid-cols-[1.18fr_.82fr]">
+          <div className="relative aspect-video overflow-hidden rounded-3xl border border-white/[.1] bg-[#101615] shadow-2xl">
+            <img
+              src={result.image}
+              alt={`صورة مصغرة بأسلوب ${result.style.arabicLabel}`}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="rounded-3xl border border-white/[.08] bg-[#0b1110] p-4">
+            {result.timings && (
+              <div className="mb-4 grid grid-cols-3 gap-2 rounded-2xl border border-[#65f2c0]/15 bg-[#65f2c0]/[.05] p-3 text-center">
+                <div>
+                  <p className="font-mono text-sm text-[#65f2c0]">
+                    {formatDuration(result.timings.promptMs)}
+                  </p>
+                  <p className="mt-1 text-[10px] text-[#81948a]">prompt</p>
+                </div>
+                <div>
+                  <p className="font-mono text-sm text-[#65f2c0]">
+                    {formatDuration(result.timings.imageMs)}
+                  </p>
+                  <p className="mt-1 text-[10px] text-[#81948a]">الصورة</p>
+                </div>
+                <div>
+                  <p className="font-mono text-sm text-[#65f2c0]">
+                    {formatDuration(result.timings.totalMs)}
+                  </p>
+                  <p className="mt-1 text-[10px] text-[#81948a]">الإجمالي</p>
+                </div>
+              </div>
+            )}
+            <p className="text-xs uppercase tracking-[.15em] text-[#65f2c0]">
+              جاهزة للنشر
+            </p>
+            <p className="mt-3 line-clamp-6 whitespace-pre-wrap text-xs leading-6 text-[#9aaca3]">
+              {result.prompt}
+            </p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <a
+                href={result.image}
+                download="xfontat-youtube-thumbnail.png"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#65f2c0] px-3 py-3 text-xs font-semibold text-[#07100d] transition hover:bg-[#7af6cb]"
+              >
+                <Download size={14} />
+                تحميل الصورة
+              </a>
+              <button
+                type="button"
+                onClick={onGenerate}
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-3 text-xs text-[#d5e1da] transition hover:border-[#65f2c0]/40"
+              >
+                <RotateCcw size={14} />
+                إعادة التوليد
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={onCopy}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-3 text-xs text-[#aebfb6] transition hover:border-white/20"
+            >
+              {copied ? <Check size={14} /> : <Clipboard size={14} />}
+              {copied ? "تم نسخ prompt" : "نسخ prompt"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="grid min-h-[420px] place-items-center rounded-3xl border border-dashed border-white/[.12] bg-[#0b1110] p-8 text-center">
+          <div>
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#65f2c0]/10 text-[#65f2c0]">
+              <Sparkles size={27} />
+            </div>
+            <h2 className="mt-5 text-xl font-medium text-[#e9f5ee]">
+              صورتك المصغرة ستظهر هنا
+            </h2>
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-[#81948a]">
+              اكتب فكرة الفيديو، اختر الأسلوب، ثم اضغط إنشاء لتحصل على Thumbnail
+              جاهز لليوتيوب.
+            </p>
+            <p className="mt-4 text-[11px] text-[#64766d]">
+              الأسلوب الحالي: {style.label}
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2 text-[10px] text-[#71837a]">
+              <span className="rounded-full border border-white/[.08] px-3 py-2">
+                1280×720
+              </span>
+              <span className="rounded-full border border-white/[.08] px-3 py-2">
+                16:9
+              </span>
+              <span className="rounded-full border border-white/[.08] px-3 py-2">
+                عربي RTL
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function createPreviewPrompt(idea: string, style: (typeof styles)[number]) {
   return [
     "إنشاء صورة مصغرة احترافية لليوتيوب بمقاس 1280×720.",
@@ -273,42 +420,22 @@ export default function YouTubeThumbnailStudio() {
           </div>
         </div>
         <span className="rounded-full border border-[#65f2c0]/20 bg-[#65f2c0]/[.06] px-3 py-2 text-[10px] text-[#65f2c0]">
-          معاينة خاصة
+          مساحة العمل
         </span>
       </header>
 
-      <section className="relative z-10 mx-auto grid max-w-[1240px] gap-8 px-5 pb-14 pt-10 sm:px-9 lg:grid-cols-[.9fr_1.1fr] lg:items-start lg:pt-16">
-        <div className="lg:sticky lg:top-8">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#65f2c0]/20 bg-[#65f2c0]/[.06] px-3 py-1.5 text-[11px] text-[#65f2c0]">
-            <WandSparkles size={13} />
-            حوّل الفكرة إلى صورة تتوقف عندها العين
-          </div>
-          <h1 className="max-w-xl text-4xl font-semibold leading-[1.12] tracking-[-.06em] sm:text-6xl">
-            أنشئ صورة مصغّرة
-            <br />
-            <span className="text-[#65f2c0]">احترافية لليوتيوب.</span>
-          </h1>
-          <p className="mt-5 max-w-lg text-sm leading-8 text-[#91a49b]">
-            اكتب فكرة فيديو يوتيوب، اختر أسلوب الصورة، وسنحوّلها إلى prompt
-            احترافي ثم نولّد لك صورة مصغّرة جذابة بمقاس 1280×720.
-          </p>
-          <div className="mt-8 grid max-w-lg grid-cols-3 gap-3 border-t border-white/[.08] pt-5 text-xs text-[#71837a]">
-            <div>
-              <strong className="mb-1 block text-[#e7f3ec]">01</strong>
-              اكتب الفكرة
-            </div>
-            <div>
-              <strong className="mb-1 block text-[#e7f3ec]">02</strong>
-              اختر الأسلوب
-            </div>
-            <div>
-              <strong className="mb-1 block text-[#e7f3ec]">03</strong>
-              ولّد الصورة
-            </div>
-          </div>
-        </div>
+      <section className="relative z-10 mx-auto grid max-w-[1240px] gap-8 px-5 pb-14 pt-8 sm:px-9 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-start lg:pt-10">
+        <WorkspacePreview
+          result={result}
+          isGenerating={isGenerating}
+          elapsedMs={elapsedMs}
+          style={style}
+          copied={copied}
+          onGenerate={generateThumbnail}
+          onCopy={copyPrompt}
+        />
 
-        <div className="rounded-[26px] border border-white/[.09] bg-[#111918]/90 p-4 shadow-2xl shadow-black/20 backdrop-blur sm:p-6">
+        <div className="order-1 rounded-[26px] border border-white/[.09] bg-[#111918]/90 p-4 shadow-2xl shadow-black/20 backdrop-blur sm:p-6">
           <div className="mb-5 flex items-center justify-between border-b border-white/[.08] pb-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <span className="grid h-7 w-7 place-items-center rounded-full bg-[#65f2c0]/15 text-xs text-[#65f2c0]">
@@ -536,91 +663,6 @@ export default function YouTubeThumbnailStudio() {
         </div>
       </section>
 
-      {(result || isGenerating) && (
-        <section className="relative z-10 mx-auto max-w-[1240px] px-5 pb-16 sm:px-9">
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <p className="mb-2 font-mono text-[10px] uppercase tracking-[.2em] text-[#65f2c0]">
-                Generated direction / {result?.style.arabicLabel ?? style.label}
-              </p>
-              <h2 className="text-2xl font-medium">هذه هي اللقطة الأولى لفكرتك</h2>
-            </div>
-            {result && (
-              <button
-                type="button"
-                onClick={copyPrompt}
-                className="hidden items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-[#b6c6bd] sm:flex"
-              >
-                {copied ? <Check size={14} /> : <Clipboard size={14} />}
-                {copied ? "تم النسخ" : "نسخ الـ prompt"}
-              </button>
-            )}
-          </div>
-
-          {isGenerating ? (
-            <div className="grid aspect-video place-items-center rounded-3xl border border-white/[.08] bg-[#111918] text-[#8da198]">
-              <div className="text-center">
-                <LoaderCircle
-                  size={32}
-                  className="mx-auto mb-3 animate-spin text-[#65f2c0]"
-                />
-                 <p className="text-sm">نولّد المشهد والعنوان العربي داخله…</p>
-                <p className="mt-2 font-mono text-[11px] text-[#65f2c0]">
-                  الوقت المنقضي: {formatDuration(elapsedMs)}
-                </p>
-              </div>
-            </div>
-          ) : result ? (
-            <div className="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
-              <div className="relative aspect-video overflow-hidden rounded-3xl border border-white/[.1] bg-[#101615] shadow-2xl">
-                <img
-                  src={result.image}
-                  alt={`صورة مصغرة بأسلوب ${result.style.arabicLabel}`}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="rounded-3xl border border-white/[.08] bg-[#111918] p-5">
-                {result.timings && (
-                  <div className="mb-4 grid grid-cols-3 gap-2 rounded-2xl border border-[#65f2c0]/15 bg-[#65f2c0]/[.05] p-3 text-center">
-                    <div>
-                      <p className="font-mono text-sm text-[#65f2c0]">
-                        {formatDuration(result.timings.promptMs)}
-                      </p>
-                      <p className="mt-1 text-[10px] text-[#81948a]">تحسين prompt</p>
-                    </div>
-                    <div>
-                      <p className="font-mono text-sm text-[#65f2c0]">
-                        {formatDuration(result.timings.imageMs)}
-                      </p>
-                      <p className="mt-1 text-[10px] text-[#81948a]">توليد الصورة</p>
-                    </div>
-                    <div>
-                      <p className="font-mono text-sm text-[#65f2c0]">
-                        {formatDuration(result.timings.totalMs)}
-                      </p>
-                      <p className="mt-1 text-[10px] text-[#81948a]">الإجمالي</p>
-                    </div>
-                  </div>
-                )}
-                <p className="text-xs uppercase tracking-[.15em] text-[#65f2c0]">
-                  Prompt جاهز
-                </p>
-                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#9aaca3]">
-                  {result.prompt}
-                </p>
-                <button
-                  type="button"
-                  onClick={copyPrompt}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-3 text-xs text-[#d5e1da] sm:hidden"
-                >
-                  {copied ? <Check size={14} /> : <Clipboard size={14} />}
-                  {copied ? "تم النسخ" : "نسخ الـ prompt"}
-                </button>
-              </div>
-            </div>
-          ) : null}
-        </section>
-      )}
         <section
           aria-labelledby="youtube-thumbnail-seo-title"
           className="relative z-10 mx-auto max-w-[1240px] px-5 pb-20 sm:px-9"
