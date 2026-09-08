@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   Check,
+  ChevronDown,
   Clipboard,
   LoaderCircle,
   Sparkles,
@@ -87,6 +88,7 @@ function createPreviewPrompt(idea: string, style: (typeof styles)[number]) {
 export default function YouTubeThumbnailStudio() {
   const [idea, setIdea] = useState("كيف تختار الخط العربي المناسب؟");
   const [selectedStyle, setSelectedStyle] = useState<StyleId>("mrbeast");
+  const [stylesOpen, setStylesOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<GenerationResult | null>(null);
@@ -225,32 +227,85 @@ export default function YouTubeThumbnailStudio() {
             </span>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {styles.map((item) => {
-              const isSelected = selectedStyle === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setSelectedStyle(item.id)}
-                  className={`min-h-[78px] rounded-2xl border p-3 text-right transition ${
-                    isSelected
-                      ? "border-[#65f2c0]/70 bg-[#65f2c0]/10 text-[#eafff4]"
-                      : "border-white/[.08] bg-[#0b1110] text-[#81948a] hover:border-white/20"
-                  }`}
-                >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {isSelected && (
-                      <Check size={14} className="shrink-0 text-[#65f2c0]" />
-                    )}
+          <div className="relative mt-4">
+            <button
+              type="button"
+              aria-expanded={stylesOpen}
+              aria-haspopup="listbox"
+              onClick={() => setStylesOpen((open) => !open)}
+              className={`flex w-full items-center justify-between rounded-2xl border px-4 py-4 text-right transition ${
+                stylesOpen
+                  ? "border-[#65f2c0]/70 bg-[#65f2c0]/10"
+                  : "border-white/[.1] bg-[#0b1110] hover:border-white/20"
+              }`}
+            >
+              <span className="flex items-center gap-3">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#65f2c0]/15 text-xs font-bold text-[#65f2c0]">
+                  {styles.findIndex((item) => item.id === selectedStyle) + 1}
+                </span>
+                <span>
+                  <span className="block text-sm font-medium text-[#eafff4]">
+                    {style.label}
                   </span>
-                  <span className="mt-1 block text-[10px] leading-5 opacity-70">
-                    {item.description}
+                  <span className="mt-1 block text-[11px] text-[#81948a]">
+                    {style.description}
                   </span>
-                </button>
-              );
-            })}
+                </span>
+              </span>
+              <ChevronDown
+                size={18}
+                className={`text-[#65f2c0] transition ${
+                  stylesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {stylesOpen && (
+              <div
+                role="listbox"
+                aria-label="اختيار ستايل المشاهير"
+                className="absolute inset-x-0 top-[calc(100%+8px)] z-20 max-h-[340px] overflow-y-auto rounded-2xl border border-white/[.12] bg-[#111918] p-2 shadow-2xl shadow-black/50"
+              >
+                <p className="px-3 py-2 text-[10px] uppercase tracking-[.14em] text-[#64766d]">
+                  اختر أسلوب المشاهير
+                </p>
+                <div className="grid gap-1 sm:grid-cols-2">
+                  {styles.map((item) => {
+                    const isSelected = selectedStyle === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        onClick={() => {
+                          setSelectedStyle(item.id);
+                          setStylesOpen(false);
+                        }}
+                        className={`rounded-xl p-3 text-right transition ${
+                          isSelected
+                            ? "bg-[#65f2c0]/10 text-[#eafff4]"
+                            : "text-[#81948a] hover:bg-white/[.05] hover:text-[#eafff4]"
+                        }`}
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-medium">{item.label}</span>
+                          {isSelected && (
+                            <Check
+                              size={14}
+                              className="shrink-0 text-[#65f2c0]"
+                            />
+                          )}
+                        </span>
+                        <span className="mt-1 block text-[10px] leading-5 opacity-70">
+                          {item.description}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
           <p className="mt-3 text-[11px] leading-5 text-[#64766d]">
             هذه مراجع بصرية عامة وليست نسخاً لوجوه المشاهير أو شعاراتهم؛ سيتم
