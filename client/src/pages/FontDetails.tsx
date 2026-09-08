@@ -141,11 +141,9 @@ export default function FontDetails() {
   });
 
   const fontFamily = font ? generateFontFamily(font.name) : '';
-  const characterMapPreview = font &&
-    font.category === "خطوط الحرة" &&
-    categoryFonts.slice(0, 50).some((previewFont) => previewFont.fileName === font.fileName)
+  const characterMapPreview = font
     ? {
-        src: `/font-previews/${generateSlug(font.name, font.fileName, font.category)}.png`,
+        src: `/font-previews/${generateSlug(font.name, font.fileName, font.category)}.webp`,
         label: `خريطة حروف خط ${font.nameArabic || font.name} مع علامة مائية من xfontat.com`,
       }
     : undefined;

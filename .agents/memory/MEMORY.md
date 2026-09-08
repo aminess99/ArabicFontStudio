@@ -1,2 +1,2 @@
 - [Cost optimization](cost-optimization.md) — keep unused Postgres DB for deploy validation; cache fonts long-term + compression to cut bandwidth costs
-- [Font character previews](font-character-previews.md) — keep the HTML glyph map and add images as a supplementary preview, starting with high-traffic fonts
+- [Font character previews](font-character-previews.md) — keep the HTML glyph map and add watermarked WebP previews as a supplementary visual layer
