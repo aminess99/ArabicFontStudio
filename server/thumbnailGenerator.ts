@@ -121,6 +121,7 @@ export function registerThumbnailRoutes(app: Express): void {
     requestWindows.set(clientKey, windowState);
 
     try {
+      const startedAt = Date.now();
       const basePrompt = buildThumbnailPrompt(idea, styleId);
       const refined = await refineThumbnailPrompt({
         idea,
@@ -128,13 +129,20 @@ export function registerThumbnailRoutes(app: Express): void {
         styleDescription: thumbnailStyles[styleId].description,
         basePrompt,
       });
+      const promptCompletedAt = Date.now();
       const image = await generateThumbnailImage(refined.prompt);
+      const completedAt = Date.now();
       return res.json({
         image,
         prompt: refined.prompt,
         creativeDirection: refined.creativeDirection,
         promptModel: "google/gemini-3.7-flash via OpenRouter",
         imageModel: "openai/gpt-image-2 via OpenRouter",
+        timings: {
+          promptMs: promptCompletedAt - startedAt,
+          imageMs: completedAt - promptCompletedAt,
+          totalMs: completedAt - startedAt,
+        },
         style: thumbnailStyles[styleId],
       });
     } catch (error) {

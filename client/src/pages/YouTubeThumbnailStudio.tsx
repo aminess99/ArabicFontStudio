@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Check,
@@ -67,11 +67,23 @@ type StyleId = (typeof styles)[number]["id"];
 type GenerationResult = {
   image: string;
   prompt: string;
+  timings?: {
+    promptMs: number;
+    imageMs: number;
+    totalMs: number;
+  };
   style: {
     label: string;
     arabicLabel: string;
   };
 };
+
+function formatDuration(milliseconds: number): string {
+  const seconds = Math.max(0, Math.round(milliseconds / 1000));
+  if (seconds < 60) return `${seconds} ث`;
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes} د ${String(seconds % 60).padStart(2, "0")} ث`;
+}
 
 function createPreviewPrompt(idea: string, style: (typeof styles)[number]) {
   return [
@@ -89,6 +101,7 @@ export default function YouTubeThumbnailStudio() {
   const [selectedStyle, setSelectedStyle] = useState<StyleId>("mrbeast");
   const [stylesOpen, setStylesOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState("");
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [copied, setCopied] = useState(false);
@@ -98,6 +111,18 @@ export default function YouTubeThumbnailStudio() {
     () => createPreviewPrompt(idea, style),
     [idea, style],
   );
+
+  useEffect(() => {
+    if (!isGenerating) return;
+
+    const startedAt = performance.now();
+    setElapsedMs(0);
+    const timer = window.setInterval(() => {
+      setElapsedMs(performance.now() - startedAt);
+    }, 250);
+
+    return () => window.clearInterval(timer);
+  }, [isGenerating]);
 
   async function generateThumbnail() {
     setIsGenerating(true);
@@ -338,7 +363,7 @@ export default function YouTubeThumbnailStudio() {
             {isGenerating ? (
               <>
                 <LoaderCircle size={17} className="animate-spin" />
-                نكتب الـ prompt ونبني المشهد…
+                نكتب الـ prompt ونبني المشهد… {formatDuration(elapsedMs)}
               </>
             ) : (
               <>
@@ -380,6 +405,9 @@ export default function YouTubeThumbnailStudio() {
                   className="mx-auto mb-3 animate-spin text-[#65f2c0]"
                 />
                  <p className="text-sm">نولّد المشهد والعنوان العربي داخله…</p>
+                <p className="mt-2 font-mono text-[11px] text-[#65f2c0]">
+                  الوقت المنقضي: {formatDuration(elapsedMs)}
+                </p>
               </div>
             </div>
           ) : result ? (
@@ -392,6 +420,28 @@ export default function YouTubeThumbnailStudio() {
                 />
               </div>
               <div className="rounded-3xl border border-white/[.08] bg-[#111918] p-5">
+                {result.timings && (
+                  <div className="mb-4 grid grid-cols-3 gap-2 rounded-2xl border border-[#65f2c0]/15 bg-[#65f2c0]/[.05] p-3 text-center">
+                    <div>
+                      <p className="font-mono text-sm text-[#65f2c0]">
+                        {formatDuration(result.timings.promptMs)}
+                      </p>
+                      <p className="mt-1 text-[10px] text-[#81948a]">تحسين prompt</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-sm text-[#65f2c0]">
+                        {formatDuration(result.timings.imageMs)}
+                      </p>
+                      <p className="mt-1 text-[10px] text-[#81948a]">توليد الصورة</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-sm text-[#65f2c0]">
+                        {formatDuration(result.timings.totalMs)}
+                      </p>
+                      <p className="mt-1 text-[10px] text-[#81948a]">الإجمالي</p>
+                    </div>
+                  </div>
+                )}
                 <p className="text-xs uppercase tracking-[.15em] text-[#65f2c0]">
                   Prompt جاهز
                 </p>
