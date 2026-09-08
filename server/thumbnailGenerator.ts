@@ -2,55 +2,55 @@ import type { Express, Request, Response } from "express";
 import { generateImage } from "./replit_integrations/image";
 
 export const thumbnailStyles = {
-  "viral-challenge": {
-    label: "Viral challenge",
-    arabicLabel: "تحدّي فيروسي",
-    description: "High-energy creator thumbnail with dramatic scale, emotion, and instant curiosity.",
+  mrbeast: {
+    label: "MrBeast Style",
+    arabicLabel: "MrBeast Style",
+    description: "Huge generic human face, exaggerated expression, saturated colors, and one oversized visual object.",
   },
-  cinematic: {
-    label: "Cinematic story",
-    arabicLabel: "قصة سينمائية",
-    description: "Moody film lighting, rich depth, atmospheric subject separation, and a strong narrative moment.",
+  pewdiepie: {
+    label: "PewDiePie Style",
+    arabicLabel: "PewDiePie Style",
+    description: "One generic creator or character, simple background, comedic expression, and a short headline-safe composition.",
   },
-  "tech-review": {
-    label: "Tech review",
-    arabicLabel: "مراجعة تقنية",
-    description: "Premium product lighting, crisp detail, clean futuristic geometry, and a polished studio finish.",
+  ksi: {
+    label: "KSI Style",
+    arabicLabel: "KSI Style",
+    description: "Bold saturated colors, sharp cuts, a strong generic expression, and sports or entertainment elements.",
   },
-  "gaming-reaction": {
-    label: "Gaming reaction",
-    arabicLabel: "ردّة فعل ألعاب",
-    description: "Electric color, expressive energy, sharp action framing, and a playful competitive mood.",
+  "logan-paul": {
+    label: "Logan Paul Style",
+    arabicLabel: "Logan Paul Style",
+    description: "Clear generic personality portrait, luxurious or spectacular background, and one curiosity-driving object.",
   },
-  "luxury-lifestyle": {
-    label: "Luxury lifestyle",
-    arabicLabel: "أسلوب فاخر",
-    description: "Editorial luxury, controlled highlights, premium materials, and aspirational composition.",
+  sidemen: {
+    label: "Sidemen Style",
+    arabicLabel: "Sidemen Style",
+    description: "Several generic people, varied expressions, a busy but organized composition, and strong colors.",
   },
-  "science-experiment": {
-    label: "Science experiment",
-    arabicLabel: "تجربة علمية",
-    description: "Curious discovery, controlled experiment lighting, surprising visual evidence, and clarity.",
+  "ali-abdaal": {
+    label: "Ali Abdaal Style",
+    arabicLabel: "Ali Abdaal Style",
+    description: "Very clean design, one generic person, simple background, and clear text-safe space.",
   },
-  "breaking-news": {
-    label: "Breaking news",
-    arabicLabel: "خبر عاجل",
-    description: "Urgent editorial framing, strong subject hierarchy, bold contrast, and credible newsroom energy.",
+  "casey-neistat": {
+    label: "Casey Neistat Style",
+    arabicLabel: "Casey Neistat Style",
+    description: "Realistic cinematic action frame, visible motion, a strong sense of story, and adventure.",
   },
-  "fitness-transformation": {
-    label: "Transformation",
-    arabicLabel: "تحوّل ولياقة",
-    description: "Before-and-after storytelling, powerful human energy, clear contrast, and motivating momentum.",
+  "ryan-trahan": {
+    label: "Ryan Trahan Style",
+    arabicLabel: "Ryan Trahan Style",
+    description: "Candid-looking moment, strange or funny situation, natural colors, and curiosity.",
   },
-  "food-sensation": {
-    label: "Food sensation",
-    arabicLabel: "تجربة طعام",
-    description: "Appetizing close-up, rich texture, warm color, expressive reaction, and irresistible detail.",
+  airrack: {
+    label: "Airrack Style",
+    arabicLabel: "Airrack Style",
+    description: "A huge spectacle, a relatively small generic person, and a clear feeling of adventure and challenge.",
   },
-  "podcast-authority": {
-    label: "Podcast authority",
-    arabicLabel: "حوار مؤثر",
-    description: "Confident portraiture, intimate studio light, editorial restraint, and thoughtful authority.",
+  ishowspeed: {
+    label: "IShowSpeed Style",
+    arabicLabel: "IShowSpeed Style",
+    description: "Extremely intense generic expression, a face zoom, funny or strange elements, and high contrast.",
   },
 } as const;
 
@@ -79,6 +79,7 @@ export function buildThumbnailPrompt(idea: string, styleId: ThumbnailStyleId): s
     `Visual direction: ${style.label}. ${style.description}`,
     "Make one clear hero subject the first thing the eye sees. Use an exaggerated but believable visual moment, strong foreground/background separation, cinematic lighting, vivid controlled color, and a composition that reads instantly at small size.",
     "Design for an Arabic-speaking YouTube audience. Reserve generous clean negative space on the right side for a later Arabic HTML title overlay, and keep the main subject away from that text-safe area.",
+    "Use the requested creator-thumbnail conventions as a broad visual reference only. Do not depict, imitate, reconstruct, or identify any real creator's face, body, voice, logo, branding, signature marks, or exact thumbnail composition. Use generic people and original visual elements.",
     "Do not render any readable words, letters, numbers, logos, watermarks, UI, fake Arabic text, or gibberish inside the image. The final Arabic title will be placed programmatically after generation.",
     "Avoid clutter, generic stock-photo composition, tiny details, duplicate subjects, distorted hands, and low-contrast shadows. Output only the finished thumbnail artwork.",
   ].join("\n");

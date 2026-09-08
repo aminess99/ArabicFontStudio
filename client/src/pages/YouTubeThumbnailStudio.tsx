@@ -10,64 +10,54 @@ import {
 
 const styles = [
   {
-    id: "viral-challenge",
-    label: "تحدّي فيروسي",
-    english: "Viral challenge",
-    description: "طاقة عالية، دهشة، ولقطة توقف التمرير",
+    id: "mrbeast",
+    label: "MrBeast Style",
+    description: "وجه ضخم، تعبير مبالغ فيه، ألوان قوية، وعنصر كبير",
   },
   {
-    id: "cinematic",
-    label: "قصة سينمائية",
-    english: "Cinematic story",
-    description: "إضاءة درامية وعمق بصري واضح",
+    id: "pewdiepie",
+    label: "PewDiePie Style",
+    description: "شخصية وخلفية بسيطة وتعبير كوميدي ونص قصير",
   },
   {
-    id: "tech-review",
-    label: "مراجعة تقنية",
-    english: "Tech review",
-    description: "منتج واضح ولمسة استوديو احترافية",
+    id: "ksi",
+    label: "KSI Style",
+    description: "ألوان قوية وقصّات حادة وعناصر رياضية أو ترفيهية",
   },
   {
-    id: "gaming-reaction",
-    label: "ردّة فعل ألعاب",
-    english: "Gaming reaction",
-    description: "ألوان كهربائية وحركة تنافسية",
+    id: "logan-paul",
+    label: "Logan Paul Style",
+    description: "صورة شخصية واضحة وخلفية مذهلة وعنصر يثير الفضول",
   },
   {
-    id: "luxury-lifestyle",
-    label: "أسلوب فاخر",
-    english: "Luxury lifestyle",
-    description: "تحرير راقٍ ومواد وإضاءة فاخرة",
+    id: "sidemen",
+    label: "Sidemen Style",
+    description: "عدة أشخاص وتعبيرات مختلفة وتكوين مزدحم منظم",
   },
   {
-    id: "science-experiment",
-    label: "تجربة علمية",
-    english: "Science experiment",
-    description: "اكتشاف وفضول ونتيجة مفاجئة",
+    id: "ali-abdaal",
+    label: "Ali Abdaal Style",
+    description: "تصميم نظيف جداً وشخصية واحدة ونص واضح",
   },
   {
-    id: "breaking-news",
-    label: "خبر عاجل",
-    english: "Breaking news",
-    description: "إحساس بالسرعة وأولوية للخبر",
+    id: "casey-neistat",
+    label: "Casey Neistat Style",
+    description: "لقطة سينمائية واقعية وحركة وإحساس بالمغامرة",
   },
   {
-    id: "fitness-transformation",
-    label: "تحوّل ولياقة",
-    english: "Transformation",
-    description: "قبل وبعد وطاقة إنسانية قوية",
+    id: "ryan-trahan",
+    label: "Ryan Trahan Style",
+    description: "لقطة عفوية وموقف غريب أو مضحك وألوان طبيعية",
   },
   {
-    id: "food-sensation",
-    label: "تجربة طعام",
-    english: "Food sensation",
-    description: "تفاصيل شهية ولحظة تثير الحواس",
+    id: "airrack",
+    label: "Airrack Style",
+    description: "مشهد ضخم جداً وشخص صغير نسبياً وتحدٍ واضح",
   },
   {
-    id: "podcast-authority",
-    label: "حوار مؤثر",
-    english: "Podcast authority",
-    description: "بورتريه واثق وأجواء حوارية راقية",
+    id: "ishowspeed",
+    label: "IShowSpeed Style",
+    description: "تعبير شديد وZoom على الوجه وعناصر غريبة",
   },
 ] as const;
 
@@ -89,13 +79,14 @@ function createPreviewPrompt(idea: string, style: (typeof styles)[number]) {
     `فكرة الفيديو: ${idea || "اكتب فكرة الفيديو هنا"}`,
     `الأسلوب: ${style.label} — ${style.description}.`,
     "لقطة بصرية واحدة واضحة، موضوع رئيسي قوي، إضاءة سينمائية، تباين عالٍ، ومساحة نظيفة لعنوان عربي يضاف لاحقاً.",
+    "استخدم قواعد تغليف صور صناع المحتوى كمرجع عام فقط، بدون نسخ وجه المشهور أو شعاره أو هويته أو تكوين صورته حرفياً.",
     "بدون نصوص أو شعارات داخل الصورة؛ سيتم وضع النص العربي برمجياً للحفاظ على وضوحه.",
   ].join("\n");
 }
 
 export default function YouTubeThumbnailStudio() {
   const [idea, setIdea] = useState("كيف تختار الخط العربي المناسب؟");
-  const [selectedStyle, setSelectedStyle] = useState<StyleId>("viral-challenge");
+  const [selectedStyle, setSelectedStyle] = useState<StyleId>("mrbeast");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<GenerationResult | null>(null);
@@ -226,7 +217,7 @@ export default function YouTubeThumbnailStudio() {
             <div>
               <p className="text-sm font-medium">اختر أسلوب الصورة</p>
               <p className="mt-1 text-xs text-[#71837a]">
-                10 اتجاهات جاهزة، ولكل اتجاه prompt مختلف
+                10 ستايلات مستوحاة من تغليف صور صناع المحتوى
               </p>
             </div>
             <span className="rounded-full bg-white/[.05] px-2.5 py-1 font-mono text-[10px] text-[#8ea59a]">
@@ -261,6 +252,10 @@ export default function YouTubeThumbnailStudio() {
               );
             })}
           </div>
+          <p className="mt-3 text-[11px] leading-5 text-[#64766d]">
+            هذه مراجع بصرية عامة وليست نسخاً لوجوه المشاهير أو شعاراتهم؛ سيتم
+            بناء تكوين أصلي لكل فكرة.
+          </p>
 
           <details className="group mt-5 rounded-2xl border border-white/[.08] bg-[#0b1110]">
             <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs text-[#a2b3aa]">
