@@ -164,14 +164,25 @@ export function registerThumbnailRoutes(app: Express): void {
             ]
           : []),
       ].join("\n\n");
-      const image = await generateThumbnailImage(imagePrompt, heroImage);
+      const generated = await generateThumbnailImage(imagePrompt, heroImage);
       const completedAt = Date.now();
+      const promptCostUsd = refined.costUsd;
+      const imageCostUsd = generated.costUsd;
+      const totalCostUsd =
+        promptCostUsd !== undefined || imageCostUsd !== undefined
+          ? (promptCostUsd ?? 0) + (imageCostUsd ?? 0)
+          : undefined;
       return res.json({
-        image,
+        image: generated.image,
         prompt: imagePrompt,
         creativeDirection: refined.creativeDirection,
         promptModel: "google/gemini-3.7-flash via OpenRouter",
         imageModel: "google/gemini-3.1-flash-image-preview (Nano Banana 2) via OpenRouter",
+        costs: {
+          promptUsd: promptCostUsd,
+          imageUsd: imageCostUsd,
+          totalUsd: totalCostUsd,
+        },
         timings: {
           promptMs: promptCompletedAt - startedAt,
           imageMs: completedAt - promptCompletedAt,

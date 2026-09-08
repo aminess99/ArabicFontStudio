@@ -74,6 +74,11 @@ type GenerationResult = {
     imageMs: number;
     totalMs: number;
   };
+  costs?: {
+    promptUsd?: number;
+    imageUsd?: number;
+    totalUsd?: number;
+  };
   style: {
     label: string;
     arabicLabel: string;
@@ -85,6 +90,12 @@ function formatDuration(milliseconds: number): string {
   if (seconds < 60) return `${seconds} ث`;
   const minutes = Math.floor(seconds / 60);
   return `${minutes} د ${String(seconds % 60).padStart(2, "0")} ث`;
+}
+
+function formatUsd(value?: number): string {
+  if (value === undefined) return "—";
+  if (value < 0.01) return `$${value.toFixed(4)}`;
+  return `$${value.toFixed(2)}`;
 }
 
 function createPreviewPrompt(idea: string, style: (typeof styles)[number]) {
@@ -537,6 +548,22 @@ export default function YouTubeThumbnailStudio() {
                         {formatDuration(result.timings.totalMs)}
                       </p>
                       <p className="mt-1 text-[10px] text-[#81948a]">الإجمالي</p>
+                    </div>
+                  </div>
+                )}
+                {result.costs && (
+                  <div className="mb-4 rounded-2xl border border-white/[.08] bg-black/10 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[10px] uppercase tracking-[.15em] text-[#81948a]">
+                        تكلفة التوليد
+                      </p>
+                      <p className="font-mono text-sm text-[#65f2c0]">
+                        {formatUsd(result.costs.totalUsd)}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex justify-between text-[10px] text-[#71837a]">
+                      <span>تحسين prompt: {formatUsd(result.costs.promptUsd)}</span>
+                      <span>الصورة: {formatUsd(result.costs.imageUsd)}</span>
                     </div>
                   </div>
                 )}

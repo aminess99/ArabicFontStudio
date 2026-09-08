@@ -11,6 +11,7 @@ type PromptInput = {
 type RefinedPrompt = {
   prompt: string;
   creativeDirection?: string;
+  costUsd?: number;
 };
 
 function parseModelJson(content: string): RefinedPrompt | null {
@@ -113,6 +114,9 @@ export async function refineThumbnailPrompt(
         content?: string | Array<{ type?: string; text?: string }>;
       };
     }>;
+    usage?: {
+      cost?: number;
+    };
   };
   const content = data.choices?.[0]?.message?.content;
 
@@ -132,5 +136,9 @@ export async function refineThumbnailPrompt(
     throw new Error("OpenRouter returned an invalid prompt format");
   }
 
-  return parsed;
+  return {
+    ...parsed,
+    costUsd:
+      typeof data.usage?.cost === "number" ? data.usage.cost : undefined,
+  };
 }
