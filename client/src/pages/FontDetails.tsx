@@ -28,17 +28,6 @@ const characterMap = [
   ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 ];
 
-const characterMapPreviews: Record<string, { src: string; label: string }> = {
-  "18-Khebrat-Musamim-Bold.ttf": {
-    src: "/font-previews/18-khebrat.png",
-    label: "خريطة حروف خط Khebrat Musamim Bold",
-  },
-  "2-Narenj.ttf": {
-    src: "/font-previews/2-narenj.png",
-    label: "خريطة حروف خط Narenj",
-  },
-};
-
 const categoryDescriptions: Record<string, string> = {
   "ثلث": "خط الثلث من أجمل الخطوط العربية الكلاسيكية، يتميز بزخرفته الأنيقة ويُستخدم في العناوين والنصوص الدينية والتصاميم الفاخرة.",
   "ديواني": "خط الديواني خط عربي تقليدي يتميز بانحناءاته الأنيقة وزخارفه الجميلة، مثالي للدعوات والمناسبات الرسمية والتصاميم الفنية.",
@@ -152,7 +141,14 @@ export default function FontDetails() {
   });
 
   const fontFamily = font ? generateFontFamily(font.name) : '';
-  const characterMapPreview = font ? characterMapPreviews[font.fileName] : undefined;
+  const characterMapPreview = font &&
+    font.category === "خطوط الحرة" &&
+    categoryFonts.slice(0, 50).some((previewFont) => previewFont.fileName === font.fileName)
+    ? {
+        src: `/font-previews/${generateSlug(font.name, font.fileName, font.category)}.png`,
+        label: `خريطة حروف خط ${font.nameArabic || font.name} مع علامة مائية من xfontat.com`,
+      }
+    : undefined;
 
   const familyVariants = useMemo(() => {
     if (!font) return [];
