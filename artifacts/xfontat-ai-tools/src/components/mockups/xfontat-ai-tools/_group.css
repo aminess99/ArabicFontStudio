@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --xf-bg: #0a0d0d;
+  --xf-panel: #111716;
+  --xf-panel-2: #151c1b;
+  --xf-line: rgba(202, 255, 224, .12);
+  --xf-text: #f0f5ef;
+  --xf-muted: #84928c;
+  --xf-teal: #65f2c0;
+  --xf-teal-strong: #20d99d;
+  --xf-orange: #ff996d;
+}
+
+.xf-shell {
+  font-family: 'Space Grotesk', 'IBM Plex Sans Arabic', sans-serif;
+  color: var(--xf-text);
+  background:
+    radial-gradient(ellipse at 56% -18%, rgba(49, 149, 122, .24), transparent 38rem),
+    radial-gradient(ellipse at 100% 58%, rgba(31, 88, 77, .12), transparent 28rem),
+    var(--xf-bg);
+  min-height: 100dvh;
+}
+.xf-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+.xf-grid {
+  background-image: linear-gradient(rgba(145, 217, 191, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(145, 217, 191, .035) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.xf-noise::after { content:""; position: fixed; inset: 0; pointer-events:none; opacity:.035; mix-blend-mode:screen; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); }
+.xf-glass { background: rgba(18, 25, 24, .76); border: 1px solid var(--xf-line); box-shadow: 0 24px 80px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.045); backdrop-filter: blur(16px); }
+.xf-button { transition: transform .2s ease, opacity .2s ease, background-color .2s ease; }
+.xf-button:hover { transform: translateY(-2px); }
+.xf-pulse { animation: xfPulse 3.6s ease-in-out infinite; }
+@keyframes xfPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(101,242,192,.15); } 50% { box-shadow: 0 0 0 11px rgba(101,242,192,0); } }
+@keyframes xfReveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.xf-reveal { animation: xfReveal .55s ease both; }
+input, textarea, select { font-family: inherit; }
