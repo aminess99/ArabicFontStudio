@@ -71,6 +71,14 @@ function isStyleId(value: unknown): value is ThumbnailStyleId {
   return typeof value === "string" && value in thumbnailStyles;
 }
 
+function isValidImageReference(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=\s]+$/i.test(value) &&
+    value.length <= 8_000_000
+  );
+}
+
 export function buildThumbnailPrompt(idea: string, styleId: ThumbnailStyleId): string {
   const style = thumbnailStyles[styleId];
 
@@ -90,6 +98,7 @@ export function registerThumbnailRoutes(app: Express): void {
   app.post("/api/thumbnail/generate", async (req: Request, res: Response) => {
     const idea = typeof req.body?.idea === "string" ? req.body.idea.trim() : "";
     const styleId = req.body?.style;
+    const rawHeroImage: unknown = req.body?.heroImage;
 
     if (idea.length < 4) {
       return res.status(400).json({ error: "اكتب فكرة أو عنواناً أطول قليلاً." });
@@ -102,6 +111,19 @@ export function registerThumbnailRoutes(app: Express): void {
     if (!isStyleId(styleId)) {
       return res.status(400).json({ error: "اختر أسلوباً صحيحاً للصورة المصغرة." });
     }
+
+    if (
+      rawHeroImage !== undefined &&
+      rawHeroImage !== null &&
+      !isValidImageReference(rawHeroImage)
+    ) {
+      return res.status(400).json({
+        error: "صورة البطل غير صالحة. استخدم PNG أو JPG أو WebP بحجم أصغر.",
+      });
+    }
+    const heroImage = isValidImageReference(rawHeroImage)
+      ? rawHeroImage
+      : undefined;
 
     const clientKey = getClientKey(req);
     const now = Date.now();
@@ -136,8 +158,13 @@ export function registerThumbnailRoutes(app: Express): void {
         idea,
         "=== END LOCKED ARABIC HEADLINE ===",
         "Text accuracy is the highest priority. Copy the locked headline character by character, preserving every Arabic letter, word order, space, punctuation mark, and diacritic. Use correct right-to-left connected Arabic shaping. If it does not fit, wrap it or reduce the font size; never alter, translate, shorten, omit, or invent any character. Do not add any other text.",
+        ...(heroImage
+          ? [
+              "A reference image is attached. Make the person or object from that reference the main hero subject of the thumbnail. Preserve its recognizable appearance and use it as the visual focus; do not replace it with an unrelated subject or add duplicate versions.",
+            ]
+          : []),
       ].join("\n\n");
-      const image = await generateThumbnailImage(imagePrompt);
+      const image = await generateThumbnailImage(imagePrompt, heroImage);
       const completedAt = Date.now();
       return res.json({
         image,

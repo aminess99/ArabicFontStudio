@@ -6,7 +6,9 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 app.use(compression());
-app.use(express.json());
+// Thumbnail reference images arrive as base64 data URLs; keep the parser
+// limit above the 6MB image limit enforced by the thumbnail endpoint.
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: false }));
 
 // Explicitly allow indexing for all HTML pages

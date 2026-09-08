@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   ArrowLeft,
   Check,
   ChevronDown,
   Clipboard,
+  ImagePlus,
   LoaderCircle,
   Sparkles,
   WandSparkles,
+  X,
 } from "lucide-react";
 
 const styles = [
@@ -100,6 +102,8 @@ export default function YouTubeThumbnailStudio() {
   const [idea, setIdea] = useState("كيف تختار الخط العربي المناسب؟");
   const [selectedStyle, setSelectedStyle] = useState<StyleId>("mrbeast");
   const [stylesOpen, setStylesOpen] = useState(false);
+  const [heroImage, setHeroImage] = useState<string | null>(null);
+  const [heroImageName, setHeroImageName] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState("");
@@ -133,7 +137,7 @@ export default function YouTubeThumbnailStudio() {
       const response = await fetch("/api/thumbnail/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea, style: selectedStyle }),
+        body: JSON.stringify({ idea, style: selectedStyle, heroImage }),
       });
       const data = await response.json();
 
@@ -151,6 +155,33 @@ export default function YouTubeThumbnailStudio() {
     } finally {
       setIsGenerating(false);
     }
+  }
+
+  function handleHeroImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setError("اختر صورة بصيغة PNG أو JPG أو WebP.");
+      return;
+    }
+
+    if (file.size > 6 * 1024 * 1024) {
+      setError("حجم صورة البطل كبير. اختر صورة أصغر من 6MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setHeroImage(reader.result);
+        setHeroImageName(file.name);
+        setError("");
+      }
+    };
+    reader.onerror = () => setError("تعذر قراءة الصورة. جرّب صورة أخرى.");
+    reader.readAsDataURL(file);
   }
 
   async function copyPrompt() {
@@ -238,6 +269,73 @@ export default function YouTubeThumbnailStudio() {
             className="h-28 w-full resize-none rounded-2xl border border-white/10 bg-[#0a100f] p-4 text-lg leading-8 text-[#f0f7f2] outline-none transition focus:border-[#65f2c0]/60"
             placeholder="مثال: جربت أرخص ميكروفون لمدة 30 يوماً"
           />
+
+          <div className="mt-5">
+            <div className="mb-2 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">أضف بطل الصورة</p>
+                <p className="mt-1 text-xs text-[#71837a]">
+                  صورة شخص أو منتج تريد أن يظهر كعنصر رئيسي
+                </p>
+              </div>
+              <span className="rounded-full border border-white/[.08] px-2.5 py-1 text-[10px] text-[#71837a]">
+                اختياري
+              </span>
+            </div>
+
+            <input
+              id="hero-image"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={handleHeroImage}
+              className="sr-only"
+            />
+            {heroImage ? (
+              <div className="flex items-center gap-3 rounded-2xl border border-[#65f2c0]/30 bg-[#65f2c0]/[.06] p-3">
+                <img
+                  src={heroImage}
+                  alt="معاينة بطل الصورة"
+                  className="h-14 w-14 rounded-xl object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium text-[#eafff4]">
+                    {heroImageName}
+                  </p>
+                  <p className="mt-1 text-[11px] text-[#81948a]">
+                    سيستخدمها الذكاء الاصطناعي كبطل للمشهد
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="حذف صورة البطل"
+                  onClick={() => {
+                    setHeroImage(null);
+                    setHeroImageName("");
+                  }}
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#81948a] transition hover:bg-white/[.08] hover:text-white"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            ) : (
+              <label
+                htmlFor="hero-image"
+                className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-white/[.14] bg-[#0b1110] p-4 transition hover:border-[#65f2c0]/50 hover:bg-[#65f2c0]/[.04]"
+              >
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/[.06] text-[#65f2c0]">
+                  <ImagePlus size={19} />
+                </span>
+                <span>
+                  <span className="block text-sm text-[#d9e8df]">
+                    ارفع صورة البطل
+                  </span>
+                  <span className="mt-1 block text-[11px] text-[#71837a]">
+                    PNG أو JPG أو WebP — حتى 6MB
+                  </span>
+                </span>
+              </label>
+            )}
+          </div>
 
           <div className="mt-6 flex items-center justify-between">
             <div>

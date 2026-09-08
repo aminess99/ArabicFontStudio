@@ -1,7 +1,10 @@
 const OPENROUTER_IMAGE_URL = "https://openrouter.ai/api/v1/images";
 const OPENROUTER_IMAGE_MODEL = "google/gemini-3.1-flash-image-preview";
 
-export async function generateThumbnailImage(prompt: string): Promise<string> {
+export async function generateThumbnailImage(
+  prompt: string,
+  inputReference?: string,
+): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new Error("OPENROUTER_API_KEY is not configured");
@@ -21,6 +24,16 @@ export async function generateThumbnailImage(prompt: string): Promise<string> {
       n: 1,
       resolution: "1K",
       aspect_ratio: "16:9",
+      ...(inputReference
+        ? {
+            input_references: [
+              {
+                type: "image_url",
+                image_url: { url: inputReference },
+              },
+            ],
+          }
+        : {}),
     }),
   });
 
