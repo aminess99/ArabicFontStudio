@@ -11,13 +11,13 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 38 28% 96%;
-  --foreground: 22 24% 13%;
-  --border: 35 16% 82%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --border: 0 0% 85%;
 
-  --card: 38 30% 98%;
-  --card-foreground: 22 24% 13%;
-  --card-border: 35 16% 82%;
+  --card: 0 0% 98%;
+  --card-foreground: 0 0% 0%;
+  --card-border: 0 0% 85%;
 
   --sidebar: 0 0% 98%;
   --sidebar-foreground: 0 0% 0%;
@@ -28,27 +28,27 @@
   --sidebar-accent-foreground: 0 0% 0%;
   --sidebar-ring: 9 75% 61%;
 
-  --popover: 38 30% 98%;
-  --popover-foreground: 22 24% 13%;
-  --popover-border: 35 16% 82%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --popover-border: 0 0% 85%;
 
-  --primary: 16 72% 49%;
-  --primary-foreground: 38 30% 98%;
+  --primary: 9 75% 61%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 34 22% 88%;
-  --secondary-foreground: 22 24% 13%;
+  --secondary: 0 0% 92%;
+  --secondary-foreground: 0 0% 0%;
 
-  --muted: 34 22% 91%;
-  --muted-foreground: 22 11% 42%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 40%;
 
-  --accent: 22 30% 88%;
-  --accent-foreground: 22 24% 13%;
+  --accent: 0 0% 92%;
+  --accent-foreground: 0 0% 0%;
 
   --destructive: 356.3033 90.5579% 54.3137%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 35 16% 76%;
-  --ring: 16 72% 49%;
+  --input: 0 0% 85%;
+  --ring: 9 75% 61%;
 
   --chart-1: 203.8863 88.2845% 53.1373%;
   --chart-2: 159.7826 100% 36.0784%;
@@ -56,10 +56,10 @@
   --chart-4: 147.1429 78.5047% 41.9608%;
   --chart-5: 341.4894 75.2000% 50.9804%;
 
-  --font-sans: 'Noto Sans Arabic', Tahoma, Arial, sans-serif;
-  --font-serif: 'Noto Sans Arabic', Tahoma, Arial, sans-serif;
-  --font-mono: 'Space Grotesk', 'Segoe UI', Arial, sans-serif;
-  --radius: 0.25rem;
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Inter', sans-serif;
+  --font-mono: Menlo, monospace;
+  --radius: 0.4rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(9, 75%, 61% / 0.00);
   --shadow-xs: 0px 2px 0px 0px hsl(9, 75%, 61% / 0.00);
   --shadow-sm: 0px 2px 0px 0px hsl(9, 75%, 61% / 0.00), 0px 1px 2px -1px hsl(9, 75%, 61% / 0.00);
@@ -102,13 +102,13 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 24 17% 7%;
-  --foreground: 38 29% 91%;
-  --border: 27 14% 19%;
+  --background: 20 14% 4%;
+  --foreground: 45 25% 91%;
+  --border: 20 14% 15%;
 
-  --card: 25 16% 10%;
-  --card-foreground: 38 29% 91%;
-  --card-border: 27 14% 19%;
+  --card: 20 14% 8%;
+  --card-foreground: 45 25% 85%;
+  --card-border: 220 15% 20%;
 
   --sidebar: 20 14% 8%;
   --sidebar-foreground: 45 25% 85%;
@@ -119,27 +119,27 @@
   --sidebar-accent-foreground: 45 25% 85%;
   --sidebar-ring: 9 75% 61%;
 
-  --popover: 24 17% 7%;
-  --popover-foreground: 38 29% 91%;
-  --popover-border: 27 14% 22%;
+  --popover: 20 14% 4%;
+  --popover-foreground: 45 25% 91%;
+  --popover-border: 220 15% 22%;
 
-  --primary: 18 78% 62%;
-  --primary-foreground: 24 17% 7%;
+  --primary: 9 75% 61%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 28 20% 22%;
-  --secondary-foreground: 38 29% 91%;
+  --secondary: 30 15% 52%;
+  --secondary-foreground: 0 0% 100%;
 
-  --muted: 26 15% 15%;
-  --muted-foreground: 35 12% 57%;
+  --muted: 20 14% 15%;
+  --muted-foreground: 45 15% 46%;
 
-  --accent: 24 35% 19%;
-  --accent-foreground: 38 29% 91%;
+  --accent: 25 45% 20%;
+  --accent-foreground: 45 25% 85%;
 
   --destructive: 356.3033 90.5579% 54.3137%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 27 14% 24%;
-  --ring: 18 78% 62%;
+  --input: 20 14% 18%;
+  --ring: 9 75% 61%;
 
   --chart-1: 203.8863 88.2845% 53.1373%;
   --chart-2: 159.7826 100% 36.0784%;
@@ -164,20 +164,7 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    direction: rtl;
-    overflow-x: hidden;
-    background-image: radial-gradient(hsl(var(--foreground) / 0.035) 0.7px, transparent 0.7px);
-    background-size: 13px 13px;
   }
-
-  ::selection { background: hsl(var(--primary) / .25); }
-  h1, h2, h3, h4 { letter-spacing: -0.03em; }
-}
-
-@layer components {
-  .editorial-kicker { font-family: var(--font-mono); letter-spacing: .08em; text-transform: uppercase; font-size: .68rem; color: hsl(var(--primary)); }
-  .editorial-rule { border-color: hsl(var(--foreground) / .12); }
-  .specimen-surface { background: hsl(var(--card) / .72); border: 1px solid hsl(var(--foreground) / .11); box-shadow: 0 14px 40px hsl(24 30% 5% / .06); }
 }
 
 @layer utilities {
