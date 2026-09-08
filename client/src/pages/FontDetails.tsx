@@ -28,6 +28,17 @@ const characterMap = [
   ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 ];
 
+const characterMapPreviews: Record<string, { src: string; label: string }> = {
+  "18-Khebrat-Musamim-Bold.ttf": {
+    src: "/font-previews/18-khebrat.png",
+    label: "خريطة حروف خط Khebrat Musamim Bold",
+  },
+  "2-Narenj.ttf": {
+    src: "/font-previews/2-narenj.png",
+    label: "خريطة حروف خط Narenj",
+  },
+};
+
 const categoryDescriptions: Record<string, string> = {
   "ثلث": "خط الثلث من أجمل الخطوط العربية الكلاسيكية، يتميز بزخرفته الأنيقة ويُستخدم في العناوين والنصوص الدينية والتصاميم الفاخرة.",
   "ديواني": "خط الديواني خط عربي تقليدي يتميز بانحناءاته الأنيقة وزخارفه الجميلة، مثالي للدعوات والمناسبات الرسمية والتصاميم الفنية.",
@@ -141,6 +152,7 @@ export default function FontDetails() {
   });
 
   const fontFamily = font ? generateFontFamily(font.name) : '';
+  const characterMapPreview = font ? characterMapPreviews[font.fileName] : undefined;
 
   const familyVariants = useMemo(() => {
     if (!font) return [];
@@ -488,6 +500,25 @@ export default function FontDetails() {
                     </div>
                   ))}
                 </div>
+                {characterMapPreview && (
+                  <figure className="mt-6 border-t pt-6">
+                    <figcaption className="text-sm font-medium mb-3 text-center">
+                      معاينة مصورة للحروف والأرقام
+                    </figcaption>
+                    <img
+                      src={characterMapPreview.src}
+                      alt={characterMapPreview.label}
+                      width={1400}
+                      height={760}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-auto rounded-md border bg-white"
+                    />
+                    <p className="text-xs text-muted-foreground text-center mt-3">
+                      صورة تجريبية توضح شكل الحروف بهذا الخط
+                    </p>
+                  </figure>
+                )}
               </div>
 
               {familyVariants.length > 0 && (
