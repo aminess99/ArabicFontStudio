@@ -3,3 +3,4 @@
 - [Mockup sandbox dependencies](mockup-sandbox-dependencies.md) — artifact previews may need isolated Tailwind/Vite resolution when workspace dependencies differ
 - [Creator thumbnail presets](creator-thumbnail-presets.md) — named creator presets guide composition only; render the exact Arabic title inside the generated image
 - [Thumbnail workspace](thumbnail-workspace.md) — keep creation controls and output in one responsive workspace; defer real auth and project history to the auth task
+- [Generated editorial review](generated-editorial-review.md) — AI blog content stays private until automated checks and explicit human verification both pass
