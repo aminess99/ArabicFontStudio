@@ -99,7 +99,9 @@ function markdownToHtml(content: string): string {
   const paragraphs = content.split(/\n\n+/).filter(Boolean);
   // The page shell owns the article's single H1. Generated Markdown can
   // repeat that title as a leading "# ..." block, so omit only that first
-  // document title while preserving all subordinate headings.
+  // document title while preserving all subordinate headings. Any other
+  // level-one Markdown headings are demoted so article content can never
+  // introduce a second H1.
   const firstBlock = paragraphs[0]?.trim();
   const contentBlocks = firstBlock && /^#\s+/.test(firstBlock)
     ? paragraphs.slice(1)
@@ -109,7 +111,7 @@ function markdownToHtml(content: string): string {
 
     if (/^# .+/.test(trimmed)) {
       const text = trimmed.replace(/^# /, '').replace(/\*\*/g, '');
-      return `<h1>${text}</h1>`;
+      return `<h2>${text}</h2>`;
     }
 
     if (/^## .+/.test(trimmed)) {
