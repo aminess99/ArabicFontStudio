@@ -7,6 +7,9 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { ArrowLeft, Clock, User, Calendar } from "lucide-react";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts as staticBlogPosts } from "@/lib/blogData";
+import { getBlogInternalLinks } from "@/lib/blogInternalLinks";
+import { generateSlug } from "@/lib/slugify";
+import type { Font } from "@shared/schema";
 
 interface GeneratedPost {
   slug: string;
@@ -117,6 +120,13 @@ export default function BlogPost() {
   });
 
   const post = staticPost || generatedPost;
+  const related = post ? getBlogInternalLinks(post) : null;
+  const relatedCategories = related?.categories.map(link => encodeURIComponent(link.category)).join(",") || "";
+  const { data: relatedFonts = [] } = useQuery<Font[]>({
+    queryKey: [`/api/fonts?categories=${relatedCategories}`],
+    enabled: !!post && !!relatedCategories,
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (!match) return null;
 
@@ -257,6 +267,43 @@ export default function BlogPost() {
             <div className="prose prose-lg max-w-none space-y-4">
               {renderMarkdown(post.content)}
             </div>
+
+            {related && (
+              <aside className="mt-10 rounded-lg border bg-muted/30 p-5" aria-labelledby="related-fonts-heading">
+                <h2 id="related-fonts-heading" className="text-xl font-bold mb-2">
+                  خطوط ومجموعات مرتبطة بموضوع المقال
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  استكشف الخطوط العربية المناسبة لتطبيق النصائح الواردة في هذا المقال.
+                </p>
+                <ul className="space-y-2">
+                  {related.categories.map(link => (
+                    <li key={link.slug}>
+                      <Link href={`/fonts/${link.slug}`} className="font-medium hover:underline">
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                  {related.collections.map(collection => (
+                    <li key={collection.slug}>
+                      <Link href={`/collection/${collection.slug}`} className="font-medium hover:underline">
+                        {collection.titleArabic}
+                      </Link>
+                    </li>
+                  ))}
+                  {relatedFonts.slice(0, 4).map(font => (
+                    <li key={font.id}>
+                      <Link
+                        href={`/font/${generateSlug(font.name, font.fileName, font.category)}`}
+                        className="font-medium hover:underline"
+                      >
+                        تحميل خط {font.nameArabic}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+            )}
 
             <div className="mt-10 pt-6 border-t">
               <Link

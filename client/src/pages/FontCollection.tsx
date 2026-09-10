@@ -10,6 +10,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { useToast } from "@/hooks/use-toast";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { getCollectionBySlug, collections } from "@/lib/collectionsData";
+import { generateSlug } from "@/lib/slugify";
 import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
@@ -101,6 +102,20 @@ export default function FontCollection() {
         "inLanguage": "ar",
         "numberOfItems": filteredFonts.length,
         "keywords": collection.keywords.join(", ")
+      },
+      {
+        "@type": "ItemList",
+        "name": `خطوط ${collection.titleArabic}`,
+        "numberOfItems": filteredFonts.length,
+        "itemListElement": filteredFonts.map((font, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "CreativeWork",
+            "name": font.nameArabic,
+            "url": `${SITE_ORIGIN}/font/${generateSlug(font.name, font.fileName, font.category)}`
+          }
+        }))
       },
       {
         "@type": "FAQPage",

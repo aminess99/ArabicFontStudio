@@ -5,6 +5,7 @@ import { insertFontSchema } from "@shared/schema";
 import { getGeneratedPosts } from "./blogGenerator";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { collections } from "../client/src/lib/collectionsData";
+import { getBlogInternalLinks } from "../client/src/lib/blogInternalLinks";
 import { registerThumbnailRoutes } from "./thumbnailGenerator";
 
 const categoryToSlug: Record<string, string> = {
@@ -53,6 +54,32 @@ function getCategoryLabel(category: string): string {
 
 function getPostDateModified(post: { dateISO: string; dateModified?: string }): string {
   return post.dateModified || post.dateISO;
+}
+
+async function renderBlogInternalLinks(post: {
+  title: string;
+  excerpt?: string;
+  content?: string;
+  keywords?: string[];
+}): Promise<string> {
+  const related = getBlogInternalLinks(post);
+  const fonts = await storage.getFontsByCategories(related.categories.map(link => link.category));
+  const categoryLinks = related.categories.map(link =>
+    `<li><a href="/fonts/${link.slug}">${link.label}</a></li>`
+  ).join("\n");
+  const collectionLinks = related.collections.map(collection =>
+    `<li><a href="/collection/${collection.slug}">${collection.titleArabic}</a></li>`
+  ).join("\n");
+  const fontLinks = fonts.slice(0, 4).map(font =>
+    `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${font.nameArabic}</a></li>`
+  ).join("\n");
+
+  return `
+<aside aria-labelledby="related-fonts-heading">
+<h2 id="related-fonts-heading">خطوط ومجموعات مرتبطة بموضوع المقال</h2>
+<p>استكشف الخطوط العربية المناسبة لتطبيق النصائح الواردة في هذا المقال:</p>
+<ul>${categoryLinks}${collectionLinks}${fontLinks}</ul>
+</aside>`;
 }
 
 const BOT_AGENTS = [
@@ -413,7 +440,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (staticPost) {
       const canonical = `https://xfontat.com/blog/${slug}`;
       const contentHtml = markdownToHtml(staticPost.content || '');
-      const body = `<p>${staticPost.excerpt || ''}</p>${contentHtml}`;
+      const relatedLinksHtml = await renderBlogInternalLinks(staticPost);
+      const body = `<p>${staticPost.excerpt || ''}</p>${contentHtml}${relatedLinksHtml}`;
       const jsonLd = [
         {
           "@type": "Article",
@@ -445,7 +473,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!post) return next();
     const canonical = `https://xfontat.com/blog/${slug}`;
     const contentHtml = markdownToHtml(post.content || '');
-    const body = `<p>${post.excerpt || ''}</p>${contentHtml}`;
+    const relatedLinksHtml = await renderBlogInternalLinks(post);
+    const body = `<p>${post.excerpt || ''}</p>${contentHtml}${relatedLinksHtml}`;
     const jsonLd = [
       {
         "@type": "Article",
@@ -555,7 +584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(botHTML(title, desc, canonical, 'خطوط عربية للتصميم الحديث', body, jsonLd));
   });
 
-  app.get("/collection/:slug", (req, res, next) => {
+  app.get("/collection/:slug", async (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const collection = collections.find(c => c.slug === req.params.slug);
     if (!collection) return next();
@@ -566,10 +595,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `<h3>${f.question}</h3><p>${f.answer}</p>`
     ).join('\n');
     const useCaseList = collection.useCases.map(u => `<li>${u}</li>`).join('\n');
+    const fonts = await storage.getFontsByCategories(collection.categories);
+    const fontLinks = fonts.map(font =>
+      `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${font.nameArabic}</a></li>`
+    ).join('\n');
     const body = `
 <p>${collection.longDescription}</p>
 <h2>حالات الاستخدام</h2>
 <ul>${useCaseList}</ul>
+<h2>خطوط المجموعة</h2>
+<ul>${fontLinks}</ul>
 <h2>الفئات المشمولة</h2>
 <ul>${collection.categories.map(c => `<li><a href="/fonts/${categoryToSlug[c] || c}">${c}</a></li>`).join('\n')}</ul>
 <h2>أسئلة شائعة</h2>
@@ -583,6 +618,21 @@ ${faqHtml}`;
         "inLanguage": "ar",
         "isPartOf": { "@type": "WebSite", "name": "xfontat", "url": "https://xfontat.com" },
         "keywords": collection.keywords.join(', '),
+        "numberOfItems": fonts.length,
+      },
+      {
+        "@type": "ItemList",
+        "name": `خطوط ${collection.titleArabic}`,
+        "numberOfItems": fonts.length,
+        "itemListElement": fonts.map((font, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "CreativeWork",
+            "name": font.nameArabic,
+            "url": `https://xfontat.com/font/${generateSlug(font.name, font.fileName, font.category)}`,
+          }
+        })),
       },
       {
         "@type": "FAQPage",
