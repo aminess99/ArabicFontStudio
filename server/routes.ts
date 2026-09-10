@@ -66,7 +66,14 @@ const BOT_AGENTS = [
 
 function markdownToHtml(content: string): string {
   const paragraphs = content.split(/\n\n+/).filter(Boolean);
-  return paragraphs.map(block => {
+  // The page shell owns the article's single H1. Generated Markdown can
+  // repeat that title as a leading "# ..." block, so omit only that first
+  // document title while preserving all subordinate headings.
+  const firstBlock = paragraphs[0]?.trim();
+  const contentBlocks = firstBlock && /^#\s+/.test(firstBlock)
+    ? paragraphs.slice(1)
+    : paragraphs;
+  return contentBlocks.map(block => {
     const trimmed = block.trim();
 
     if (/^# .+/.test(trimmed)) {
