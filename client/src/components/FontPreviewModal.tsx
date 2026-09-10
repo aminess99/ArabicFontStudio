@@ -60,9 +60,10 @@ export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPrev
               variant="ghost"
               size="icon"
               onClick={onClose}
+              aria-label="إغلاق معاينة الخط"
               data-testid="button-close-modal"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </Button>
           </div>
         </DialogHeader>
@@ -77,8 +78,8 @@ export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPrev
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <Type className="h-4 w-4" />
+              <Label id="modal-font-size-label" className="flex items-center gap-2">
+                <Type className="h-4 w-4" aria-hidden="true" />
                 حجم الخط: {fontSize}px
               </Label>
             </div>
@@ -88,13 +89,15 @@ export function FontPreviewModal({ isOpen, onClose, font, onDownload }: FontPrev
               min={16}
               max={72}
               step={2}
+              aria-labelledby="modal-font-size-label"
               data-testid="slider-font-size"
             />
           </div>
 
           <div className="space-y-3">
-            <Label>نص المعاينة</Label>
+            <Label htmlFor="modal-preview-text">نص المعاينة</Label>
             <Textarea
+              id="modal-preview-text"
               value={previewText}
               onChange={(e) => setPreviewText(e.target.value)}
               placeholder="اكتب نصاً لمعاينة الخط"

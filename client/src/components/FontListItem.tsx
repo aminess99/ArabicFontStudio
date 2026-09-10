@@ -112,9 +112,11 @@ export function FontListItem({
             size="icon"
             className={isFavorite ? "text-red-500" : ""}
             onClick={onToggleFavorite}
+            aria-label={isFavorite ? `إزالة خط ${nameArabic} من المفضلة` : `إضافة خط ${nameArabic} إلى المفضلة`}
+            aria-pressed={isFavorite}
             data-testid={`button-favorite-${name}`}
           >
-            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
           </Button>
           
           <Button asChild className="flex-1 md:flex-none">

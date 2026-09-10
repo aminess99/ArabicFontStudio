@@ -40,8 +40,10 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
             </nav>
 
             <div className="relative flex-1 max-w-xs md:max-w-md">
-              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground shrink-0" />
+              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground shrink-0" aria-hidden="true" />
+              <label htmlFor="header-font-search" className="sr-only">البحث عن خط</label>
               <Input
+                id="header-font-search"
                 type="search"
                 placeholder="ابحث عن خط..."
                 className="pr-10 text-sm md:text-base"
@@ -60,7 +62,9 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
         <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
           <div className="space-y-3 md:space-y-0 md:flex md:items-center md:gap-3">
             <div className="flex-1 min-w-0 md:min-w-[200px]">
+              <label htmlFor="header-preview-text" className="sr-only">نص معاينة الخطوط</label>
               <Input
+                id="header-preview-text"
                 type="text"
                 placeholder="نص المعاينة..."
                 value={previewText}
@@ -71,7 +75,7 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
             </div>
 
             <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto">
-              <Type className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Type className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
               <div className="flex-1 md:w-32">
                 <Slider
                   value={[fontSize]}
@@ -79,6 +83,7 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
                   min={16}
                   max={72}
                   step={2}
+                  aria-label={`حجم خط المعاينة: ${fontSize} بكسل`}
                   data-testid="slider-font-size-header"
                 />
               </div>

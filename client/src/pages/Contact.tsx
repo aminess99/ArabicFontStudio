@@ -68,8 +68,9 @@ export default function Contact() {
               <h2 className="text-2xl font-semibold mb-6">أرسل لنا رسالة</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">الاسم</label>
+                  <label htmlFor="contact-name" className="block text-sm font-medium mb-2">الاسم</label>
                   <input 
+                    id="contact-name"
                     type="text" 
                     className="w-full px-4 py-2 border rounded-lg bg-background"
                     placeholder="أدخل اسمك"
@@ -78,8 +79,9 @@ export default function Contact() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">البريد الإلكتروني</label>
+                  <label htmlFor="contact-email" className="block text-sm font-medium mb-2">البريد الإلكتروني</label>
                   <input 
+                    id="contact-email"
                     type="email" 
                     className="w-full px-4 py-2 border rounded-lg bg-background"
                     placeholder="أدخل بريدك الإلكتروني"
@@ -88,8 +90,9 @@ export default function Contact() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">الموضوع</label>
+                  <label htmlFor="contact-subject" className="block text-sm font-medium mb-2">الموضوع</label>
                   <input 
+                    id="contact-subject"
                     type="text" 
                     className="w-full px-4 py-2 border rounded-lg bg-background"
                     placeholder="موضوع الرسالة"
@@ -98,8 +101,9 @@ export default function Contact() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">الرسالة</label>
+                  <label htmlFor="contact-message" className="block text-sm font-medium mb-2">الرسالة</label>
                   <textarea 
+                    id="contact-message"
                     className="w-full px-4 py-2 border rounded-lg bg-background min-h-[150px]"
                     placeholder="اكتب رسالتك هنا..."
                     data-testid="input-message"

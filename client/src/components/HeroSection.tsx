@@ -19,8 +19,10 @@ export function HeroSection({ searchQuery, onSearchChange }: HeroSectionProps) {
             اكتشف، عاين، وحمّل أجمل الخطوط العربية بصيغ متعددة
           </p>
           <div className="relative max-w-xl mx-auto">
-            <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <label htmlFor="hero-font-search" className="sr-only">البحث في مكتبة الخطوط</label>
             <Input
+              id="hero-font-search"
               type="search"
               placeholder="ابحث عن الخط المثالي..."
               className="h-14 pr-12 text-lg"

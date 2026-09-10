@@ -350,8 +350,9 @@ export default function FontDetails() {
               </div>
 
               <div className="mb-6">
-                <label className="text-sm text-muted-foreground mb-2 block">أدخل نص للمعاينة</label>
+                <label htmlFor="font-details-preview-text" className="text-sm text-muted-foreground mb-2 block">أدخل نص للمعاينة</label>
                 <Input
+                  id="font-details-preview-text"
                   type="text"
                   placeholder="اكتب نص للمعاينة..."
                   value={previewText}
@@ -394,9 +395,11 @@ export default function FontDetails() {
                   size="icon"
                   className={isFavorite ? "text-red-500 border-red-500" : ""}
                   onClick={() => setIsFavorite(!isFavorite)}
+                  aria-label={isFavorite ? `إزالة خط ${font.nameArabic} من المفضلة` : `إضافة خط ${font.nameArabic} إلى المفضلة`}
+                  aria-pressed={isFavorite}
                   data-testid="button-favorite"
                 >
-                  <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+                  <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
                 </Button>
               </div>
 

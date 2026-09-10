@@ -448,10 +448,11 @@ export default function YouTubeThumbnailStudio() {
             </span>
           </div>
 
-          <label className="mb-2 block text-[11px] font-medium uppercase tracking-[.14em] text-[#82958c]">
+          <label htmlFor="thumbnail-idea" className="mb-2 block text-[11px] font-medium uppercase tracking-[.14em] text-[#82958c]">
             ماذا سيشاهد الجمهور؟
           </label>
           <textarea
+            id="thumbnail-idea"
             value={idea}
             onChange={(event) => setIdea(event.target.value)}
             dir="rtl"
