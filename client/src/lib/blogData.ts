@@ -6,6 +6,7 @@ export interface BlogPostData {
   author: string;
   date: string;
   dateISO: string;
+  dateModified?: string;
   readTime: number;
   keywords: string[];
 }

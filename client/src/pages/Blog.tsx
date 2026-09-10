@@ -17,6 +17,7 @@ interface GeneratedPost {
   author: string;
   date: string;
   dateISO: string;
+  dateModified?: string;
   readTime: number;
   keywords: string[];
   generated: true;
@@ -75,6 +76,7 @@ export default function Blog() {
             description: post.excerpt,
             url: `${SITE_ORIGIN}/blog/${post.slug}`,
             datePublished: post.dateISO,
+            dateModified: post.dateModified || post.dateISO,
             author: { "@type": "Person", name: post.author },
           },
         })),

@@ -51,6 +51,10 @@ function getCategoryLabel(category: string): string {
   return category.startsWith("خطوط ") ? category : `خطوط ${category}`;
 }
 
+function getPostDateModified(post: { dateISO: string; dateModified?: string }): string {
+  return post.dateModified || post.dateISO;
+}
+
 const BOT_AGENTS = [
   'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider',
   'yandexbot', 'facebot', 'ia_archiver', 'ahrefsbot', 'semrushbot',
@@ -419,6 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "inLanguage": "ar",
           "author": { "@type": "Person", "name": staticPost.author },
           "datePublished": staticPost.dateISO,
+          "dateModified": getPostDateModified(staticPost),
           "publisher": { "@type": "Organization", "name": "xfontat", "url": "https://xfontat.com" },
           "keywords": staticPost.keywords?.join(', '),
         },
@@ -450,6 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "inLanguage": "ar",
         "author": { "@type": "Person", "name": post.author || "فريق xfontat" },
         "datePublished": post.dateISO,
+        "dateModified": getPostDateModified(post),
         "publisher": { "@type": "Organization", "name": "xfontat", "url": "https://xfontat.com" },
       },
       {

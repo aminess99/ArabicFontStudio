@@ -21,6 +21,7 @@ export interface GeneratedPost {
   author: string;
   date: string;
   dateISO: string;
+  dateModified: string;
   readTime: number;
   keywords: string[];
   generated: true;
@@ -30,7 +31,13 @@ function loadPosts(): GeneratedPost[] {
   try {
     if (!fs.existsSync(DATA_FILE)) return [];
     const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw);
+    const posts = JSON.parse(raw) as Array<Omit<GeneratedPost, "dateModified"> & { dateModified?: string }>;
+    return posts.map((post) => ({
+      ...post,
+      // Legacy records predate dateModified; their publication date is the
+      // truthful last-modified date until a later edit is recorded.
+      dateModified: post.dateModified || post.dateISO,
+    }));
   } catch {
     return [];
   }
@@ -154,6 +161,7 @@ async function generateSinglePost(topic: string): Promise<GeneratedPost | null> 
       author: "فريق xfontat",
       date: dateArabic,
       dateISO,
+      dateModified: dateISO,
       readTime,
       keywords: parsed.keywords || [],
       generated: true,
