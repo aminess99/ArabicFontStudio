@@ -377,22 +377,6 @@ function isPublishable(post: GeneratedPost): boolean {
     review.fontReferencesVerified;
 }
 
-function loadAllPosts(): GeneratedPost[] {
-  try {
-    if (!fs.existsSync(DATA_FILE)) return [];
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    const posts = JSON.parse(raw) as Array<Omit<GeneratedPost, "dateModified"> & { dateModified?: string }>;
-    return posts.map((post) => ({
-      ...post,
-      // Legacy records predate dateModified; their publication date is the
-      // truthful last-modified date until a later edit is recorded.
-      dateModified: post.dateModified || post.dateISO,
-    }));
-  } catch {
-    return [];
-  }
-}
-
 interface EditorialReview {
   decision: "approved" | "rejected";
   reviewedAt: string;
