@@ -847,7 +847,7 @@ ${faqHtml}`;
         ]
       }
     ];
-    res.send(botHTML(title, desc, canonical, 'مكتبة الخطوط العربية المجانية - xfontat', body, jsonLd));
+    res.send(botHTML(title, desc, canonical, 'مكتبة خطوط عربية مجانية للتحميل الفوري — أكثر من 850 خط عربي', body, jsonLd));
   });
 
   app.get("/api/fonts", async (req, res) => {

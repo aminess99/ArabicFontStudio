@@ -122,7 +122,7 @@ export default function Home() {
       />
 
       <section className="container mx-auto px-3 md:px-4 pt-6 pb-2">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة الخطوط العربية المجانية</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة خطوط عربية مجانية للتحميل الفوري — أكثر من 850 خط عربي</h1>
         <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
           مرحباً بك في xfontat، أكبر مكتبة خطوط عربية مجانية على الإنترنت. تصفّح مجموعة واسعة من الخطوط العربية الاحترافية من فئات متنوعة تشمل خطوط الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، والفوتوشوب. جميع الخطوط متاحة للتحميل المجاني بصيغ TTF وOTF لاستخدامها في مشاريعك التصميمية والطباعية.
         </p>
