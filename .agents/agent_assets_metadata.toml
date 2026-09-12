@@ -16,3 +16,17 @@ type = "unspecified"
 title = "50 خطاً بأسماء دول وعواصم عربية"
 description = "حزمة ZIP تضم 50 ملف خط من arbfonts.com مرتبطة بأسماء دول ومدن عربية، مع قائمة المصدر والروابط داخل الحزمة."
 logical_id = "d18902f5-0056-495a-9301-724e1b5108f1"
+
+[[outputs]]
+id = "kIcDRDI-Zwzgv8D3wPk-L"
+uri = "file://attached_assets/site-icon-transparent.png"
+type = "image"
+title = "أيقونة الموقع بخلفية شفافة"
+description = "الأيقونة المستخرجة من الصورة، جاهزة للاستخدام كأيقونة للموقع أو التطبيق."
+logical_id = "1380e65d-51ed-48d0-beeb-f303bdb98bd1"
+content_hash = "sha256:e8c98b70c80cf1487336d9dd4b00f3e8efa96a6f098c107e130bac5dd4b39054"
+size = 35021
+mtime_ms = 1789173906345
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:955d86de-9f9a-4ec8-8766-9b8fb8c43f4b/1380e65d-51ed-48d0-beeb-f303bdb98bd1/fa342453-4b4f-4b45-961e-2b44789bafd8"
+storage_version_token = "1789173946127140"
+content_type = "image/png"
