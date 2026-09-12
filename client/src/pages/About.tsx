@@ -13,8 +13,8 @@ export default function About() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="من نحن | xfontat - منصة الخطوط العربية"
-        description="تعرف على xfontat، أكبر منصة خطوط عربية مجانية على الإنترنت. نوفر مجموعة شاملة من الخطوط العربية بأنماط متعددة: ثلث، ديواني، كوفي، نسخ، رقعة، تصميم، فوتوشوب، ونستعليق."
+        title="من نحن | xfontat — منصة مكتبة الخطوط العربية المجانية"
+        description="تعرف على xfontat، منصة مكتبة الخطوط العربية المجانية التي توفر خطوطاً احترافية للمصممين والمطورين مع معاينة تفاعلية وتحميل مباشر وسهل."
         path="/about"
         schema={schema}
       />

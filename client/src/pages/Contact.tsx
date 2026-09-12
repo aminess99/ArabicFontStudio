@@ -15,8 +15,8 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title="اتصل بنا | xfontat"
-        description="تواصل مع فريق xfontat للدعم الفني والاقتراحات والاستفسارات. نحن هنا لمساعدتك في الحصول على أفضل تجربة مع الخطوط العربية."
+        title="اتصل بنا | xfontat — دعم مكتبة الخطوط العربية والمساعدة"
+        description="تواصل مع فريق xfontat للحصول على دعم مكتبة الخطوط العربية، إرسال الاقتراحات، والإبلاغ عن مشكلات التحميل أو الاستخدام وسنساعدك سريعاً."
         path="/contact"
         schema={schema}
       />
@@ -43,7 +43,7 @@ export default function Contact() {
                 <Mail className="h-12 w-12 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">البريد الإلكتروني</h3>
                 <p className="text-sm text-muted-foreground">
-                  info@arabic-fonts.com
+                  info@xfontat.com
                 </p>
               </div>
               
@@ -51,7 +51,7 @@ export default function Contact() {
                 <MessageSquare className="h-12 w-12 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">الدعم الفني</h3>
                 <p className="text-sm text-muted-foreground">
-                  support@arabic-fonts.com
+                  support@xfontat.com
                 </p>
               </div>
               
@@ -59,7 +59,7 @@ export default function Contact() {
                 <Send className="h-12 w-12 mx-auto mb-4 text-primary" />
                 <h3 className="font-semibold mb-2">الاقتراحات</h3>
                 <p className="text-sm text-muted-foreground">
-                  suggestions@arabic-fonts.com
+                  suggestions@xfontat.com
                 </p>
               </div>
             </div>

@@ -13,8 +13,8 @@ export default function Terms() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title="شروط الاستخدام | xfontat"
-        description="تعرف على شروط وأحكام استخدام موقع xfontat وحقوق استخدام الخطوط العربية المتوفرة على المنصة."
+        title="شروط الاستخدام | xfontat — حقوق استخدام الخطوط العربية"
+        description="تعرف على شروط استخدام xfontat، وقواعد تحميل الخطوط العربية وحقوق استخدامها الشخصي أو التجاري وفق ترخيص كل خط والأنظمة المعمول بها."
         path="/terms"
         schema={schema}
       />

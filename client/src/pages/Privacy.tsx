@@ -13,8 +13,8 @@ export default function Privacy() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title="سياسة الخصوصية | xfontat"
-        description="تعرف على سياسة الخصوصية الخاصة بموقع xfontat. نحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية."
+        title="سياسة الخصوصية | xfontat — حماية بيانات زوار مكتبة الخطوط"
+        description="اقرأ سياسة الخصوصية في xfontat وتعرف على البيانات التي نجمعها، وكيف نستخدمها ونحميها أثناء تصفح مكتبة الخطوط العربية وتحميلها بأمان."
         path="/privacy"
         schema={schema}
       />

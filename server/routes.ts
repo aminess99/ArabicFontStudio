@@ -301,6 +301,7 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/$/,
   /^\/design-fonts$/,
   /^\/blog$/,
+  /^\/youtube-thumbnail-maker$/,
   /^\/about$/,
   /^\/contact$/,
   /^\/privacy$/,
@@ -334,8 +335,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
 
+    if (!font) {
+      return res.status(404).send(botHTML(
+        'الخط غير موجود | xfontat',
+        'تعذر العثور على الخط المطلوب في مكتبة xfontat.',
+        `https://xfontat.com/font/${req.params.slug}`,
+        'الخط غير موجود',
+        '<p>تعذر العثور على الخط المطلوب.</p><p><a href="/">العودة إلى الرئيسية</a></p>'
+      ));
+    }
     if (!isBot(req.headers['user-agent'] || '')) return next();
-    if (!font) return res.status(404).send("Font not found");
     const canonical = `https://xfontat.com/font/${req.params.slug}`;
     const title = `تحميل خط ${font.nameArabic} مجاناً | xfontat`;
     const desc = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat || 'TTF'}. خط ${font.category} احترافي متاح للتحميل المباشر.`;
@@ -369,9 +378,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/fonts/:category", async (req, res, next) => {
-    if (!isBot(req.headers['user-agent'] || '')) return next();
     const arabicCat = slugToCategory[req.params.category];
-    if (!arabicCat) return next();
+    if (!arabicCat) {
+      return res.status(404).send(botHTML(
+        'التصنيف غير موجود | xfontat',
+        'تعذر العثور على تصنيف الخطوط المطلوب في مكتبة xfontat.',
+        `https://xfontat.com/fonts/${req.params.category}`,
+        'التصنيف غير موجود',
+        '<p>تعذر العثور على تصنيف الخطوط المطلوب.</p><p><a href="/">العودة إلى الرئيسية</a></p>'
+      ));
+    }
+    if (!isBot(req.headers['user-agent'] || '')) return next();
     const fonts = await storage.getAllFonts();
     const catFonts = fonts.filter(f => f.category === arabicCat);
     const canonical = `https://xfontat.com/fonts/${req.params.category}`;
@@ -434,12 +451,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/blog/:slug", async (req, res, next) => {
-    if (!isBot(req.headers['user-agent'] || '')) return next();
     const slug = req.params.slug;
 
     // Check static blog posts first
     const staticPost = staticBlogPosts.find(p => p.slug === slug);
     if (staticPost) {
+      if (!isBot(req.headers['user-agent'] || '')) return next();
       const canonical = `https://xfontat.com/blog/${slug}`;
       const contentHtml = markdownToHtml(staticPost.content || '');
       const relatedLinksHtml = await renderBlogInternalLinks(staticPost);
@@ -472,7 +489,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Then check generated posts
     const posts = getGeneratedPosts();
     const post = posts.find(p => p.slug === slug);
-    if (!post) return next();
+    if (!post) {
+      return res.status(404).send(botHTML(
+        'المقال غير موجود | xfontat',
+        'تعذر العثور على المقال المطلوب في مدونة xfontat.',
+        `https://xfontat.com/blog/${slug}`,
+        'المقال غير موجود',
+        '<p>تعذر العثور على المقال المطلوب.</p><p><a href="/blog">العودة إلى المدونة</a></p>'
+      ));
+    }
+    if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = `https://xfontat.com/blog/${slug}`;
     const contentHtml = markdownToHtml(post.content || '');
     const relatedLinksHtml = await renderBlogInternalLinks(post);
@@ -586,10 +612,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(botHTML(title, desc, canonical, 'خطوط عربية للتصميم الحديث', body, jsonLd));
   });
 
-  app.get("/collection/:slug", async (req, res, next) => {
+  app.get("/youtube-thumbnail-maker", (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
+
+    const canonical = 'https://xfontat.com/youtube-thumbnail-maker';
+    const title = 'منشئ الصور المصغرة لليوتيوب بالذكاء الاصطناعي | xfontat';
+    const desc = 'أنشئ صوراً مصغرة احترافية لليوتيوب بالذكاء الاصطناعي مع دعم النص العربي واتجاه RTL، بمقاس 1280×720 ومعاينة جاهزة للنشر.';
+    const body = `
+<p>${desc}</p>
+<h2>كيف يعمل منشئ الصور المصغرة؟</h2>
+<p>اكتب فكرة الفيديو أو عنوانه، اختر أسلوباً بصرياً مناسباً، وأضف صورة شخصية أو منتجاً عند الحاجة، ثم أنشئ صورة مصغرة مخصصة لليوتيوب.</p>
+<h2>مميزات الأداة</h2>
+<ul>
+<li>دعم العناوين العربية واتجاه الكتابة من اليمين إلى اليسار.</li>
+<li>إنشاء الصور بمقاس 1280×720 المناسب ليوتيوب.</li>
+<li>رفع صورة شخصية أو منتج بصيغ PNG وJPG وWebP.</li>
+<li>اختيار أساليب بصرية متنوعة دون نسخ هوية صناع محتوى آخرين.</li>
+</ul>
+<p><a href="${canonical}">ابدأ إنشاء صورة مصغرة الآن</a></p>`;
+    const jsonLd = [
+      {
+        "@type": "WebApplication",
+        "name": "منشئ الصور المصغرة لليوتيوب",
+        "alternateName": "AI YouTube Thumbnail Maker",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web",
+        "url": canonical,
+        "description": desc,
+        "inLanguage": "ar",
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "ما المقاس المناسب لصورة Thumbnail في يوتيوب؟",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "المقاس المستخدم هو 1280×720 بنسبة 16:9، وهو مناسب لعرض الصور المصغرة على يوتيوب."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "هل يدعم منشئ الصور المصغرة الكتابة العربية؟",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "نعم، يدعم العناوين العربية واتجاه الكتابة من اليمين إلى اليسار مع الحفاظ على النص الذي تدخله."
+            }
+          }
+        ]
+      }
+    ];
+    res.send(botHTML(title, desc, canonical, 'منشئ الصور المصغرة لليوتيوب بالذكاء الاصطناعي', body, jsonLd));
+  });
+
+  app.get("/collection/:slug", async (req, res, next) => {
     const collection = collections.find(c => c.slug === req.params.slug);
-    if (!collection) return next();
+    if (!collection) {
+      return res.status(404).send(botHTML(
+        'المجموعة غير موجودة | xfontat',
+        'تعذر العثور على مجموعة الخطوط المطلوبة في مكتبة xfontat.',
+        `https://xfontat.com/collection/${req.params.slug}`,
+        'المجموعة غير موجودة',
+        '<p>تعذر العثور على مجموعة الخطوط المطلوبة.</p><p><a href="/">العودة إلى الرئيسية</a></p>'
+      ));
+    }
+    if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = `https://xfontat.com/collection/${req.params.slug}`;
     const title = `${collection.titleArabic} | xfontat`;
     const desc = collection.description;
@@ -658,8 +746,8 @@ ${faqHtml}`;
   app.get("/about", (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = 'https://xfontat.com/about';
-    const title = 'من نحن | xfontat - مكتبة الخطوط العربية';
-    const desc = 'تعرف على xfontat، منصة الخطوط العربية الاحترافية التي توفر أكبر مجموعة من الخطوط العربية المجانية للمصممين والمطورين.';
+    const title = 'من نحن | xfontat — منصة مكتبة الخطوط العربية المجانية';
+    const desc = 'تعرف على xfontat، منصة مكتبة الخطوط العربية المجانية التي توفر خطوطاً احترافية للمصممين والمطورين مع معاينة تفاعلية وتحميل مباشر وسهل.';
     const body = `
 <p>${desc}</p>
 <h2>ما هي xfontat؟</h2>
@@ -689,8 +777,8 @@ ${faqHtml}`;
   app.get("/contact", (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = 'https://xfontat.com/contact';
-    const title = 'اتصل بنا | xfontat';
-    const desc = 'تواصل مع فريق xfontat لأي استفسارات حول الخطوط العربية، الاقتراحات، أو الدعم الفني.';
+    const title = 'اتصل بنا | xfontat — دعم مكتبة الخطوط العربية والمساعدة';
+    const desc = 'تواصل مع فريق xfontat للحصول على دعم مكتبة الخطوط العربية، إرسال الاقتراحات، والإبلاغ عن مشكلات التحميل أو الاستخدام وسنساعدك سريعاً.';
     const body = `
 <p>${desc}</p>
 <h2>طرق التواصل</h2>
@@ -712,8 +800,8 @@ ${faqHtml}`;
   app.get("/privacy", (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = 'https://xfontat.com/privacy';
-    const title = 'سياسة الخصوصية | xfontat';
-    const desc = 'اقرأ سياسة الخصوصية الخاصة بمنصة xfontat لتعرف كيف نتعامل مع بياناتك الشخصية.';
+    const title = 'سياسة الخصوصية | xfontat — حماية بيانات زوار مكتبة الخطوط';
+    const desc = 'اقرأ سياسة الخصوصية في xfontat وتعرف على البيانات التي نجمعها، وكيف نستخدمها ونحميها أثناء تصفح مكتبة الخطوط العربية وتحميلها بأمان.';
     const body = `
 <p>${desc}</p>
 <h2>جمع البيانات</h2>
@@ -735,8 +823,8 @@ ${faqHtml}`;
   app.get("/terms", (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = 'https://xfontat.com/terms';
-    const title = 'شروط الاستخدام | xfontat';
-    const desc = 'اقرأ شروط وأحكام استخدام منصة xfontat لمكتبة الخطوط العربية.';
+    const title = 'شروط الاستخدام | xfontat — حقوق استخدام الخطوط العربية';
+    const desc = 'تعرف على شروط استخدام xfontat، وقواعد تحميل الخطوط العربية وحقوق استخدامها الشخصي أو التجاري وفق ترخيص كل خط والأنظمة المعمول بها.';
     const body = `
 <p>${desc}</p>
 <h2>استخدام الخطوط</h2>
@@ -760,8 +848,8 @@ ${faqHtml}`;
     const fonts = await storage.getAllFonts();
     const categories = Array.from(new Set(fonts.map(f => f.category)));
     const canonical = `https://xfontat.com/`;
-    const title = `xfontat | تحميل خطوط عربية مجانية - ${fonts.length} خط`;
-    const desc = `مكتبة شاملة من ${fonts.length} خط عربي احترافي ضمن ${categories.length} تصنيفات: ${categories.join("، ")}. تحميل مجاني.`;
+    const title = `تحميل خطوط عربية مجانية — ${fonts.length} خط عربي احترافي | xfontat`;
+    const desc = `مكتبة تضم ${fonts.length} خطاً عربياً احترافياً في ${categories.length} تصنيفات. تحميل مجاني بصيغ TTF وOTF مع معاينة تفاعلية وبدون تسجيل.`;
     const catLinks = categories.map(c =>
       `<li><a href="/fonts/${categoryToSlug[c] || c}">${c} (${fonts.filter(f => f.category === c).length} خط)</a></li>`
     ).join('\n');
@@ -1056,10 +1144,16 @@ Sitemap: https://xfontat.com/sitemap.xml`;
     }
   });
 
-  // Bot 404 catch-all: return a real 404 for bots hitting unknown routes
+  // Return a real 404 for unknown document routes instead of letting the SPA
+  // fallback turn every typo into a successful-looking page.
   app.use((req, res, next) => {
-    if (!isBot(req.headers['user-agent'] || '')) return next();
-    if (isKnownRoute(req.path)) return next();
+    if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+    const isAssetRequest =
+      /\.[a-z0-9]{1,8}$/i.test(req.path) ||
+      req.path.startsWith('/assets/') ||
+      req.path.startsWith('/@') ||
+      req.path.startsWith('/src/');
+    if (isKnownRoute(req.path) || isAssetRequest) return next();
     const canonical = `https://xfontat.com${req.path}`;
     const body = `
 <p>الصفحة التي تبحث عنها غير موجودة.</p>

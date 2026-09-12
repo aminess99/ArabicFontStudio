@@ -44,6 +44,9 @@ export default function Home() {
   const fonts = pagedData?.data ?? [];
   const totalItems = pagedData?.total ?? 0;
   const totalPages = Math.ceil(totalItems / FONTS_PER_PAGE);
+  const homeFontCount = totalItems || 857;
+  const homeTitle = `تحميل خطوط عربية مجانية — ${homeFontCount} خط عربي احترافي | xfontat`;
+  const homeDescription = `مكتبة تضم ${homeFontCount} خطاً عربياً احترافياً في 9 تصنيفات: ثلث، ديواني، رقعة، كوفي، نسخ وتصميم. تحميل مجاني بصيغ TTF وOTF مع معاينة تفاعلية وبدون تسجيل.`;
 
   const groupedFonts = useMemo(() => groupFontsByFamily(fonts), [fonts]);
 
@@ -96,8 +99,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title="xfontat | تحميل خطوط عربية مجانية - ثلث، ديواني، كوفي، نسخ، رقعة"
-        description="اكتشف مكتبة شاملة من الخطوط العربية الاحترافية بأنماط متنوعة: الثلث، الديواني، الكوفي، النسخ، الرقعة، والتصميم. حمّل خطوط عربية مجانية بصيغ TTF وOTF لمشاريعك التصميمية."
+        title={homeTitle}
+        description={homeDescription}
         path="/"
         schema={schema}
       />

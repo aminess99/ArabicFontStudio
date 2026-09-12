@@ -8,6 +8,60 @@ import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
 
+type SpaMetadata = {
+  title: string;
+  description: string;
+  canonical: string;
+};
+
+const SPA_METADATA: Record<string, SpaMetadata> = {
+  "/": {
+    title: "تحميل خطوط عربية مجانية — 857 خط عربي احترافي | xfontat",
+    description: "مكتبة تضم 857 خطاً عربياً احترافياً في 9 تصنيفات: ثلث، ديواني، رقعة، كوفي، نسخ وتصميم. تحميل مجاني بصيغ TTF وOTF مع معاينة تفاعلية وبدون تسجيل.",
+    canonical: "https://xfontat.com/",
+  },
+  "/about": {
+    title: "من نحن | xfontat — منصة مكتبة الخطوط العربية المجانية",
+    description: "تعرف على xfontat، منصة مكتبة الخطوط العربية المجانية التي توفر خطوطاً احترافية للمصممين والمطورين مع معاينة تفاعلية وتحميل مباشر وسهل.",
+    canonical: "https://xfontat.com/about",
+  },
+  "/contact": {
+    title: "اتصل بنا | xfontat — دعم مكتبة الخطوط العربية والمساعدة",
+    description: "تواصل مع فريق xfontat للحصول على دعم مكتبة الخطوط العربية، إرسال الاقتراحات، والإبلاغ عن مشكلات التحميل أو الاستخدام وسنساعدك سريعاً.",
+    canonical: "https://xfontat.com/contact",
+  },
+  "/privacy": {
+    title: "سياسة الخصوصية | xfontat — حماية بيانات زوار مكتبة الخطوط",
+    description: "اقرأ سياسة الخصوصية في xfontat وتعرف على البيانات التي نجمعها، وكيف نستخدمها ونحميها أثناء تصفح مكتبة الخطوط العربية وتحميلها بأمان.",
+    canonical: "https://xfontat.com/privacy",
+  },
+  "/terms": {
+    title: "شروط الاستخدام | xfontat — حقوق استخدام الخطوط العربية",
+    description: "تعرف على شروط استخدام xfontat، وقواعد تحميل الخطوط العربية وحقوق استخدامها الشخصي أو التجاري وفق ترخيص كل خط والأنظمة المعمول بها.",
+    canonical: "https://xfontat.com/terms",
+  },
+  "/youtube-thumbnail-maker": {
+    title: "منشئ الصور المصغرة لليوتيوب بالذكاء الاصطناعي | xfontat",
+    description: "أنشئ صوراً مصغرة احترافية لليوتيوب بالذكاء الاصطناعي مع دعم النص العربي واتجاه RTL، بمقاس 1280×720 ومعاينة جاهزة للنشر.",
+    canonical: "https://xfontat.com/youtube-thumbnail-maker",
+  },
+};
+
+function applySpaMetadata(template: string, pathName: string): string {
+  const metadata = SPA_METADATA[pathName] || SPA_METADATA["/"];
+  return template
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${metadata.title}</title>`)
+    .replace(/<meta name="title"[^>]*>/, `<meta name="title" content="${metadata.title}" />`)
+    .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${metadata.description}" />`)
+    .replace(/<link rel="canonical"[^>]*>/, `<link rel="canonical" href="${metadata.canonical}" />`)
+    .replace(/<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${metadata.canonical}" />`)
+    .replace(/<meta property="og:title"[^>]*>/, `<meta property="og:title" content="${metadata.title}" />`)
+    .replace(/<meta property="og:description"[^>]*>/, `<meta property="og:description" content="${metadata.description}" />`)
+    .replace(/<meta name="twitter:url"[^>]*>/, `<meta name="twitter:url" content="${metadata.canonical}" />`)
+    .replace(/<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${metadata.title}" />`)
+    .replace(/<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${metadata.description}" />`);
+}
+
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -58,6 +112,8 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
+      const pathname = new URL(url, "http://localhost").pathname;
+      template = applySpaMetadata(template, pathname);
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
@@ -76,10 +132,25 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  app.use(express.static(distPath, {
+    maxAge: "1y",
+    setHeaders: (res, filePath) => {
+      if (path.basename(filePath) === "index.html") {
+        res.setHeader("Cache-Control", "no-cache");
+      } else {
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      }
+    },
+  }));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  app.use("*", async (req, res, next) => {
+    try {
+      const template = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf-8");
+      const page = applySpaMetadata(template, req.path);
+      res.status(200).set({ "Content-Type": "text/html" }).send(page);
+    } catch (error) {
+      next(error);
+    }
   });
 }
