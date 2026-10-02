@@ -74,6 +74,10 @@ export class MemStorage implements IStorage {
       id,
       description: insertFont.description ?? null,
       designer: insertFont.designer ?? null,
+      sourceUrl: insertFont.sourceUrl ?? null,
+      license: insertFont.license ?? null,
+      licenseNotice: insertFont.licenseNotice ?? null,
+      copyright: insertFont.copyright ?? null,
       featured: insertFont.featured ?? false,
       addedAt: insertFont.addedAt ?? new Date()
     };

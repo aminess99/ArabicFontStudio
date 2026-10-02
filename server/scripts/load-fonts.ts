@@ -3,6 +3,37 @@ import fs from "fs";
 import path from "path";
 
 const FONTS_DIR = path.join(process.cwd(), "client/public/fonts");
+const PROVENANCE_PATH = path.join(process.cwd(), "server/data/font-provenance.json");
+
+type FontProvenance = {
+  name: string;
+  nameArabic: string;
+  description: string;
+  designer: string | null;
+  sourceUrl: string;
+  license: string;
+  licenseNotice: string;
+  copyright: string | null;
+  category: string;
+  style: string;
+  fileName: string;
+  fileFormat: string;
+};
+
+function loadFontProvenance(): Map<string, FontProvenance> {
+  if (!fs.existsSync(PROVENANCE_PATH)) {
+    throw new Error(`Font provenance manifest not found: ${PROVENANCE_PATH}`);
+  }
+
+  const parsed: unknown = JSON.parse(fs.readFileSync(PROVENANCE_PATH, "utf8"));
+  if (!Array.isArray(parsed)) {
+    throw new Error(`Font provenance manifest must contain an array: ${PROVENANCE_PATH}`);
+  }
+
+  return new Map(
+    (parsed as FontProvenance[]).map((entry) => [`${entry.category}/${entry.fileName}`, entry])
+  );
+}
 
 const categoryMap: Record<string, string> = {
   "ثلث": "ثلث",
@@ -50,6 +81,7 @@ function getFileFormat(fileName: string): string {
 
 export async function loadFonts() {
   console.log("🔄 Loading fonts from disk...");
+  const provenanceByFile = loadFontProvenance();
   
   const categories = Object.keys(categoryMap);
   let totalFonts = 0;
@@ -70,8 +102,9 @@ export async function loadFonts() {
     console.log(`📁 ${category}: ${fontFiles.length} fonts`);
 
     for (const file of fontFiles) {
-      const fontName = cleanFontName(file);
-      const fileFormat = getFileFormat(file);
+      const metadata = provenanceByFile.get(`${category}/${file}`);
+      const fontName = metadata?.name ?? cleanFontName(file);
+      const fileFormat = metadata?.fileFormat ?? getFileFormat(file);
       const fileUrl = `/fonts/${category}/${file}`;
       const isFeatured = featuredFonts.has(fontName);
       
@@ -81,11 +114,15 @@ export async function loadFonts() {
 
       await storage.createFont({
         name: fontName,
-        nameArabic: fontName,
-        description: `خط ${fontName} من فئة ${categoryMap[category]}`,
-        designer: undefined,
-        category: categoryMap[category],
-        style: "عادي",
+        nameArabic: metadata?.nameArabic ?? fontName,
+        description: metadata?.description ?? `خط ${fontName} من فئة ${categoryMap[category]}`,
+        designer: metadata?.designer ?? undefined,
+        sourceUrl: metadata?.sourceUrl ?? null,
+        license: metadata?.license ?? null,
+        licenseNotice: metadata?.licenseNotice ?? null,
+        copyright: metadata?.copyright ?? null,
+        category: metadata?.category ?? categoryMap[category],
+        style: metadata?.style ?? "عادي",
         fileUrl: fileUrl,
         fileName: file,
         fileFormat: fileFormat,

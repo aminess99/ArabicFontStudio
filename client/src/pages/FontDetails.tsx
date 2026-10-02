@@ -434,6 +434,49 @@ export default function FontDetails() {
                       <span className="mr-2 font-medium">{font.designer}</span>
                     </div>
                   )}
+                  {font.license && (
+                    <div className="col-span-2 border-t pt-4">
+                      <h3 className="font-semibold mb-2">ملاحظات الترخيص والمصدر</h3>
+                      <p>
+                        <span className="text-muted-foreground">الترخيص:</span>
+                        <a
+                          className="mr-2 font-medium underline underline-offset-4"
+                          href="/fonts/licenses/OFL-1.1.txt"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {font.license}
+                        </a>
+                      </p>
+                      {font.copyright && (
+                        <p className="mt-1">
+                          <span className="text-muted-foreground">حقوق النشر:</span>
+                          <span className="mr-2">{font.copyright}</span>
+                        </p>
+                      )}
+                      {font.sourceUrl && (
+                        <p className="mt-1">
+                          <span className="text-muted-foreground">صفحة المصدر:</span>
+                          <a
+                            className="mr-2 underline underline-offset-4"
+                            href={font.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            arbfonts.com
+                          </a>
+                        </p>
+                      )}
+                      {font.licenseNotice && (
+                        <details className="mt-3 rounded-md border p-3">
+                          <summary className="cursor-pointer font-medium">ملاحظة الترخيص من المصدر</summary>
+                          <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
+                            {font.licenseNotice}
+                          </p>
+                        </details>
+                      )}
+                    </div>
+                  )}
                   <div>
                     <span className="text-muted-foreground">السعر:</span>
                     <span className="mr-2 font-medium text-green-600 dark:text-green-400">مجاني</span>
