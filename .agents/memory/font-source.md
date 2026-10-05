@@ -14,3 +14,9 @@ For additions requiring a specific license, a search-result match is not suffici
 **Why:** Site searches for license terms also return unrelated title matches, weights, legacy versions, and pages whose license wording is incomplete.
 
 **How to apply:** Record only families whose page explicitly confirms the required license and whose family is not already represented in the catalog; treat unclear or mixed terms conservatively.
+
+Do not rely on provenance manifests alone for duplicate checks. Scan the installed font assets and compare their internal family names; some existing font files may have no provenance entry.
+
+**Why:** In this project, family records cover only a subset of the installed library, so a missing attribution record does not mean the family is new.
+
+**How to apply:** Before adding a candidate, check both the provenance data and the actual font files' family metadata.
