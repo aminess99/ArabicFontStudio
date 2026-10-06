@@ -44,13 +44,10 @@ export default function Home() {
   const fonts = pagedData?.data ?? [];
   const totalItems = pagedData?.total ?? 0;
   const totalPages = Math.ceil(totalItems / FONTS_PER_PAGE);
-  const homeFontCount = totalItems || 857;
-  const homeTitle = `تحميل خطوط عربية مجانية — ${homeFontCount} خط عربي احترافي | xfontat`;
-  const homeDescription = `مكتبة تضم ${homeFontCount} خطاً عربياً احترافياً في 9 تصنيفات: ثلث، ديواني، رقعة، كوفي، نسخ وتصميم. تحميل مجاني بصيغ TTF وOTF مع معاينة تفاعلية وبدون تسجيل.`;
+  const homeTitle = "تحميل خطوط عربية مجانية | مكتبة xfontat";
+  const homeDescription = "تصفّح مكتبة xfontat للخطوط العربية المجانية: خطوط احترافية للتحميل بصيغ TTF وOTF، مع معاينة تفاعلية ومعلومات الترخيص والمصدر.";
 
   const groupedFonts = useMemo(() => groupFontsByFamily(fonts), [fonts]);
-
-  const startIndex = (currentPage - 1) * FONTS_PER_PAGE;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -125,7 +122,7 @@ export default function Home() {
       />
 
       <section className="container mx-auto px-3 md:px-4 pt-6 pb-2">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة خطوط عربية مجانية للتحميل الفوري — أكثر من 850 خط عربي</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">مكتبة خطوط عربية مجانية للتحميل الفوري</h1>
         <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
           مرحباً بك في xfontat، أكبر مكتبة خطوط عربية مجانية على الإنترنت. تصفّح مجموعة واسعة من الخطوط العربية الاحترافية من فئات متنوعة تشمل خطوط الثلث، الديواني، الرقعة، الكوفي، النسخ، التصميم، والفوتوشوب. جميع الخطوط متاحة للتحميل المجاني بصيغ TTF وOTF لاستخدامها في مشاريعك التصميمية والطباعية.
         </p>
@@ -160,7 +157,7 @@ export default function Home() {
           <>
             <div className="mb-3 md:mb-4 pb-3 border-b">
               <p className="text-xs md:text-sm text-muted-foreground">
-                عرض {startIndex + 1} - {startIndex + groupedFonts.length} من {totalItems} خط
+                تصفّح الخطوط العربية المتاحة
               </p>
             </div>
 

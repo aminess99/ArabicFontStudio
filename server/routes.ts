@@ -848,8 +848,8 @@ ${faqHtml}`;
     const fonts = await storage.getAllFonts();
     const categories = Array.from(new Set(fonts.map(f => f.category)));
     const canonical = `https://xfontat.com/`;
-    const title = `تحميل خطوط عربية مجانية — ${fonts.length} خط عربي احترافي | xfontat`;
-    const desc = `مكتبة تضم ${fonts.length} خطاً عربياً احترافياً في ${categories.length} تصنيفات. تحميل مجاني بصيغ TTF وOTF مع معاينة تفاعلية وبدون تسجيل.`;
+    const title = "تحميل خطوط عربية مجانية | مكتبة xfontat";
+    const desc = "تصفّح مكتبة xfontat للخطوط العربية المجانية: خطوط احترافية للتحميل بصيغ TTF وOTF، مع معاينة تفاعلية ومعلومات الترخيص والمصدر.";
     const catLinks = categories.map(c =>
       `<li><a href="/fonts/${categoryToSlug[c] || c}">${c} (${fonts.filter(f => f.category === c).length} خط)</a></li>`
     ).join('\n');
@@ -865,7 +865,7 @@ ${faqHtml}`;
 <h2>تصنيفات الخطوط العربية في xfontat</h2>
 <ul>${catLinks}</ul>
 <h2>لماذا تختار xfontat؟</h2>
-<p>xfontat هي منصة عربية متخصصة في توفير مجموعة شاملة من الخطوط العربية الاحترافية. نضع بين يديك ${fonts.length} خطاً عربياً متنوعاً في ${categories.length} تصنيفات رئيسية. جميع الخطوط متاحة للتحميل الفوري بصيغتي TTF وOTF دون تسجيل أو اشتراك، مع ضرورة مراجعة ترخيص كل خط قبل الاستخدام التجاري. تتميز منصتنا بأداة المعاينة التفاعلية التي تتيح لك كتابة نصك الخاص ومعاينته بأي خط قبل التحميل.</p>
+<p>xfontat هي منصة عربية متخصصة في توفير مجموعة شاملة من الخطوط العربية الاحترافية في تصنيفات متنوعة. جميع الخطوط متاحة للتحميل الفوري بصيغتي TTF وOTF دون تسجيل أو اشتراك، مع ضرورة مراجعة ترخيص كل خط قبل الاستخدام التجاري. تتميز منصتنا بأداة المعاينة التفاعلية التي تتيح لك كتابة نصك الخاص ومعاينته بأي خط قبل التحميل.</p>
 <h2>أبرز الخطوط المتاحة للتحميل</h2>
 <ul>${fontLinks}</ul>
 `;
@@ -935,7 +935,7 @@ ${faqHtml}`;
         ]
       }
     ];
-    res.send(botHTML(title, desc, canonical, 'مكتبة خطوط عربية مجانية للتحميل الفوري — أكثر من 850 خط عربي', body, jsonLd));
+    res.send(botHTML(title, desc, canonical, 'مكتبة خطوط عربية مجانية للتحميل الفوري', body, jsonLd));
   });
 
   app.get("/api/fonts", async (req, res) => {

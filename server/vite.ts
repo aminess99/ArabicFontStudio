@@ -16,8 +16,8 @@ type SpaMetadata = {
 
 const SPA_METADATA: Record<string, SpaMetadata> = {
   "/": {
-    title: "تحميل خطوط عربية مجانية — 921 خط عربي احترافي | xfontat",
-    description: "مكتبة تضم 921 خطوط عربية احترافية في 9 تصنيفات: ثلث، ديواني، رقعة، كوفي، نسخ وتصميم. تحميل مجاني بصيغ TTF وOTF مع معاينة تفاعلية وبدون تسجيل.",
+    title: "تحميل خطوط عربية مجانية | مكتبة xfontat",
+    description: "تصفّح مكتبة xfontat للخطوط العربية المجانية: خطوط احترافية للتحميل بصيغ TTF وOTF، مع معاينة تفاعلية ومعلومات الترخيص والمصدر.",
     canonical: "https://xfontat.com/",
   },
   "/about": {
