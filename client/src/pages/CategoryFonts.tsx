@@ -53,7 +53,7 @@ const categoryMeta: Record<string, { title: string; description: string; arabicN
   'خطوط الحرة': {
     title: 'خطوط حرة عربية وغرافيتي - تحميل مجاني | xfontat',
     description: 'مجموعة مميزة من الخطوط العربية الحرة والغرافيتي والزخرفية للعناوين والشعارات والملصقات والتصاميم الإبداعية. حملها مجاناً بصيغ TTF وOTF.',
-    arabicName: 'خطوط الحرة'
+    arabicName: 'خطوط الغرافيتي'
   },
   'فوتوشوب': {
     title: 'خطوط فوتوشوب عربية احترافية - تحميل مجاني | xfontat',

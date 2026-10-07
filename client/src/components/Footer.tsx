@@ -10,7 +10,7 @@ export function Footer() {
     { name: "خط النسخ", path: "/fonts/naskh" },
     { name: "خط الرقعة", path: "/fonts/ruqaa" },
     { name: "خطوط التصميم", path: "/fonts/tasmeem" },
-    { name: "خطوط الحرة", path: "/fonts/graffiti" },
+    { name: "خطوط الغرافيتي", path: "/fonts/graffiti" },
     { name: "خطوط فوتوشوب", path: "/fonts/photoshop" },
     { name: "خطوط النستعليق", path: "/fonts/nastaliq" },
   ];

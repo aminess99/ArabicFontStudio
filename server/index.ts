@@ -23,6 +23,7 @@ app.use((req, res, next) => {
 // Fonts and other static assets rarely change, so cache them aggressively on
 // the visitor's browser to cut down on repeat bandwidth costs.
 app.use(express.static(path.resolve(import.meta.dirname, "..", "client", "public"), {
+  redirect: false,
   maxAge: "30d",
   setHeaders: (res, filePath) => {
     if (/\.(woff2?|ttf|otf)$/i.test(filePath)) {

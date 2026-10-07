@@ -233,25 +233,27 @@ export default function FontDetails() {
   }
 
   const fontSlug = generateSlug(font.name, font.fileName, font.category);
+  const displayCategory = font.category === "خطوط الحرة" ? "خطوط الغرافيتي" : font.category;
+  const isKnownOflLicense = /(?:SIL\s+)?(?:OFL|Open Font License)\s*1\.1/i.test(font.license || "");
   const categoryDesc = categoryDescriptions[font.category] || "خط عربي احترافي مناسب للتصميم والطباعة.";
   const useCases = categoryUseCases[font.category] || ["التصميم", "الطباعة"];
   const relatedArticles = getRelatedBlogPosts(font.category);
 
   const breadcrumbItems = [
     { label: 'الرئيسية', href: '/' },
-    { label: font.category, href: `/fonts/${getCategorySlug(font.category)}` },
+    { label: displayCategory, href: `/fonts/${getCategorySlug(font.category)}` },
     { label: font.nameArabic, href: `/font/${fontSlug}` }
   ];
 
-  const seoTitle = `تحميل خط ${font.nameArabic} مجاناً - ${font.name} | xfontat`;
-  const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat}. خط عربي من فئة ${font.category} مناسب لـ${useCases.slice(0, 3).join(" و")}. معاينة مباشرة وتحميل فوري من مكتبة xfontat.`;
+  const seoTitle = `تحميل خط ${font.nameArabic} بصيغة ${font.fileFormat || "TTF"} مجاناً | xfontat`;
+  const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat || "TTF"}. خط عربي من فئة ${displayCategory} مناسب لـ${useCases.slice(0, 3).join(" و")}. عاينه مباشرة قبل التحميل.`;
 
   const fontPageSchema = {
     "@context": "https://schema.org",
     "@graph": [
       createBreadcrumbSchema([
         { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
-        { name: font.category, url: `${SITE_ORIGIN}/fonts/${getCategorySlug(font.category)}` },
+        { name: displayCategory, url: `${SITE_ORIGIN}/fonts/${getCategorySlug(font.category)}` },
         { name: font.nameArabic, url: `${SITE_ORIGIN}/font/${fontSlug}` }
       ]),
       {
@@ -294,7 +296,7 @@ export default function FontDetails() {
             "name": `ما هي استخدامات خط ${font.nameArabic}؟`,
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `خط ${font.nameArabic} من فئة ${font.category} ومناسب لـ${useCases.join("، ")}. ${categoryDesc}`
+              "text": `خط ${font.nameArabic} من فئة ${displayCategory} ومناسب لـ${useCases.join("، ")}. ${categoryDesc}`
             }
           }
         ]
@@ -336,7 +338,7 @@ export default function FontDetails() {
               <h1 className="text-2xl md:text-3xl font-bold mb-2" data-testid="text-font-name">
                 تحميل خط {font.nameArabic} مجاناً
               </h1>
-              <p className="text-muted-foreground mb-4">{font.name} - خط {font.category} عربي احترافي</p>
+              <p className="text-muted-foreground mb-4">{font.name} - {displayCategory} عربي احترافي</p>
               <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                 {categoryDesc} يتوفر خط {font.nameArabic} بصيغة {font.fileFormat} وهو مناسب لـ{useCases.join("، ")}.
               </p>
@@ -417,7 +419,7 @@ export default function FontDetails() {
                   <div>
                     <span className="text-muted-foreground">الفئة:</span>
                     <Link href={`/fonts/${getCategorySlug(font.category)}`} className="mr-2 font-medium hover:underline" data-testid="link-info-category">
-                      {font.category}
+                      {displayCategory}
                     </Link>
                   </div>
                   <div>
@@ -434,11 +436,11 @@ export default function FontDetails() {
                       <span className="mr-2 font-medium">{font.designer}</span>
                     </div>
                   )}
-                  {font.license && (
-                    <div className="col-span-2 border-t pt-4">
-                      <h3 className="font-semibold mb-2">ملاحظات الترخيص والمصدر</h3>
-                      <p>
-                        <span className="text-muted-foreground">الترخيص:</span>
+                  <div className="col-span-2 border-t pt-4">
+                    <h3 className="font-semibold mb-2">الترخيص وحقوق الاستخدام</h3>
+                    <p>
+                      <span className="text-muted-foreground">نوع الترخيص:</span>
+                      {isKnownOflLicense ? (
                         <a
                           className="mr-2 font-medium underline underline-offset-4"
                           href="/fonts/licenses/OFL-1.1.txt"
@@ -447,36 +449,65 @@ export default function FontDetails() {
                         >
                           {font.license}
                         </a>
+                      ) : (
+                        <span className="mr-2 font-medium">{font.license || "غير محدد في بياناتنا"}</span>
+                      )}
+                    </p>
+                    <p className="mt-1">
+                      <span className="text-muted-foreground">الاستخدام التجاري والتعديل:</span>
+                      <span className="mr-2">
+                        {isKnownOflLicense
+                          ? "مسموحان وفق شروط ترخيص OFL 1.1."
+                          : "غير مؤكدين؛ راجع الترخيص الأصلي قبل الاستخدام."}
+                      </span>
+                    </p>
+                    {font.copyright && (
+                      <p className="mt-1">
+                        <span className="text-muted-foreground">حقوق النشر:</span>
+                        <span className="mr-2">{font.copyright}</span>
                       </p>
-                      {font.copyright && (
-                        <p className="mt-1">
-                          <span className="text-muted-foreground">حقوق النشر:</span>
-                          <span className="mr-2">{font.copyright}</span>
+                    )}
+                    <p className="mt-1">
+                      <span className="text-muted-foreground">المصمم:</span>
+                      <span className="mr-2">{font.designer || "غير محدد في بياناتنا"}</span>
+                    </p>
+                    {font.sourceUrl ? (
+                      <p className="mt-1">
+                        <span className="text-muted-foreground">صفحة المصدر:</span>
+                        <a
+                          className="mr-2 underline underline-offset-4"
+                          href={font.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          عرض المصدر
+                        </a>
+                      </p>
+                    ) : (
+                      <p className="mt-1">
+                        <span className="text-muted-foreground">المصدر:</span>
+                        <span className="mr-2">غير محدد في بياناتنا</span>
+                      </p>
+                    )}
+                    {font.licenseNotice && (
+                      <details className="mt-3 rounded-md border p-3">
+                        <summary className="cursor-pointer font-medium">ملاحظة الترخيص من المصدر</summary>
+                        <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
+                          {font.licenseNotice}
                         </p>
-                      )}
-                      {font.sourceUrl && (
-                        <p className="mt-1">
-                          <span className="text-muted-foreground">صفحة المصدر:</span>
-                          <a
-                            className="mr-2 underline underline-offset-4"
-                            href={font.sourceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            arbfonts.com
-                          </a>
-                        </p>
-                      )}
-                      {font.licenseNotice && (
-                        <details className="mt-3 rounded-md border p-3">
-                          <summary className="cursor-pointer font-medium">ملاحظة الترخيص من المصدر</summary>
-                          <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
-                            {font.licenseNotice}
-                          </p>
-                        </details>
-                      )}
-                    </div>
-                  )}
+                      </details>
+                    )}
+                    {isKnownOflLicense && (
+                      <p className="mt-3 text-xs text-muted-foreground">
+                        راجع نص الترخيص قبل الاستخدام التجاري، خصوصاً شروط التوزيع والتعديل.
+                      </p>
+                    )}
+                    {!font.license && (
+                      <p className="mt-3 text-xs text-muted-foreground">
+                        لا نعرض ادعاءً بأن الخط «بدون حقوق». استخدمه بعد التحقق من ترخيصه ومصدره.
+                      </p>
+                    )}
+                  </div>
                   <div>
                     <span className="text-muted-foreground">السعر:</span>
                     <span className="mr-2 font-medium text-green-600 dark:text-green-400">مجاني</span>
@@ -601,7 +632,7 @@ export default function FontDetails() {
 
               {relatedFonts.length > 0 && (
                 <div className="border rounded-lg p-6 mb-8">
-                  <h2 className="text-xl font-bold mb-4">خطوط مشابهة من فئة {font.category}</h2>
+                  <h2 className="text-xl font-bold mb-4">خطوط مشابهة من فئة {displayCategory}</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {relatedFonts.map((relFont) => (
                       <Link
@@ -622,7 +653,7 @@ export default function FontDetails() {
                       className="text-sm text-foreground hover:underline"
                       data-testid="link-view-all-category"
                     >
-                      عرض جميع خطوط {font.category}
+                      عرض جميع {displayCategory}
                     </Link>
                   </div>
                 </div>
@@ -654,7 +685,7 @@ export default function FontDetails() {
                   <h3 className="text-lg font-bold mb-3">فئة الخط</h3>
                   <Link href={`/fonts/${getCategorySlug(font.category)}`} data-testid="link-font-category">
                     <span className="px-3 py-1 bg-muted text-foreground rounded-md text-sm cursor-pointer hover:bg-muted/80">
-                      {font.category}
+                      {displayCategory}
                     </span>
                   </Link>
                 </div>

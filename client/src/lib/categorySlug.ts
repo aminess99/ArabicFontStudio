@@ -18,6 +18,10 @@ export function getCategorySlug(arabicName: string): string {
   return categoryToSlug[arabicName] || arabicName;
 }
 
+export function getCategoryDisplayName(arabicName: string): string {
+  return arabicName === "خطوط الحرة" ? "خطوط الغرافيتي" : arabicName;
+}
+
 export function getCategoryFromSlug(slug: string): string | undefined {
   return slugToCategory[slug];
 }
