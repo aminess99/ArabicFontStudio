@@ -4,11 +4,12 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { ArrowLeft, Clock, User, Calendar } from "lucide-react";
+import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts as staticBlogPosts } from "@/lib/blogData";
 import { getBlogInternalLinks } from "@/lib/blogInternalLinks";
 import { generateSlug } from "@/lib/slugify";
+import { renderMarkdownToHtml } from "@shared/markdown";
 import type { Font } from "@shared/schema";
 
 interface GeneratedPost {
@@ -23,86 +24,6 @@ interface GeneratedPost {
   readTime: number;
   keywords: string[];
   generated: true;
-}
-
-function renderMarkdown(content: string) {
-  const paragraphs = content.split("\n\n").filter(Boolean);
-  return paragraphs.map((block, index) => {
-    const trimmed = block.trim();
-
-    if (/^## .+/.test(trimmed)) {
-      return (
-        <h2 key={index} className="text-xl md:text-2xl font-bold mt-8 mb-3 text-foreground">
-          {trimmed.replace(/^## /, "")}
-        </h2>
-      );
-    }
-
-    if (/^### .+/.test(trimmed)) {
-      return (
-        <h3 key={index} className="text-lg md:text-xl font-bold mt-6 mb-2 text-foreground">
-          {trimmed.replace(/^### /, "")}
-        </h3>
-      );
-    }
-
-    if (trimmed.startsWith("**") && trimmed.endsWith("**:")) {
-      return (
-        <h2 key={index} className="text-xl font-bold mt-6 mb-2 text-foreground">
-          {trimmed.replace(/\*\*/g, "").replace(/:$/, "")}
-        </h2>
-      );
-    }
-
-    if (trimmed.startsWith("**")) {
-      const heading = trimmed.match(/^\*\*(.+?)\*\*:?\s*/);
-      if (heading) {
-        const rest = trimmed.replace(/^\*\*(.+?)\*\*:?\s*/, "");
-        return (
-          <div key={index}>
-            <h3 className="text-lg font-bold mt-4 mb-1 text-foreground">{heading[1]}</h3>
-            {rest && (
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {rest.replace(/\*\*/g, "")}
-              </p>
-            )}
-          </div>
-        );
-      }
-    }
-
-    if (/^\d+\.\s/.test(trimmed)) {
-      const items = trimmed.split("\n").filter(Boolean);
-      return (
-        <ol key={index} className="list-decimal list-inside space-y-2 text-muted-foreground">
-          {items.map((item, i) => (
-            <li key={i} className="leading-relaxed">
-              {item.replace(/^\d+\.\s*/, "").replace(/\*\*/g, "")}
-            </li>
-          ))}
-        </ol>
-      );
-    }
-
-    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      const items = trimmed.split("\n").filter(Boolean);
-      return (
-        <ul key={index} className="list-disc list-inside space-y-2 text-muted-foreground">
-          {items.map((item, i) => (
-            <li key={i} className="leading-relaxed">
-              {item.replace(/^[-*]\s/, "").replace(/\*\*/g, "")}
-            </li>
-          ))}
-        </ul>
-      );
-    }
-
-    return (
-      <p key={index} className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-        {trimmed.replace(/\*\*/g, "")}
-      </p>
-    );
-  });
 }
 
 export default function BlogPost() {
@@ -171,7 +92,6 @@ export default function BlogPost() {
         "@type": "Article",
         headline: post.title,
         description: post.excerpt,
-        author: { "@type": "Person", name: post.author },
         publisher: {
           "@type": "Organization",
           name: "xfontat",
@@ -250,10 +170,6 @@ export default function BlogPost() {
               <p className="text-base md:text-lg text-muted-foreground mb-4">{post.excerpt}</p>
               <div className="flex flex-wrap items-center gap-3 md:gap-5 text-xs md:text-sm text-muted-foreground border-t border-b py-3">
                 <div className="flex items-center gap-1.5">
-                  <User className="w-4 h-4" />
-                  <span>{post.author}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
                   <span>{post.date}</span>
                 </div>
@@ -264,8 +180,10 @@ export default function BlogPost() {
               </div>
             </header>
 
-            <div className="prose prose-lg max-w-none space-y-4">
-              {renderMarkdown(post.content)}
+            <div
+              className="prose prose-lg max-w-none space-y-4"
+              dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(post.content) }}
+            >
             </div>
 
             {related && (

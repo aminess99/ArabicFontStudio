@@ -7,7 +7,7 @@ export const organizationSchema = {
   "alternateName": "إكس فونتات",
   "url": SITE_ORIGIN,
   "logo": `${SITE_ORIGIN}/logo.png`,
-  "description": "مكتبة شاملة للخطوط العربية الاحترافية مع إمكانية التحميل المجاني",
+  "description": "منصة لتصفح الخطوط العربية ومعاينتها والاطلاع على الصيغ والتراخيص المتاحة.",
   "inLanguage": "ar",
   "sameAs": []
 };
@@ -46,7 +46,7 @@ export function createCollectionPageSchema(params: {
     "about": {
       "@type": "Thing",
       "name": "خطوط عربية",
-      "description": "مجموعة من الخطوط العربية الاحترافية"
+      "description": "مجموعة من الخطوط العربية المعروضة للتصفح والمعاينة"
     },
     "numberOfItems": params.numberOfItems
   };
@@ -104,7 +104,7 @@ export function createFAQSchema() {
         "name": "كيف أحمل الخطوط من xfontat؟",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "يمكنك تحميل أي خط بسهولة من خلال الضغط على زر 'تحميل' الأخضر بجانب كل خط. الخطوط متاحة بصيغ TTF و OTF و WOFF و WOFF2."
+          "text": "افتح صفحة الخط واضغط على زر التنزيل؛ تعرض الصفحة الصيغة المتاحة لهذا الملف."
         }
       },
       {
@@ -120,7 +120,7 @@ export function createFAQSchema() {
         "name": "ما الفرق بين صيغ الخطوط المختلفة؟",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "TTF: الصيغة الأساسية للخطوط، تعمل على معظم البرامج. OTF: صيغة متقدمة بميزات إضافية. WOFF: مصممة للويب بأحجام أصغر. WOFF2: نسخة محسّنة من WOFF بضغط أفضل."
+          "text": "تختلف الصيغ المتاحة وخصائصها بحسب الملف. راجع صفحة الخط ومتطلبات البرنامج أو المتصفح المستهدف قبل الاستخدام."
         }
       },
       {
@@ -133,10 +133,10 @@ export function createFAQSchema() {
       },
       {
         "@type": "Question",
-        "name": "هل تدعم xfontat جميع أنظمة التشغيل؟",
+        "name": "هل يعمل الخط على نظام التشغيل الذي أستخدمه؟",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "نعم، الخطوط متاحة لجميع أنظمة التشغيل: Windows و macOS و Linux وحتى الأجهزة المحمولة."
+          "text": "يعتمد التوافق على صيغة الملف ونظام التشغيل والتطبيق. اختبر الخط في البيئة التي ستستخدمه فيها."
         }
       }
     ]

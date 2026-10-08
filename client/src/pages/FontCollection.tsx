@@ -85,7 +85,7 @@ export default function FontCollection() {
     { label: collection.titleArabic, href: `/collection/${slug}` }
   ];
 
-  const seoDescription = `${collection.description} - ${filteredFonts.length} خط عربي متاح للتحميل المجاني بصيغ TTF وOTF.`;
+  const seoDescription = `${collection.description} تختلف صيغ الملفات وشروط استخدامها؛ راجع صفحة كل خط.`;
 
   const schema = {
     "@context": "https://schema.org",

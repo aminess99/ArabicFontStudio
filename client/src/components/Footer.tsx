@@ -33,7 +33,7 @@ export function Footer() {
           <div>
             <h3 className="font-bold text-lg mb-4">xfontat</h3>
             <p className="text-sm text-muted-foreground">
-              مكتبة شاملة للخطوط العربية الاحترافية مع إمكانية التحميل المجاني
+              تصفّح الخطوط العربية واطّلع على الصيغ والتراخيص المتاحة لكل ملف
             </p>
           </div>
 

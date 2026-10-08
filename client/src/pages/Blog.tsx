@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { Clock, User, Calendar } from "lucide-react";
+import { Clock, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts as staticBlogPosts } from "@/lib/blogData";
@@ -77,7 +77,6 @@ export default function Blog() {
             url: `${SITE_ORIGIN}/blog/${post.slug}`,
             datePublished: post.dateISO,
             dateModified: post.dateModified || post.dateISO,
-            author: { "@type": "Person", name: post.author },
           },
         })),
       },
@@ -159,10 +158,6 @@ export default function Blog() {
                         {post.excerpt}
                       </p>
                       <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground pt-3 border-t">
-                        <div className="flex items-center gap-1">
-                          <User className="w-3 h-3 md:w-4 md:h-4" />
-                          <span>{post.author}</span>
-                        </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 md:w-4 md:h-4" />
                           <span>{post.date}</span>
