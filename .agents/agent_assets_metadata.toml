@@ -30,3 +30,17 @@ mtime_ms = 1789174095465
 storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:955d86de-9f9a-4ec8-8766-9b8fb8c43f4b/1380e65d-51ed-48d0-beeb-f303bdb98bd1/cc12466f-0a07-4766-aceb-86fbae533433"
 storage_version_token = "1789174098712113"
 content_type = "image/png"
+
+[[outputs]]
+id = "i4Tsud0nT0YZ0XKik78FN"
+uri = "file://attached_assets/xfontat-geo-audit.pdf"
+type = "pdf"
+title = "مراجعة GEO لموقع xfontat.com"
+description = "مراجعة عربية لظهور الموقع في البحث وإجابات الذكاء الاصطناعي، مع فحص Bing وخريطة الموقع وأولويات التحسين."
+logical_id = "e57da817-8ddb-4fb1-9e87-43e364a724c7"
+content_hash = "sha256:727fabe235d72334c9c3ada870cc5ac6f741cd4f5631c986b611857d9bcad92d"
+size = 202161
+mtime_ms = 1791470426142
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:955d86de-9f9a-4ec8-8766-9b8fb8c43f4b/e57da817-8ddb-4fb1-9e87-43e364a724c7/bbe94c9d-7106-4499-9a3d-062759ec6058"
+storage_version_token = "1791470437298040"
+content_type = "application/pdf"
