@@ -1,5 +1,5 @@
 import { Search, Type } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "./ThemeToggle";
 import { Slider } from "@/components/ui/slider";
@@ -14,6 +14,9 @@ interface HeaderProps {
 }
 
 export function Header({ searchQuery, onSearchChange, previewText, onPreviewTextChange, fontSize, onFontSizeChange }: HeaderProps) {
+  const [location] = useLocation();
+  const englishPath = location === "/" ? "/en" : `/en${location}`;
+  const frenchPath = location === "/" ? "/fr" : `/fr${location}`;
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="border-b">
@@ -53,14 +56,24 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
               />
             </div>
 
-            <Link
-              href="/en"
-              hrefLang="en"
-              className="shrink-0 rounded-md border px-2.5 py-2 text-xs md:text-sm hover:bg-muted"
-              data-testid="link-language-english"
-            >
-              English
-            </Link>
+            <div className="flex shrink-0 gap-1">
+              <Link
+                href={englishPath}
+                hrefLang="en"
+                className="rounded-md border px-2 py-2 text-xs md:text-sm hover:bg-muted"
+                data-testid="link-language-english"
+              >
+                EN
+              </Link>
+              <Link
+                href={frenchPath}
+                hrefLang="fr"
+                className="rounded-md border px-2 py-2 text-xs md:text-sm hover:bg-muted"
+                data-testid="link-language-french"
+              >
+                FR
+              </Link>
+            </div>
 
             <ThemeToggle />
           </div>

@@ -20,6 +20,7 @@ import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import FontCollection from "@/pages/FontCollection";
 import EnglishDirectory from "@/pages/EnglishDirectory";
+import LocalizedContentPage from "@/pages/LocalizedContentPage";
 import {
   PurpleLogoPreview,
   YouTubeThumbnailPreview,
@@ -64,6 +65,26 @@ function Router() {
       <Switch>
         <Route path="/en" component={EnglishDirectory} />
         <Route path="/en/fonts/:category" component={EnglishDirectory} />
+        <Route path="/fr" component={EnglishDirectory} />
+        <Route path="/fr/fonts/:category" component={EnglishDirectory} />
+        <Route path="/en/font/:slug" component={LocalizedContentPage} />
+        <Route path="/fr/font/:slug" component={LocalizedContentPage} />
+        <Route path="/en/collection/:slug" component={LocalizedContentPage} />
+        <Route path="/fr/collection/:slug" component={LocalizedContentPage} />
+        <Route path="/en/blog/:slug" component={LocalizedContentPage} />
+        <Route path="/fr/blog/:slug" component={LocalizedContentPage} />
+        <Route path="/en/blog" component={LocalizedContentPage} />
+        <Route path="/fr/blog" component={LocalizedContentPage} />
+        <Route path="/en/design-fonts" component={LocalizedContentPage} />
+        <Route path="/fr/design-fonts" component={LocalizedContentPage} />
+        <Route path="/en/about" component={LocalizedContentPage} />
+        <Route path="/fr/about" component={LocalizedContentPage} />
+        <Route path="/en/contact" component={LocalizedContentPage} />
+        <Route path="/fr/contact" component={LocalizedContentPage} />
+        <Route path="/en/privacy" component={LocalizedContentPage} />
+        <Route path="/fr/privacy" component={LocalizedContentPage} />
+        <Route path="/en/terms" component={LocalizedContentPage} />
+        <Route path="/fr/terms" component={LocalizedContentPage} />
         <Route path="/" component={Home} />
         <Route path="/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
         <Route path="/design-fonts" component={DesignFonts} />

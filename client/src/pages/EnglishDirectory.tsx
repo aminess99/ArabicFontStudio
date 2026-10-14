@@ -3,7 +3,12 @@ import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
-import { englishCategories, englishHome, getEnglishCategory } from "@/lib/internationalContent";
+import {
+  englishCategories,
+  englishHome,
+  frenchCategories,
+  frenchHome,
+} from "@/lib/internationalContent";
 import type { Font } from "@shared/schema";
 
 const PAGE_SIZE = 15;
@@ -15,7 +20,15 @@ interface PagedFontResponse {
   limit: number;
 }
 
-function FontFileRow({ font, previewText }: { font: Font; previewText: string }) {
+function FontFileRow({
+  font,
+  previewText,
+  copy,
+}: {
+  font: Font;
+  previewText: string;
+  copy: typeof englishHome;
+}) {
   const [fontLoaded, setFontLoaded] = useState(false);
   const fontFamily = generateFontFamily(font.name);
 
@@ -60,7 +73,7 @@ function FontFileRow({ font, previewText }: { font: Font; previewText: string })
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
             {format && <span>Format: {format}</span>}
             <span>
-              License: {license || englishHome.licenseUnknown}
+              {copy.licenseLabel}: {license || copy.licenseUnknown}
             </span>
             {font.sourceUrl && (
               <a
@@ -69,7 +82,7 @@ function FontFileRow({ font, previewText }: { font: Font; previewText: string })
                 rel="noreferrer"
                 className="underline underline-offset-2 hover:text-foreground"
               >
-                {englishHome.source}
+                {copy.source}
               </a>
             )}
           </div>
@@ -80,7 +93,7 @@ function FontFileRow({ font, previewText }: { font: Font; previewText: string })
           className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
           data-testid={`international-download-${font.id}`}
         >
-          {englishHome.download}
+          {copy.download}
         </a>
       </div>
     </article>
@@ -88,9 +101,15 @@ function FontFileRow({ font, previewText }: { font: Font; previewText: string })
 }
 
 export default function EnglishDirectory() {
-  const [, categoryParams] = useRoute("/en/fonts/:category");
-  const categorySlug = categoryParams?.category;
-  const category = getEnglishCategory(categorySlug);
+  const pathname = typeof window === "undefined" ? "/en" : window.location.pathname;
+  const locale = pathname === "/fr" || pathname.startsWith("/fr/") ? "fr" : "en";
+  const isFrench = locale === "fr";
+  const homeCopy = isFrench ? frenchHome : englishHome;
+  const categories = isFrench ? frenchCategories : englishCategories;
+  const [, englishCategoryParams] = useRoute("/en/fonts/:category");
+  const [, frenchCategoryParams] = useRoute("/fr/fonts/:category");
+  const categorySlug = englishCategoryParams?.category || frenchCategoryParams?.category;
+  const category = categories.find((item) => item.slug === categorySlug);
   const invalidCategory = Boolean(categorySlug && !category);
   const [search, setSearch] = useState("");
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
@@ -115,15 +134,16 @@ export default function EnglishDirectory() {
   const fonts = data?.data ?? [];
   const total = data?.total ?? 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const title = category?.title ?? englishHome.title;
-  const description = category?.description ?? englishHome.description;
-  const path = category ? `/en/fonts/${category.slug}` : "/en";
+  const title = category?.title ?? homeCopy.title;
+  const description = category?.description ?? homeCopy.description;
+  const path = category ? `/${locale}/fonts/${category.slug}` : `/${locale}`;
   const arabicPath = category ? `/fonts/${category.slug}` : "/";
-  const heading = category?.name ?? englishHome.heading;
-  const intro = category?.intro ?? englishHome.intro;
-  const faqs = category?.faqs ?? englishHome.faqs;
+  const heading = category?.name ?? homeCopy.heading;
+  const intro = category?.intro ?? homeCopy.intro;
+  const faqs = category?.faqs ?? homeCopy.faqs;
   const alternates = [
-    { lang: "en", href: `https://xfontat.com${path}` },
+    { lang: "en", href: `https://xfontat.com/${category ? `en/fonts/${category.slug}` : "en"}` },
+    { lang: "fr", href: `https://xfontat.com/${category ? `fr/fonts/${category.slug}` : "fr"}` },
     { lang: "ar", href: `https://xfontat.com${arabicPath}` },
     { lang: "x-default", href: `https://xfontat.com${arabicPath}` },
   ];
@@ -136,7 +156,7 @@ export default function EnglishDirectory() {
         name: heading,
         description,
         url: `https://xfontat.com${path}`,
-        inLanguage: "en",
+        inLanguage: locale,
         ...(category && data ? { numberOfItems: total } : {}),
       };
 
@@ -144,15 +164,15 @@ export default function EnglishDirectory() {
     return (
       <main className="min-h-screen bg-background px-4 py-20 text-center" dir="ltr">
         <SEOHead
-          title="Category not found | xfontat"
-          description="The requested Arabic font category was not found."
-          path={`/en/fonts/${categorySlug}`}
-          lang="en"
+          title={isFrench ? "Catégorie introuvable | xfontat" : "Category not found | xfontat"}
+          description={isFrench ? "La catégorie demandée est introuvable." : "The requested Arabic font category was not found."}
+          path={`/${locale}/fonts/${categorySlug}`}
+          lang={locale}
           direction="ltr"
         />
-        <h1 className="text-3xl font-bold">Category not found</h1>
-        <Link href="/en" className="mt-5 inline-block underline underline-offset-4">
-          Return to the English font directory
+        <h1 className="text-3xl font-bold">{isFrench ? "Catégorie introuvable" : "Category not found"}</h1>
+        <Link href={`/${locale}`} className="mt-5 inline-block underline underline-offset-4">
+          {isFrench ? "Retour à la bibliothèque" : "Return to the font directory"}
         </Link>
       </main>
     );
@@ -165,40 +185,38 @@ export default function EnglishDirectory() {
         description={description}
         path={path}
         schema={schema}
-        lang="en"
+        lang={locale}
         direction="ltr"
         alternates={alternates}
       />
 
       <header className="border-b bg-background">
         <div className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-4">
-          <Link href="/en" className="text-xl font-bold tracking-tight" aria-label="xfontat English home">
+          <Link href={`/${locale}`} className="text-xl font-bold tracking-tight" aria-label={`xfontat ${locale} home`}>
             xfontat
           </Link>
           <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" aria-label="Font styles">
-            <Link href="/en" className="hover:underline">{englishHome.home}</Link>
-            {englishCategories.slice(0, 5).map((item) => (
-              <Link key={item.slug} href={`/en/fonts/${item.slug}`} className="hover:underline">
+            <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
+            {categories.slice(0, 5).map((item) => (
+              <Link key={item.slug} href={`/${locale}/fonts/${item.slug}`} className="hover:underline">
                 {item.name}
               </Link>
             ))}
           </nav>
-          <Link
-            href={arabicPath}
-            hrefLang="ar"
-            className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
-          >
-            {englishHome.language}
-          </Link>
+          <div className="flex gap-2 text-sm">
+            <Link href={category ? `/en/fonts/${category.slug}` : "/en"} hrefLang="en" className="rounded-md border px-2 py-2 hover:bg-muted">EN</Link>
+            <Link href={category ? `/fr/fonts/${category.slug}` : "/fr"} hrefLang="fr" className="rounded-md border px-2 py-2 hover:bg-muted">FR</Link>
+            <Link href={arabicPath} hrefLang="ar" className="rounded-md border px-2 py-2 hover:bg-muted">{homeCopy.language}</Link>
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-6 md:py-10">
-        <nav className="mb-5 flex flex-wrap gap-2" aria-label={englishHome.allCategories}>
-          {englishCategories.map((item) => (
+        <nav className="mb-5 flex flex-wrap gap-2" aria-label={homeCopy.allCategories}>
+          {categories.map((item) => (
             <Link
               key={item.slug}
-              href={`/en/fonts/${item.slug}`}
+              href={`/${locale}/fonts/${item.slug}`}
               className={`rounded-full border px-3 py-1.5 text-sm hover:bg-muted ${
                 item.slug === category?.slug ? "border-primary bg-muted" : ""
               }`}
@@ -223,12 +241,12 @@ export default function EnglishDirectory() {
         {!category && (
           <section className="grid gap-6 border-b py-7 md:grid-cols-2">
             <div>
-              <h2 className="text-xl font-semibold">{englishHome.aboutHeading}</h2>
-              <p className="mt-2 leading-7 text-muted-foreground">{englishHome.about}</p>
+              <h2 className="text-xl font-semibold">{homeCopy.aboutHeading}</h2>
+              <p className="mt-2 leading-7 text-muted-foreground">{homeCopy.about}</p>
             </div>
             <div>
-              <h2 className="text-xl font-semibold">{englishHome.licenseHeading}</h2>
-              <p className="mt-2 leading-7 text-muted-foreground">{englishHome.license}</p>
+              <h2 className="text-xl font-semibold">{homeCopy.licenseHeading}</h2>
+              <p className="mt-2 leading-7 text-muted-foreground">{homeCopy.license}</p>
             </div>
           </section>
         )}
@@ -236,23 +254,23 @@ export default function EnglishDirectory() {
         <section className="py-6" aria-label="Search and preview">
           <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2 text-sm font-medium">
-              {englishHome.searchLabel}
+              {homeCopy.searchLabel}
               <input
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder={englishHome.searchPlaceholder}
+                placeholder={homeCopy.searchPlaceholder}
                 className="h-11 rounded-md border bg-background px-3 text-base font-normal"
                 data-testid="english-font-search"
               />
             </label>
             <label className="grid gap-2 text-sm font-medium">
-              {englishHome.previewLabel}
+              {homeCopy.previewLabel}
               <input
                 type="text"
                 value={previewText}
                 onChange={(event) => setPreviewText(event.target.value)}
-                placeholder={englishHome.previewPlaceholder}
+                placeholder={homeCopy.previewPlaceholder}
                 className="h-11 rounded-md border bg-background px-3 text-base font-normal"
                 dir="auto"
                 data-testid="english-font-preview"
@@ -263,23 +281,23 @@ export default function EnglishDirectory() {
 
         <section aria-live="polite">
           {isLoading ? (
-            <p className="py-10 text-center text-muted-foreground">{englishHome.loading}</p>
+            <p className="py-10 text-center text-muted-foreground">{homeCopy.loading}</p>
           ) : isError ? (
             <div className="py-10 text-center">
-              <p className="text-muted-foreground">{englishHome.error}</p>
+              <p className="text-muted-foreground">{homeCopy.error}</p>
               <button className="mt-3 underline underline-offset-4" onClick={() => refetch()}>
-                {englishHome.retry}
+                {homeCopy.retry}
               </button>
             </div>
           ) : fonts.length === 0 ? (
-            <p className="py-10 text-center text-muted-foreground">{englishHome.noResults}</p>
+            <p className="py-10 text-center text-muted-foreground">{homeCopy.noResults}</p>
           ) : (
             <>
               <p className="border-b py-3 text-sm text-muted-foreground">
-                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total} {englishHome.results}
+                {isFrench ? "Résultats" : "Showing"} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} {isFrench ? "sur" : "of"} {total} {homeCopy.results}
               </p>
               {fonts.map((font) => (
-                <FontFileRow key={font.id} font={font} previewText={previewText} />
+                <FontFileRow key={font.id} font={font} previewText={previewText} copy={homeCopy} />
               ))}
               {totalPages > 1 && (
                 <nav className="flex items-center justify-center gap-4 py-7" aria-label="Pagination">
@@ -288,15 +306,15 @@ export default function EnglishDirectory() {
                     disabled={page <= 1}
                     className="rounded-md border px-4 py-2 disabled:opacity-50"
                   >
-                    {englishHome.previous}
+                    {homeCopy.previous}
                   </button>
-                  <span className="text-sm text-muted-foreground">Page {page} of {totalPages}</span>
+                  <span className="text-sm text-muted-foreground">{isFrench ? "Page" : "Page"} {page} {isFrench ? "sur" : "of"} {totalPages}</span>
                   <button
                     onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
                     disabled={page >= totalPages}
                     className="rounded-md border px-4 py-2 disabled:opacity-50"
                   >
-                    {englishHome.next}
+                    {homeCopy.next}
                   </button>
                 </nav>
               )}
@@ -305,7 +323,7 @@ export default function EnglishDirectory() {
         </section>
 
         <section className="mt-10 border-t pt-8">
-          <h2 className="text-2xl font-bold">{category ? `About ${category.name} Arabic fonts` : "Common questions about Arabic fonts"}</h2>
+          <h2 className="text-2xl font-bold">{category ? (isFrench ? `À propos des polices arabes ${category.name}` : `About ${category.name} Arabic fonts`) : homeCopy.faqHeading}</h2>
           <div className="mt-5 space-y-5">
             {faqs.map((faq) => (
               <article key={faq.question}>

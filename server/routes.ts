@@ -8,7 +8,17 @@ import { collections } from "../client/src/lib/collectionsData";
 import { getBlogInternalLinks } from "../client/src/lib/blogInternalLinks";
 import { registerThumbnailRoutes } from "./thumbnailGenerator";
 import { renderMarkdownToHtml } from "@shared/markdown";
-import { englishCategories, englishHome } from "../client/src/lib/internationalContent";
+import {
+  englishCategories,
+  englishHome,
+  frenchCategories,
+  frenchHome,
+} from "../client/src/lib/internationalContent";
+import { localizedBlogPosts } from "../client/src/lib/blogTranslations";
+import {
+  localizedCollections,
+  localizedStaticPages,
+} from "../client/src/lib/localizedPagesContent";
 
 const categoryToSlug: Record<string, string> = {
   "ثلث": "thuluth",
@@ -175,7 +185,7 @@ const SITE_NAME = 'xfontat';
 const FALLBACK_OG_IMAGE = 'https://xfontat.com/logo.png';
 
 interface BotPageOptions {
-  lang?: "ar" | "en";
+  lang?: "ar" | "en" | "fr";
   alternates?: { lang: string; href: string }[];
 }
 
@@ -213,6 +223,12 @@ function botHTML(
     ? `<nav aria-label="Main navigation">
 <a href="/en">Home</a> |
 ${englishCategories.map((category) => `<a href="/en/fonts/${category.slug}">${category.name}</a>`).join(" | ")} |
+<a href="/">العربية</a>
+</nav>`
+    : lang === "fr"
+    ? `<nav aria-label="Navigation principale">
+<a href="/fr">Accueil</a> |
+${frenchCategories.map((category) => `<a href="/fr/fonts/${category.slug}">${category.name}</a>`).join(" | ")} |
 <a href="/">العربية</a>
 </nav>`
     : `<nav>
@@ -255,7 +271,7 @@ ${alternateLinks}
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${ogImage}">
 <meta property="og:image:alt" content="${title}">
-<meta property="og:locale" content="${lang === "ar" ? "ar_AR" : "en_US"}">
+<meta property="og:locale" content="${lang === "ar" ? "ar_AR" : lang === "fr" ? "fr_FR" : "en_US"}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@xfontat">
 <meta name="twitter:title" content="${title}">
@@ -277,6 +293,10 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/$/,
   /^\/en\/?$/,
   /^\/en\/fonts\/[^/]+$/,
+  /^\/fr\/?$/,
+  /^\/fr\/fonts\/[^/]+$/,
+  /^\/(?:en|fr)\/(?:font|collection|blog)\/[^/]+$/,
+  /^\/(?:en|fr)\/(?:blog|design-fonts|about|contact|privacy|terms)\/?$/,
   /^\/design-fonts$/,
   /^\/blog$/,
   /^\/youtube-thumbnail-maker$/,
@@ -439,6 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         alternates: [
           { lang: "ar", href: canonical },
           { lang: "en", href: `https://xfontat.com/en/fonts/${req.params.category}` },
+          { lang: "fr", href: `https://xfontat.com/fr/fonts/${req.params.category}` },
           { lang: "x-default", href: canonical },
         ],
       }
@@ -887,6 +908,7 @@ ${faqHtml}`;
         lang: "en",
         alternates: [
           { lang: "en", href: canonical },
+          { lang: "fr", href: "https://xfontat.com/fr" },
           { lang: "ar", href: "https://xfontat.com/" },
           { lang: "x-default", href: "https://xfontat.com/" },
         ],
@@ -958,11 +980,322 @@ ${faqHtml}
         lang: "en",
         alternates: [
           { lang: "en", href: canonical },
+          { lang: "fr", href: `https://xfontat.com/fr/fonts/${category.slug}` },
           { lang: "ar", href: `https://xfontat.com/fonts/${category.slug}` },
           { lang: "x-default", href: `https://xfontat.com/fonts/${category.slug}` },
         ],
       }
     ));
+  });
+
+  app.get("/fr", async (req, res, next) => {
+    if (!isBot(req.headers["user-agent"] || "")) return next();
+
+    const fonts = await storage.getAllFonts();
+    const canonical = "https://xfontat.com/fr";
+    const categoryLinks = frenchCategories
+      .map((category) => `<li><a href="/fr/fonts/${category.slug}">${category.name}</a></li>`)
+      .join("\n");
+    const fontLinks = fonts
+      .slice(0, 80)
+      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .join("\n");
+    const body = `
+<p>${frenchHome.intro}</p>
+<h2>Parcourir les styles de polices arabes</h2>
+<ul>${categoryLinks}</ul>
+<h2>${frenchHome.aboutHeading}</h2>
+<p>${frenchHome.about}</p>
+<h2>${frenchHome.licenseHeading}</h2>
+<p>${frenchHome.license}</p>
+<h2>Fichiers de polices arabes de la bibliothèque</h2>
+<ul>${fontLinks}</ul>`;
+    const jsonLd = [
+      {
+        "@type": "WebSite",
+        "name": "xfontat",
+        "url": canonical,
+        "description": frenchHome.description,
+        "inLanguage": "fr",
+      },
+      {
+        "@type": "CollectionPage",
+        "name": frenchHome.title,
+        "description": frenchHome.description,
+        "url": canonical,
+        "inLanguage": "fr",
+        "numberOfItems": fonts.length,
+      },
+    ];
+    res.send(botHTML(
+      frenchHome.title,
+      frenchHome.description,
+      canonical,
+      frenchHome.heading,
+      body,
+      jsonLd,
+      undefined,
+      {
+        lang: "fr",
+        alternates: [
+          { lang: "fr", href: canonical },
+          { lang: "en", href: "https://xfontat.com/en" },
+          { lang: "ar", href: "https://xfontat.com/" },
+          { lang: "x-default", href: "https://xfontat.com/" },
+        ],
+      }
+    ));
+  });
+
+  app.get("/fr/fonts/:category", async (req, res, next) => {
+    const category = frenchCategories.find((item) => item.slug === req.params.category);
+    const canonical = `https://xfontat.com/fr/fonts/${req.params.category}`;
+    if (!category) {
+      return res.status(404).send(botHTML(
+        "Catégorie introuvable | xfontat",
+        "La catégorie demandée est introuvable.",
+        canonical,
+        "Catégorie introuvable",
+        '<p>Cette catégorie n’est pas disponible.</p><p><a href="/fr">Retour à la bibliothèque</a></p>',
+        undefined,
+        undefined,
+        { lang: "fr" }
+      ));
+    }
+    if (!isBot(req.headers["user-agent"] || "")) return next();
+
+    const fonts = await storage.getFontsByCategory(category.arabicCategory);
+    const fontLinks = fonts
+      .slice(0, 80)
+      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .join("\n");
+    const faqHtml = category.faqs
+      .map((faq) => `<section><h3>${faq.question}</h3><p>${faq.answer}</p></section>`)
+      .join("\n");
+    const body = `
+<p>${category.intro}</p>
+<h2>Utilisations courantes</h2>
+<ul>${category.uses.map((use) => `<li>${use}</li>`).join("\n")}</ul>
+<h2>Fichiers de cette catégorie</h2>
+<ul>${fontLinks}</ul>
+<h2>Questions fréquentes sur les polices ${category.name}</h2>
+${faqHtml}
+<p>Les formats et les licences varient selon les fichiers. Consultez les informations et la source de chaque fichier avant utilisation.</p>`;
+    const jsonLd = [
+      {
+        "@type": "CollectionPage",
+        "name": category.name,
+        "description": category.description,
+        "url": canonical,
+        "inLanguage": "fr",
+        "numberOfItems": fonts.length,
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": category.faqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+        })),
+      },
+    ];
+    res.send(botHTML(
+      category.title,
+      category.description,
+      canonical,
+      category.name,
+      body,
+      jsonLd,
+      undefined,
+      {
+        lang: "fr",
+        alternates: [
+          { lang: "fr", href: canonical },
+          { lang: "en", href: `https://xfontat.com/en/fonts/${category.slug}` },
+          { lang: "ar", href: `https://xfontat.com/fonts/${category.slug}` },
+          { lang: "x-default", href: `https://xfontat.com/fonts/${category.slug}` },
+        ],
+      }
+    ));
+  });
+
+  app.get("/:locale/:section/:slug", async (req, res, next) => {
+    const locale = req.params.locale;
+    if (locale !== "en" && locale !== "fr") return next();
+    if (!isBot(req.headers["user-agent"] || "")) return next();
+
+    const isFrench = locale === "fr";
+    const section = req.params.section;
+    const slug = req.params.slug;
+    const canonical = `https://xfontat.com/${locale}/${section}/${slug}`;
+    const alternates = [
+      { lang: "en", href: `https://xfontat.com/en/${section}/${slug}` },
+      { lang: "fr", href: `https://xfontat.com/fr/${section}/${slug}` },
+      { lang: "ar", href: `https://xfontat.com/${section}/${slug}` },
+    ];
+
+    if (section === "font") {
+      const font = await storage.getFontBySlug(slug, generateSlug);
+      if (!font) {
+        const title = isFrench ? "Police introuvable | xfontat" : "Font not found | xfontat";
+        return res.status(404).send(botHTML(title, title, canonical, title, `<p><a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a></p>`, undefined, undefined, { lang: locale }));
+      }
+      const title = `${font.name} | xfontat`;
+      const description = isFrench
+        ? `Prévisualisez ${escapeHtml(font.name)}, consultez son format et sa licence, puis téléchargez le fichier.`
+        : `Preview ${escapeHtml(font.name)}, review its format and license, and download the file.`;
+      const category = (isFrench ? frenchCategories : englishCategories)
+        .find((item) => item.arabicCategory === font.category);
+      const body = `
+<p lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</p>
+<p>${isFrench ? "Catégorie" : "Category"}: ${category?.name || escapeHtml(font.category)}</p>
+<p>${isFrench ? "Format" : "Format"}: ${escapeHtml(font.fileFormat || "—")}</p>
+<p>${isFrench ? "Licence" : "License"}: ${escapeHtml(font.license || font.licenseNotice || (isFrench ? "Consultez la source" : "Check the source"))}</p>
+${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Consulter la source" : "View source"}</a></p>` : ""}
+<p><a href="${escapeHtml(font.fileUrl)}" download>${isFrench ? "Télécharger le fichier" : "Download file"}</a></p>`;
+      return res.send(botHTML(
+        title,
+        description,
+        canonical,
+        font.name,
+        body,
+        { "@type": "CreativeWork", "name": font.name, "url": canonical, "inLanguage": locale },
+        undefined,
+        { lang: locale, alternates }
+      ));
+    }
+
+    if (section === "collection") {
+      const collection = collections.find((item) => item.slug === slug);
+      const translated = localizedCollections[locale][slug];
+      if (!collection || !translated) {
+        return res.status(404).send(botHTML(
+          isFrench ? "Collection introuvable | xfontat" : "Collection not found | xfontat",
+          isFrench ? "Cette collection n’est pas disponible." : "This collection is not available.",
+          canonical,
+          isFrench ? "Collection introuvable" : "Collection not found",
+          `<p><a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a></p>`,
+          undefined,
+          undefined,
+          { lang: locale }
+        ));
+      }
+      const categoryNames = (isFrench ? frenchCategories : englishCategories);
+      const fonts = await storage.getFontsByCategories(collection.categories);
+      const links = fonts.slice(0, 80).map((font) =>
+        `<li><a href="/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`
+      ).join("");
+      const body = `
+<p>${translated.description}</p>
+<ul>${translated.useCases.map((item) => `<li>${item}</li>`).join("")}</ul>
+<h2>${isFrench ? "Catégories" : "Categories"}</h2>
+<ul>${collection.categories.map((name) => {
+  const category = categoryNames.find((item) => item.arabicCategory === name);
+  return `<li>${category?.name || escapeHtml(name)}</li>`;
+}).join("")}</ul>
+<h2>${isFrench ? "Fichiers de polices" : "Font files"}</h2>
+<ul>${links}</ul>`;
+      return res.send(botHTML(
+        translated.title,
+        translated.description,
+        canonical,
+        translated.title,
+        body,
+        { "@type": "CollectionPage", "name": translated.title, "url": canonical, "inLanguage": locale, "numberOfItems": fonts.length },
+        undefined,
+        { lang: locale, alternates }
+      ));
+    }
+
+    if (section === "blog") {
+      const post = staticBlogPosts.find((item) => item.slug === slug);
+      const translated = localizedBlogPosts[locale][slug];
+      if (!post || !translated) return res.status(404).send(botHTML(
+        isFrench ? "Article introuvable | xfontat" : "Article not found | xfontat",
+        isFrench ? "Cet article n’est pas disponible dans cette langue." : "This article is not available in this language.",
+        canonical,
+        isFrench ? "Article introuvable" : "Article not found",
+        `<p><a href="/blog/${escapeHtml(slug)}">${isFrench ? "Lire l’article arabe" : "Read the Arabic article"}</a></p>`,
+        undefined,
+        undefined,
+        { lang: locale }
+      ));
+      const body = `
+<p>${translated.excerpt}</p>
+<h2>${isFrench ? "En bref" : "In brief"}</h2>
+<p>${translated.summary}</p>
+<p>${isFrench ? "L’article complet est disponible en arabe." : "The full article is available in Arabic."}</p>
+<p><a href="/blog/${post.slug}">${isFrench ? "Lire l’article original en arabe" : "Read the original Arabic article"}</a></p>`;
+      return res.send(botHTML(
+        translated.title,
+        translated.excerpt,
+        canonical,
+        translated.title,
+        body,
+        { "@type": "Article", "headline": translated.title, "description": translated.excerpt, "url": canonical, "inLanguage": locale },
+        undefined,
+        { lang: locale, alternates }
+      ));
+    }
+    return next();
+  });
+
+  app.get("/:locale/:page", (req, res, next) => {
+    const locale = req.params.locale;
+    const page = req.params.page;
+    if ((locale !== "en" && locale !== "fr") || !isBot(req.headers["user-agent"] || "")) return next();
+    const canonical = `https://xfontat.com/${locale}/${page}`;
+    const isFrench = locale === "fr";
+    const translatedPages = localizedStaticPages[locale];
+    if (page === "blog") {
+      const title = isFrench ? "Conseils sur les polices arabes | xfontat" : "Arabic font guides | xfontat";
+      const description = isFrench
+        ? "Guides pratiques pour choisir et utiliser des polices arabes."
+        : "Practical guides to choosing and using Arabic fonts.";
+      const posts = staticBlogPosts.map((post) => {
+        const translation = localizedBlogPosts[locale][post.slug];
+        return translation ? `<li><a href="/${locale}/blog/${post.slug}">${translation.title}</a> — ${translation.excerpt}</li>` : "";
+      }).join("");
+      return res.send(botHTML(title, description, canonical, title, `<ul>${posts}</ul>`, { "@type": "Blog", "name": title, "inLanguage": locale }, undefined, {
+        lang: locale,
+        alternates: [
+          { lang: "en", href: `https://xfontat.com/en/blog` },
+          { lang: "fr", href: `https://xfontat.com/fr/blog` },
+          { lang: "ar", href: "https://xfontat.com/blog" },
+        ],
+      }));
+    }
+    if (page === "design-fonts") {
+      const content = isFrench
+        ? { title: "Polices arabes de design | xfontat", description: "Parcourez les fichiers de polices arabes de la catégorie design et vérifiez leurs détails.", heading: "Polices arabes de design" }
+        : { title: "Arabic design fonts | xfontat", description: "Browse Arabic font files in the design category and review their details.", heading: "Arabic design fonts" };
+      const body = `<p>${content.description}</p><p><a href="/${locale}/fonts/tasmeem">${isFrench ? "Parcourir cette catégorie" : "Browse this category"}</a></p>`;
+      return res.send(botHTML(content.title, content.description, canonical, content.heading, body, { "@type": "WebPage", "name": content.title, "url": canonical, "inLanguage": locale }, undefined, {
+        lang: locale,
+        alternates: [
+          { lang: "en", href: "https://xfontat.com/en/design-fonts" },
+          { lang: "fr", href: "https://xfontat.com/fr/design-fonts" },
+          { lang: "ar", href: "https://xfontat.com/design-fonts" },
+        ],
+      }));
+    }
+    const key = page as "about" | "contact" | "privacy" | "terms";
+    if (!(key in translatedPages)) return next();
+    const content = translatedPages[key];
+    const isContact = "intro" in content;
+    const body = isContact
+      ? `<p>${content.description}</p><p>${content.intro}</p><p>info@xfontat.com · support@xfontat.com · suggestions@xfontat.com</p>`
+      : `<p>${content.description}</p>${content.sections.map(section => `<section><h2>${section.heading}</h2>${("paragraphs" in section ? section.paragraphs : section.body).map(paragraph => `<p>${paragraph}</p>`).join("")}</section>`).join("")}`;
+    return res.send(botHTML(content.title, content.description, canonical, isContact ? content.heading : content.title, body, {
+      "@type": "WebPage", "name": content.title, "url": canonical, "inLanguage": locale,
+    }, undefined, {
+      lang: locale,
+      alternates: [
+        { lang: "en", href: `https://xfontat.com/en/${page}` },
+        { lang: "fr", href: `https://xfontat.com/fr/${page}` },
+        { lang: "ar", href: `https://xfontat.com/${page}` },
+      ],
+    }));
   });
 
   app.get("/", async (req, res, next) => {
@@ -1070,6 +1403,7 @@ ${faqHtml}
         alternates: [
           { lang: "ar", href: canonical },
           { lang: "en", href: "https://xfontat.com/en" },
+          { lang: "fr", href: "https://xfontat.com/fr" },
           { lang: "x-default", href: canonical },
         ],
       }
@@ -1170,6 +1504,15 @@ ${faqHtml}
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "daily" },
         { url: "/en", priority: "1.0", changefreq: "daily" },
+        { url: "/fr", priority: "1.0", changefreq: "daily" },
+        ...(["en", "fr"] as const).flatMap(locale => [
+          { url: `/${locale}/design-fonts`, priority: "0.8", changefreq: "weekly" },
+          { url: `/${locale}/blog`, priority: "0.7", changefreq: "weekly" },
+          { url: `/${locale}/about`, priority: "0.5", changefreq: "monthly" },
+          { url: `/${locale}/contact`, priority: "0.5", changefreq: "monthly" },
+          { url: `/${locale}/privacy`, priority: "0.3", changefreq: "yearly" },
+          { url: `/${locale}/terms`, priority: "0.3", changefreq: "yearly" },
+        ]),
         { url: "/youtube-thumbnail-maker", priority: "0.9", changefreq: "weekly" },
         { url: "/design-fonts", priority: "0.9", changefreq: "weekly" },
         { url: "/blog", priority: "0.7", changefreq: "weekly" },
@@ -1191,18 +1534,31 @@ ${faqHtml}
         priority: "0.8",
         changefreq: "weekly",
       }));
+      const frenchCategoryPages = frenchCategories.map(category => ({
+        url: `/fr/fonts/${category.slug}`,
+        priority: "0.8",
+        changefreq: "weekly",
+      }));
 
       const seenFontUrls = new Set<string>();
       const fontPages = fonts.flatMap(font => {
         const url = `/font/${generateSlug(font.name, font.fileName, font.category)}`;
         if (seenFontUrls.has(url)) return [];
         seenFontUrls.add(url);
-        return [{
+        return [
+          {
           url,
           priority: "0.7",
           changefreq: "monthly",
           lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : undefined,
-        }];
+          },
+          ...(["en", "fr"] as const).map(locale => ({
+            url: `/${locale}${url}`,
+            priority: "0.7",
+            changefreq: "monthly",
+            lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : undefined,
+          })),
+        ];
       });
 
       const generatedBlogPosts = getGeneratedPosts().map(post => ({
@@ -1220,12 +1576,16 @@ ${faqHtml}
           seenSlugs.add(post.slug);
           return true;
         })
-        .map(post => ({
-          url: `/blog/${post.slug}`,
-          priority: "0.6",
-          changefreq: "monthly",
-          lastmod: new Date(post.date).toISOString(),
-        }));
+        .flatMap(post => {
+          const lastmod = new Date(post.date).toISOString();
+          const entries = [{ url: `/blog/${post.slug}`, priority: "0.6", changefreq: "monthly", lastmod }];
+          if (!localizedBlogPosts.en[post.slug] || !localizedBlogPosts.fr[post.slug]) return entries;
+          return [
+            ...entries,
+            { url: `/en/blog/${post.slug}`, priority: "0.6", changefreq: "monthly", lastmod },
+            { url: `/fr/blog/${post.slug}`, priority: "0.6", changefreq: "monthly", lastmod },
+          ];
+        });
 
       const collectionSlugs = collections.map(c => c.slug);
       const collectionPages = collectionSlugs.map(slug => ({
@@ -1233,11 +1593,18 @@ ${faqHtml}
         priority: "0.8",
         changefreq: "weekly",
       }));
+      const localizedCollectionPages = (["en", "fr"] as const).flatMap(locale =>
+        Object.keys(localizedCollections[locale]).map(slug => ({
+          url: `/${locale}/collection/${slug}`,
+          priority: "0.8",
+          changefreq: "weekly",
+        }))
+      );
 
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-      [...staticPages, ...categoryPages, ...englishCategoryPages, ...collectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
+      [...staticPages, ...categoryPages, ...englishCategoryPages, ...frenchCategoryPages, ...collectionPages, ...localizedCollectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
         if (page.lastmod) {
