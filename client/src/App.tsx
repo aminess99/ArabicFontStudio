@@ -19,6 +19,7 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import FontCollection from "@/pages/FontCollection";
+import EnglishDirectory from "@/pages/EnglishDirectory";
 import {
   PurpleLogoPreview,
   YouTubeThumbnailPreview,
@@ -61,6 +62,8 @@ function Router() {
     <>
       <ScrollToTop />
       <Switch>
+        <Route path="/en" component={EnglishDirectory} />
+        <Route path="/en/fonts/:category" component={EnglishDirectory} />
         <Route path="/" component={Home} />
         <Route path="/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
         <Route path="/design-fonts" component={DesignFonts} />

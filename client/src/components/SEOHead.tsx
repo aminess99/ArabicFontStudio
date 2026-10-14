@@ -5,13 +5,30 @@ interface SEOHeadProps {
   description: string;
   path: string;
   schema?: object;
+  lang?: string;
+  direction?: "ltr" | "rtl";
+  alternates?: { lang: string; href: string }[];
 }
 
-export function SEOHead({ title, description, path, schema }: SEOHeadProps) {
+export function SEOHead({
+  title,
+  description,
+  path,
+  schema,
+  lang = "ar",
+  direction = "rtl",
+  alternates = [],
+}: SEOHeadProps) {
   const baseUrl = "https://xfontat.com";
   const fullUrl = `${baseUrl}${path}`;
+  const alternateLinksKey = JSON.stringify(alternates);
 
   useEffect(() => {
+    const root = document.documentElement;
+    const previousLang = root.lang;
+    const previousDirection = root.dir;
+    root.lang = lang;
+    root.dir = direction;
     document.title = title;
 
     const metaTags = [
@@ -37,23 +54,38 @@ export function SEOHead({ title, description, path, schema }: SEOHeadProps) {
       canonical.setAttribute("href", fullUrl);
     }
 
+    document.querySelectorAll('link[data-seo-alternate="true"]').forEach((link) => link.remove());
+    const alternateLinks = alternates.map(({ lang: alternateLang, href }) => {
+      const link = document.createElement("link");
+      link.rel = "alternate";
+      link.hreflang = alternateLang;
+      link.href = href;
+      link.dataset.seoAlternate = "true";
+      document.head.appendChild(link);
+      return link;
+    });
+
+    let script: HTMLScriptElement | undefined;
     if (schema) {
       const existingScript = document.querySelector('script[data-schema="page"]');
       if (existingScript) {
         existingScript.remove();
       }
 
-      const script = document.createElement("script");
+      script = document.createElement("script");
       script.type = "application/ld+json";
       script.setAttribute("data-schema", "page");
       script.textContent = JSON.stringify(schema);
       document.head.appendChild(script);
-
-      return () => {
-        script.remove();
-      };
     }
-  }, [title, description, fullUrl, schema]);
+
+    return () => {
+      alternateLinks.forEach((link) => link.remove());
+      script?.remove();
+      root.lang = previousLang;
+      root.dir = previousDirection;
+    };
+  }, [title, description, fullUrl, schema, lang, direction, alternateLinksKey]);
 
   return null;
 }

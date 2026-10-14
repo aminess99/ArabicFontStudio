@@ -53,6 +53,15 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
               />
             </div>
 
+            <Link
+              href="/en"
+              hrefLang="en"
+              className="shrink-0 rounded-md border px-2.5 py-2 text-xs md:text-sm hover:bg-muted"
+              data-testid="link-language-english"
+            >
+              English
+            </Link>
+
             <ThemeToggle />
           </div>
         </div>

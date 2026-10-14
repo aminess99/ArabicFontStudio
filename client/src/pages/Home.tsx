@@ -100,6 +100,11 @@ export default function Home() {
         description={homeDescription}
         path="/"
         schema={schema}
+        alternates={[
+          { lang: "ar", href: "https://xfontat.com/" },
+          { lang: "en", href: "https://xfontat.com/en" },
+          { lang: "x-default", href: "https://xfontat.com/" },
+        ]}
       />
       <Header 
         searchQuery={searchQuery} 

@@ -8,6 +8,7 @@ import { collections } from "../client/src/lib/collectionsData";
 import { getBlogInternalLinks } from "../client/src/lib/blogInternalLinks";
 import { registerThumbnailRoutes } from "./thumbnailGenerator";
 import { renderMarkdownToHtml } from "@shared/markdown";
+import { englishCategories, englishHome } from "../client/src/lib/internationalContent";
 
 const categoryToSlug: Record<string, string> = {
   "ثلث": "thuluth",
@@ -173,6 +174,24 @@ const categoryContent: Record<string, { intro: string; history: string; usageTip
 const SITE_NAME = 'xfontat';
 const FALLBACK_OG_IMAGE = 'https://xfontat.com/logo.png';
 
+interface BotPageOptions {
+  lang?: "ar" | "en";
+  alternates?: { lang: string; href: string }[];
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character];
+  });
+}
+
 function botHTML(
   title: string,
   description: string,
@@ -180,45 +199,23 @@ function botHTML(
   h1: string,
   body: string,
   jsonLd?: object | object[],
-  image?: string
+  image?: string,
+  options: BotPageOptions = {}
 ): string {
+  const lang = options.lang || "ar";
   const ogImage = image || FALLBACK_OG_IMAGE;
-  const jsonLdScript = jsonLd
-    ? `<script type="application/ld+json">${JSON.stringify(Array.isArray(jsonLd) ? { "@context": "https://schema.org", "@graph": jsonLd } : jsonLd)}</script>`
-    : '';
-  return `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="index, follow">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="256x256" href="/favicon.png">
-<link rel="shortcut icon" href="/favicon.ico">
-<title>${title}</title>
-<meta name="description" content="${description}">
-<link rel="canonical" href="${canonical}">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="${SITE_NAME}">
-<meta property="og:title" content="${title}">
-<meta property="og:description" content="${description}">
-<meta property="og:url" content="${canonical}">
-<meta property="og:image" content="${ogImage}">
-<meta property="og:image:alt" content="${title}">
-<meta property="og:locale" content="ar_AR">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@xfontat">
-<meta name="twitter:title" content="${title}">
-<meta name="twitter:description" content="${description}">
-<meta name="twitter:image" content="${ogImage}">
-<meta name="twitter:image:alt" content="${title}">
-<meta name="twitter:url" content="${canonical}">
-${jsonLdScript}
-</head>
-<body>
-<h1>${h1}</h1>
-${body}
-<nav>
+  const alternateLinks = (options.alternates || [])
+    .map(({ lang: alternateLang, href }) =>
+      `<link rel="alternate" hreflang="${escapeHtml(alternateLang)}" href="${escapeHtml(href)}">`
+    )
+    .join("\n");
+  const navigation = lang === "en"
+    ? `<nav aria-label="Main navigation">
+<a href="/en">Home</a> |
+${englishCategories.map((category) => `<a href="/en/fonts/${category.slug}">${category.name}</a>`).join(" | ")} |
+<a href="/">العربية</a>
+</nav>`
+    : `<nav>
 <a href="/">الرئيسية</a> |
 <a href="/fonts/thuluth">خطوط الثلث</a> |
 <a href="/fonts/diwani">خطوط الديواني</a> |
@@ -232,14 +229,54 @@ ${body}
 <a href="/design-fonts">خطوط التصميم الحديث</a> |
 <a href="/about">من نحن</a> |
 <a href="/blog">المدونة</a> |
-<a href="/contact">اتصل بنا</a>
-</nav>
+<a href="/contact">اتصل بنا</a> |
+<a href="/en">English</a>
+</nav>`;
+  const jsonLdScript = jsonLd
+    ? `<script type="application/ld+json">${JSON.stringify(Array.isArray(jsonLd) ? { "@context": "https://schema.org", "@graph": jsonLd } : jsonLd)}</script>`
+    : '';
+  return `<!DOCTYPE html>
+<html lang="${lang}" dir="${lang === "ar" ? "rtl" : "ltr"}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="256x256" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<title>${title}</title>
+<meta name="description" content="${description}">
+<link rel="canonical" href="${canonical}">
+${alternateLinks}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${SITE_NAME}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${description}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="${ogImage}">
+<meta property="og:image:alt" content="${title}">
+<meta property="og:locale" content="${lang === "ar" ? "ar_AR" : "en_US"}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@xfontat">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}">
+<meta name="twitter:image" content="${ogImage}">
+<meta name="twitter:image:alt" content="${title}">
+<meta name="twitter:url" content="${canonical}">
+${jsonLdScript}
+</head>
+<body>
+<h1>${h1}</h1>
+${body}
+${navigation}
 </body>
 </html>`;
 }
 
 const KNOWN_ROUTE_PATTERNS = [
   /^\/$/,
+  /^\/en\/?$/,
+  /^\/en\/fonts\/[^/]+$/,
   /^\/design-fonts$/,
   /^\/blog$/,
   /^\/youtube-thumbnail-maker$/,
@@ -389,7 +426,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "mainEntity": [{ "@type": "Question", "name": content.faq.split('؟')[0] + '؟', "acceptedAnswer": { "@type": "Answer", "text": content.faq.split('؟').slice(1).join('؟') } }]
       }] : [])
     ];
-    res.send(botHTML(title, desc, canonical, categoryLabel, body, jsonLd));
+    res.send(botHTML(
+      title,
+      desc,
+      canonical,
+      categoryLabel,
+      body,
+      jsonLd,
+      undefined,
+      {
+        lang: "ar",
+        alternates: [
+          { lang: "ar", href: canonical },
+          { lang: "en", href: `https://xfontat.com/en/fonts/${req.params.category}` },
+          { lang: "x-default", href: canonical },
+        ],
+      }
+    ));
   });
 
   app.get("/blog/:slug", async (req, res, next) => {
@@ -783,6 +836,135 @@ ${faqHtml}`;
     res.send(botHTML(title, desc, canonical, 'شروط الاستخدام', body, jsonLd));
   });
 
+  app.get("/en", async (req, res, next) => {
+    if (!isBot(req.headers["user-agent"] || "")) return next();
+
+    const fonts = await storage.getAllFonts();
+    const canonical = "https://xfontat.com/en";
+    const categoryLinks = englishCategories
+      .map((category) => `<li><a href="/en/fonts/${category.slug}">${category.name}</a></li>`)
+      .join("\n");
+    const fontLinks = fonts
+      .slice(0, 80)
+      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .join("\n");
+    const body = `
+<p>${englishHome.intro}</p>
+<h2>Browse Arabic font styles</h2>
+<ul>${categoryLinks}</ul>
+<h2>${englishHome.aboutHeading}</h2>
+<p>${englishHome.about}</p>
+<h2>${englishHome.licenseHeading}</h2>
+<p>${englishHome.license}</p>
+<h2>Arabic font files in the directory</h2>
+<ul>${fontLinks}</ul>`;
+    const jsonLd = [
+      {
+        "@type": "WebSite",
+        "name": "xfontat",
+        "url": canonical,
+        "description": englishHome.description,
+        "inLanguage": "en",
+      },
+      {
+        "@type": "CollectionPage",
+        "name": englishHome.title,
+        "description": englishHome.description,
+        "url": canonical,
+        "inLanguage": "en",
+        "numberOfItems": fonts.length,
+      },
+    ];
+    res.send(botHTML(
+      englishHome.title,
+      englishHome.description,
+      canonical,
+      englishHome.heading,
+      body,
+      jsonLd,
+      undefined,
+      {
+        lang: "en",
+        alternates: [
+          { lang: "en", href: canonical },
+          { lang: "ar", href: "https://xfontat.com/" },
+          { lang: "x-default", href: "https://xfontat.com/" },
+        ],
+      }
+    ));
+  });
+
+  app.get("/en/fonts/:category", async (req, res, next) => {
+    const category = englishCategories.find((item) => item.slug === req.params.category);
+    const canonical = `https://xfontat.com/en/fonts/${req.params.category}`;
+    if (!category) {
+      return res.status(404).send(botHTML(
+        "Category not found | xfontat",
+        "The requested Arabic font category was not found.",
+        canonical,
+        "Category not found",
+        '<p>The requested category is not available.</p><p><a href="/en">Return to the English directory</a></p>',
+        undefined,
+        undefined,
+        { lang: "en" }
+      ));
+    }
+    if (!isBot(req.headers["user-agent"] || "")) return next();
+
+    const fonts = await storage.getFontsByCategory(category.arabicCategory);
+    const fontLinks = fonts
+      .slice(0, 80)
+      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .join("\n");
+    const faqHtml = category.faqs
+      .map((faq) => `<section><h3>${faq.question}</h3><p>${faq.answer}</p></section>`)
+      .join("\n");
+    const body = `
+<p>${category.intro}</p>
+<h2>Common uses</h2>
+<ul>${category.uses.map((use) => `<li>${use}</li>`).join("\n")}</ul>
+<h2>Font files in this category</h2>
+<ul>${fontLinks}</ul>
+<h2>Common questions about ${category.name} fonts</h2>
+${faqHtml}
+<p>Formats and licenses vary by file. Check the individual file information and source before use.</p>`;
+    const jsonLd = [
+      {
+        "@type": "CollectionPage",
+        "name": category.name,
+        "description": category.description,
+        "url": canonical,
+        "inLanguage": "en",
+        "numberOfItems": fonts.length,
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": category.faqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+        })),
+      },
+    ];
+    res.send(botHTML(
+      category.title,
+      category.description,
+      canonical,
+      category.name,
+      body,
+      jsonLd,
+      undefined,
+      {
+        lang: "en",
+        alternates: [
+          { lang: "en", href: canonical },
+          { lang: "ar", href: `https://xfontat.com/fonts/${category.slug}` },
+          { lang: "x-default", href: `https://xfontat.com/fonts/${category.slug}` },
+        ],
+      }
+    ));
+  });
+
   app.get("/", async (req, res, next) => {
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const fonts = await storage.getAllFonts();
@@ -875,7 +1057,23 @@ ${faqHtml}`;
         ]
       }
     ];
-    res.send(botHTML(title, desc, canonical, 'مكتبة خطوط عربية مجانية للتحميل الفوري', body, jsonLd));
+    res.send(botHTML(
+      title,
+      desc,
+      canonical,
+      'مكتبة خطوط عربية مجانية للتحميل الفوري',
+      body,
+      jsonLd,
+      undefined,
+      {
+        lang: "ar",
+        alternates: [
+          { lang: "ar", href: canonical },
+          { lang: "en", href: "https://xfontat.com/en" },
+          { lang: "x-default", href: canonical },
+        ],
+      }
+    ));
   });
 
   app.get("/api/fonts", async (req, res) => {
@@ -971,6 +1169,7 @@ ${faqHtml}`;
 
       const staticPages = [
         { url: "/", priority: "1.0", changefreq: "daily" },
+        { url: "/en", priority: "1.0", changefreq: "daily" },
         { url: "/youtube-thumbnail-maker", priority: "0.9", changefreq: "weekly" },
         { url: "/design-fonts", priority: "0.9", changefreq: "weekly" },
         { url: "/blog", priority: "0.7", changefreq: "weekly" },
@@ -986,6 +1185,11 @@ ${faqHtml}`;
         url: `/fonts/${categoryToSlug[cat] || cat}`,
         priority: "0.8",
         changefreq: "weekly"
+      }));
+      const englishCategoryPages = englishCategories.map(category => ({
+        url: `/en/fonts/${category.slug}`,
+        priority: "0.8",
+        changefreq: "weekly",
       }));
 
       const seenFontUrls = new Set<string>();
@@ -1033,7 +1237,7 @@ ${faqHtml}`;
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
       xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-      [...staticPages, ...categoryPages, ...collectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
+      [...staticPages, ...categoryPages, ...englishCategoryPages, ...collectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
         if (page.lastmod) {

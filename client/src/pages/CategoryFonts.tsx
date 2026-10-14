@@ -168,6 +168,11 @@ export default function CategoryFonts() {
         description={categoryData.description}
         path={`/fonts/${categorySlug}`}
         schema={schema}
+        alternates={[
+          { lang: "ar", href: `https://xfontat.com/fonts/${categorySlug}` },
+          { lang: "en", href: `https://xfontat.com/en/fonts/${categorySlug}` },
+          { lang: "x-default", href: `https://xfontat.com/fonts/${categorySlug}` },
+        ]}
       />
       <Header 
         searchQuery={searchQuery} 
