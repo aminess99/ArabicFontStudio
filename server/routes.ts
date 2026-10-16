@@ -14,7 +14,10 @@ import {
   frenchCategories,
   frenchHome,
 } from "../client/src/lib/internationalContent";
-import { localizedBlogPosts } from "../client/src/lib/blogTranslations";
+import {
+  fullBlogTranslations,
+  localizedBlogPosts,
+} from "../client/src/lib/blogTranslations";
 import {
   localizedCollections,
   localizedStaticPages,
@@ -297,6 +300,7 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/fr\/fonts\/[^/]+$/,
   /^\/(?:en|fr)\/(?:font|collection|blog)\/[^/]+$/,
   /^\/(?:en|fr)\/(?:blog|design-fonts|about|contact|privacy|terms)\/?$/,
+  /^\/(?:en|fr)\/youtube-thumbnail-maker\/?$/,
   /^\/design-fonts$/,
   /^\/blog$/,
   /^\/youtube-thumbnail-maker$/,
@@ -1209,7 +1213,9 @@ ${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Con
 
     if (section === "blog") {
       const post = staticBlogPosts.find((item) => item.slug === slug);
-      const translated = localizedBlogPosts[locale][slug];
+      const translated = (fullBlogTranslations[slug]?.[locale] || localizedBlogPosts[locale][slug]) as
+        | { title: string; excerpt: string; summary?: string; content?: string }
+        | undefined;
       if (!post || !translated) return res.status(404).send(botHTML(
         isFrench ? "Article introuvable | xfontat" : "Article not found | xfontat",
         isFrench ? "Cet article n’est pas disponible dans cette langue." : "This article is not available in this language.",
@@ -1220,12 +1226,9 @@ ${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Con
         undefined,
         { lang: locale }
       ));
-      const body = `
-<p>${translated.excerpt}</p>
-<h2>${isFrench ? "En bref" : "In brief"}</h2>
-<p>${translated.summary}</p>
-<p>${isFrench ? "L’article complet est disponible en arabe." : "The full article is available in Arabic."}</p>
-<p><a href="/blog/${post.slug}">${isFrench ? "Lire l’article original en arabe" : "Read the original Arabic article"}</a></p>`;
+      const body = "content" in translated
+        ? `${renderMarkdownToHtml(translated.content || "")}<p><a href="/blog/${post.slug}">${isFrench ? "Consulter la version arabe" : "View the Arabic version"}</a></p>`
+        : `<p>${translated.excerpt}</p><h2>${isFrench ? "En bref" : "In brief"}</h2><p>${translated.summary}</p><p><a href="/blog/${post.slug}">${isFrench ? "Lire l’article original en arabe" : "Read the original Arabic article"}</a></p>`;
       return res.send(botHTML(
         translated.title,
         translated.excerpt,
@@ -1253,7 +1256,7 @@ ${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Con
         ? "Guides pratiques pour choisir et utiliser des polices arabes."
         : "Practical guides to choosing and using Arabic fonts.";
       const posts = staticBlogPosts.map((post) => {
-        const translation = localizedBlogPosts[locale][post.slug];
+        const translation = fullBlogTranslations[post.slug]?.[locale] || localizedBlogPosts[locale][post.slug];
         return translation ? `<li><a href="/${locale}/blog/${post.slug}">${translation.title}</a> — ${translation.excerpt}</li>` : "";
       }).join("");
       return res.send(botHTML(title, description, canonical, title, `<ul>${posts}</ul>`, { "@type": "Blog", "name": title, "inLanguage": locale }, undefined, {
@@ -1279,14 +1282,41 @@ ${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Con
         ],
       }));
     }
+    if (page === "youtube-thumbnail-maker") {
+      const content = isFrench
+        ? {
+            title: "Créateur de miniatures YouTube par IA | xfontat",
+            description: "Créez une miniature 1280×720 à partir d’une idée, avec un titre arabe lisible et une composition liée au sujet.",
+            heading: "Créateur de miniatures YouTube pour vidéos en arabe",
+            features: ["Texte arabe de droite à gauche", "Styles visuels au choix", "Import d’une personne ou d’un produit"],
+          }
+        : {
+            title: "AI YouTube Thumbnail Maker for Arabic | xfontat",
+            description: "Create a 1280×720 thumbnail from a video idea, with a clear Arabic title and a composition tied to the topic.",
+            heading: "YouTube thumbnail maker for Arabic videos",
+            features: ["Arabic right-to-left text", "Selectable visual styles", "Upload a person or product image"],
+          };
+      const body = `<p>${content.description}</p><ul>${content.features.map((feature) => `<li>${feature}</li>`).join("")}</ul>`;
+      return res.send(botHTML(content.title, content.description, canonical, content.heading, body, {
+        "@type": "WebApplication", "name": content.title, "url": canonical, "inLanguage": locale,
+        "applicationCategory": "MultimediaApplication", "operatingSystem": "Web",
+      }, undefined, {
+        lang: locale,
+        alternates: [
+          { lang: "en", href: "https://xfontat.com/en/youtube-thumbnail-maker" },
+          { lang: "fr", href: "https://xfontat.com/fr/youtube-thumbnail-maker" },
+          { lang: "ar", href: "https://xfontat.com/youtube-thumbnail-maker" },
+        ],
+      }));
+    }
     const key = page as "about" | "contact" | "privacy" | "terms";
     if (!(key in translatedPages)) return next();
     const content = translatedPages[key];
-    const isContact = "intro" in content;
-    const body = isContact
-      ? `<p>${content.description}</p><p>${content.intro}</p><p>info@xfontat.com · support@xfontat.com · suggestions@xfontat.com</p>`
-      : `<p>${content.description}</p>${content.sections.map(section => `<section><h2>${section.heading}</h2>${("paragraphs" in section ? section.paragraphs : section.body).map(paragraph => `<p>${paragraph}</p>`).join("")}</section>`).join("")}`;
-    return res.send(botHTML(content.title, content.description, canonical, isContact ? content.heading : content.title, body, {
+    const heading = "intro" in content ? content.heading : content.title;
+    const body = "intro" in content
+      ? `<p>${content.description}</p><p>${content.intro}</p><p>info@xfontat.com · support@xfontat.com · suggestions@xfontat.com</p><p>${content.form.join(" · ")}</p>`
+      : `<p>${content.description}</p>${content.sections.map(section => `<section><h2>${section.heading}</h2>${(section.paragraphs ?? section.body ?? []).map((paragraph: string) => `<p>${paragraph}</p>`).join("")}${section.items ? `<ul>${section.items.map((item: string) => `<li>${item}</li>`).join("")}</ul>` : ""}</section>`).join("")}`;
+    return res.send(botHTML(content.title, content.description, canonical, heading, body, {
       "@type": "WebPage", "name": content.title, "url": canonical, "inLanguage": locale,
     }, undefined, {
       lang: locale,
@@ -1506,6 +1536,7 @@ ${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Con
         { url: "/en", priority: "1.0", changefreq: "daily" },
         { url: "/fr", priority: "1.0", changefreq: "daily" },
         ...(["en", "fr"] as const).flatMap(locale => [
+          { url: `/${locale}/youtube-thumbnail-maker`, priority: "0.9", changefreq: "weekly" },
           { url: `/${locale}/design-fonts`, priority: "0.8", changefreq: "weekly" },
           { url: `/${locale}/blog`, priority: "0.7", changefreq: "weekly" },
           { url: `/${locale}/about`, priority: "0.5", changefreq: "monthly" },

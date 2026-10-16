@@ -57,22 +57,22 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
             </div>
 
             <div className="flex shrink-0 gap-1">
-              <Link
+              <a
                 href={englishPath}
                 hrefLang="en"
                 className="rounded-md border px-2 py-2 text-xs md:text-sm hover:bg-muted"
                 data-testid="link-language-english"
               >
                 EN
-              </Link>
-              <Link
+              </a>
+              <a
                 href={frenchPath}
                 hrefLang="fr"
                 className="rounded-md border px-2 py-2 text-xs md:text-sm hover:bg-muted"
                 data-testid="link-language-french"
               >
                 FR
-              </Link>
+              </a>
             </div>
 
             <ThemeToggle />

@@ -93,11 +93,24 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
   },
 };
 
+type LocalizedStaticSection = {
+  heading: string;
+  paragraphs?: string[];
+  body?: string[];
+  items?: string[];
+};
+
+type LocalizedStaticPage = {
+  title: string;
+  description: string;
+  sections: LocalizedStaticSection[];
+};
+
 export const localizedStaticPages: Record<SiteLocale, {
-  about: { title: string; description: string; sections: { heading: string; paragraphs: string[] }[] };
+  about: LocalizedStaticPage;
   contact: { title: string; description: string; heading: string; intro: string; form: string[] };
-  privacy: { title: string; description: string; sections: { heading: string; body: string[] }[] };
-  terms: { title: string; description: string; sections: { heading: string; body: string[] }[] };
+  privacy: LocalizedStaticPage;
+  terms: LocalizedStaticPage;
 }> = {
   en: {
     about: {
@@ -107,6 +120,10 @@ export const localizedStaticPages: Record<SiteLocale, {
         { heading: "Welcome to xfontat", paragraphs: ["xfontat is a directory for browsing and previewing Arabic fonts. File formats and usage terms vary, so review the details and license for each file.", "Our aim is to make it easier to explore Arabic typefaces and preview them with different text before downloading."] },
         { heading: "Our mission", paragraphs: ["We organize the listed font files and provide previews that help designers, developers, and writers test text before downloading.", "We aim to improve the available font information and make source, format, and license details easier to find when available."] },
         { heading: "Using the directory", paragraphs: ["The category pages describe the digital files listed in the directory; they are not a substitute for specialist historical references.", "When historical information or attribution is added, it should include a source readers can verify."] },
+        { heading: "Arabic font styles in the directory", paragraphs: ["The directory groups digital font files under these category labels. The labels are for browsing and do not establish historical origins or classifications."], items: ["Thuluth — a decorative style often used for artwork and headings; test it where details remain legible.", "Diwani — a flowing decorative style that can be tested for invitations, certificates, and headings.", "Ruqah — a compact style to test in handwriting-like uses and short headings; digital legibility depends on the font and size.", "Kufi — a category containing varied styles, including geometric forms for logos and visual work.", "Naskh — commonly encountered in reading and print; test each font and size against the actual content.", "Design fonts — visual styles to explore for advertising, posts, and design projects.", "Expressive fonts — decorative styles to test in headings, posters, and visual design.", "Photoshop fonts — files to test in design software that supports their formats; Arabic support varies by program and version.", "Nastaliq — a style associated with Persian and Urdu calligraphy and used in some literary and decorative contexts."] },
+        { heading: "Arabic typography in modern digital design", paragraphs: ["Digital publishing makes Arabic fonts available in files that can be used on compatible devices and software, alongside traditional writing and printing methods.", "Arabic digital design requires attention to text direction, connected letter shaping, and diacritics. Test fonts on the operating systems and browsers you target, and review each file’s details before use.", "For Arabic interfaces, set the correct HTML direction and test text, sizes, and spacing across devices. No single spacing value works for every font and screen."] },
+        { heading: "What xfontat offers", paragraphs: ["Features available on the website include:"], items: ["Free downloads for files marked as available; check each font’s license before use or redistribution.", "Interactive previews so you can enter text and see how it looks before downloading.", "Categories for exploring the font files listed in the directory.", "Articles about Arabic fonts and their use in design.", "An Arabic-first interface with right-to-left layout support.", "File, format, and license details when available."] },
+        { heading: "Our vision for the future", paragraphs: ["We aim for xfontat to grow beyond a font directory and serve the Arabic design community, from beginners looking for a first font to professionals and researchers studying Arabic typography.", "We are working toward integrated design tools for customizing fonts on the platform and a search experience that can suggest fonts from a project description."] },
       ],
     },
     contact: {
@@ -114,30 +131,36 @@ export const localizedStaticPages: Record<SiteLocale, {
       description: "Contact xfontat about the Arabic font directory, file information, or website issues.",
       heading: "Get in touch",
       intro: "Choose the address that best matches your question. For font usage rights, include the font name and its source page.",
-      form: ["Name", "Email address", "Subject", "Message"],
+      form: ["Send us a message", "Name", "Enter your name", "Email address", "Enter your email address", "Subject", "Message subject", "Message", "Write your message here…", "Send message", "We’ll reply as soon as possible. Thank you for contacting us!"],
     },
     privacy: {
       title: "Privacy policy",
       description: "Read how xfontat handles information when you use the website.",
       sections: [
-        { heading: "Introduction", body: ["This policy describes information that may be collected and how it may be used when you visit xfontat."] },
-        { heading: "Information and usage", body: ["Technical and usage information may include browser details, pages visited, and interactions with font files.", "We may use collected information to maintain and improve the website and understand how its features are used."] },
-        { heading: "Cookies", body: ["The site or its service providers may use cookies or similar technologies for functionality and analytics. You can manage cookies in your browser settings; disabling them may affect some features."] },
-        { heading: "Data security and sharing", body: ["Reasonable safeguards are used to protect information, but no online transmission or electronic storage method can be guaranteed completely secure.", "We do not sell personal information. Aggregated information may be used for analytics or shared where required to operate the service."] },
-        { heading: "Your choices and policy changes", body: ["You may contact us about a privacy request or question. We may update this policy and will publish the revised text on this page."] },
-        { heading: "Contact", body: ["For privacy questions, contact privacy@arabic-fonts.com."] },
+        { heading: "Introduction", body: ["Last updated: November 2025.", "We respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and protect information when you use our website."] },
+        { heading: "Information we collect", body: ["We may collect the following types of information:"], items: ["Browsing information, including IP address, browser type, and pages you visit.", "Usage information, such as the fonts you browse and download.", "Cookies used to improve the user experience."] },
+        { heading: "How we use your information", body: ["We use the information we collect for the following purposes:"], items: ["Improve our services and user experience.", "Analyze patterns in how the website is used.", "Save your preferences, such as dark or light mode.", "Provide content tailored to your interests."] },
+        { heading: "Cookies", body: ["We use cookies to improve your experience on the website. You can manage cookie preferences in your browser settings. Disabling cookies may affect some website functions."] },
+        { heading: "Data protection", body: ["We take appropriate security measures to protect information from unauthorized access, alteration, disclosure, or destruction. However, no method of online transmission or electronic storage is 100% secure."] },
+        { heading: "Information sharing", body: ["We do not sell, rent, or share personal information with third parties for marketing purposes. Aggregated and non-identifying information may be shared for analytics."] },
+        { heading: "Your rights", body: ["You have the following rights regarding your data:"], items: ["The right to access your personal data.", "The right to correct inaccurate data.", "The right to request deletion of your data.", "The right to object to processing of your data."] },
+        { heading: "Changes to this policy", body: ["We may update this privacy policy from time to time. Any changes will be posted on this page with a new last-updated date."] },
+        { heading: "Contact", body: ["For questions about this privacy policy, contact privacy@arabic-fonts.com."] },
       ],
     },
     terms: {
       title: "Terms of use",
       description: "Review the terms for using xfontat and the separate license conditions that apply to font files.",
       sections: [
-        { heading: "Acceptance", body: ["By using xfontat, you agree to these website terms. If you do not agree, do not use the website."] },
-        { heading: "Font files and licenses", body: ["Downloading a file does not grant rights beyond the license that applies to that file. Check the original license before commercial use, embedding, modification, or redistribution.", "Do not resell or redistribute font files as standalone files unless the applicable license permits it. Respect the rights of the original creators."] },
-        { heading: "Intellectual property", body: ["Font files remain subject to the rights and licenses of their respective owners. xfontat does not replace or override those terms."] },
-        { heading: "Prohibited use", body: ["Do not use the website unlawfully, attempt unauthorized access, submit harmful content, scrape the website without permission, or infringe another party’s rights."] },
-        { heading: "Disclaimer and liability", body: ["The website and files are provided as available, without a guarantee of uninterrupted service or error-free files. Use them at your own discretion and verify file details before use.", "To the extent permitted by law, xfontat is not liable for indirect or consequential loss arising from use of the website or files."] },
-        { heading: "Changes and contact", body: ["These terms may be updated by publishing a revised version on this page. For questions, contact legal@arabic-fonts.com."] },
+        { heading: "Acceptance of terms", body: ["Last updated: November 2025.", "By using xfontat, you agree to comply with these terms and conditions. If you do not agree, please do not use the website."] },
+        { heading: "Use of fonts", body: ["Fonts on this website are provided for use under the following conditions:"], items: ["You may download fonts for free; commercial use is subject to the license for each individual font.", "You may not resell fonts or distribute them as separate font files.", "You may embed fonts in your projects and products.", "Please respect the intellectual property rights of the original designers."] },
+        { heading: "Intellectual property rights", body: ["All fonts available on the website belong to their respective owners and designers. We provide these fonts as a service to the community and respect the intellectual property rights of all creators."] },
+        { heading: "Restrictions on use", body: ["You are prohibited from:"], items: ["Using the website in a way that violates local or international laws.", "Attempting unauthorized access to the website’s systems.", "Publishing harmful or abusive content through the website.", "Using automated software to collect website data without permission.", "Infringing the intellectual property rights of any party."] },
+        { heading: "Disclaimer", body: ["The fonts and services are provided “as is” without warranties of any kind. We do not guarantee that fonts will be error-free or that the website will operate without interruption. Your use of the website and fonts is at your own risk."] },
+        { heading: "Limitation of liability", body: ["We are not liable for direct, indirect, incidental, special, or consequential damages resulting from the use of, or inability to use, the website or fonts."] },
+        { heading: "Changes", body: ["We reserve the right to modify these terms at any time. Changes will be posted on this page with a new last-updated date. Continued use of the website after changes means you accept them."] },
+        { heading: "Governing law", body: ["These terms are governed by and interpreted in accordance with applicable laws, without regard to conflict-of-law provisions."] },
+        { heading: "Contact", body: ["For questions about these terms, contact legal@arabic-fonts.com."] },
       ],
     },
   },
@@ -149,6 +172,10 @@ export const localizedStaticPages: Record<SiteLocale, {
         { heading: "Bienvenue sur xfontat", paragraphs: ["xfontat est un répertoire permettant de parcourir et de prévisualiser des polices arabes. Les formats et conditions d’utilisation varient : consultez les détails et la licence de chaque fichier.", "Notre objectif est de faciliter l’exploration des polices arabes et leur prévisualisation avec différents textes avant téléchargement."] },
         { heading: "Notre mission", paragraphs: ["Nous organisons les fichiers présentés et proposons des aperçus pour aider les designers, développeurs et rédacteurs à tester leur texte avant le téléchargement.", "Nous souhaitons améliorer les informations disponibles et faciliter l’accès aux sources, formats et licences lorsqu’ils sont connus."] },
         { heading: "Utiliser le répertoire", paragraphs: ["Les pages de catégories décrivent les fichiers numériques répertoriés ; elles ne remplacent pas des références historiques spécialisées.", "Toute information historique ou attribution ajoutée devrait citer une source vérifiable par les lecteurs."] },
+        { heading: "Styles de polices arabes du répertoire", paragraphs: ["Le répertoire regroupe les fichiers sous les catégories suivantes. Ces intitulés facilitent la navigation et ne constituent pas une classification historique."], items: ["Thuluth — style décoratif souvent utilisé pour des œuvres et des titres ; testez-le à une taille où les détails restent lisibles.", "Diwani — style ornemental fluide à tester pour des invitations, certificats et titres.", "Ruqah — style compact à tester pour des usages manuscrits et des titres courts ; la lisibilité numérique dépend de la police et de sa taille.", "Kufi — catégorie qui réunit divers styles, notamment des formes géométriques pour les logos et les visuels.", "Naskh — rencontré dans la lecture et l’imprimé ; testez chaque police et taille avec le contenu réel.", "Polices de design — styles visuels à explorer pour la publicité, les publications et les projets graphiques.", "Polices expressives — styles décoratifs à tester pour les titres, affiches et créations visuelles.", "Polices pour Photoshop — fichiers à tester dans les logiciels compatibles avec leur format ; la prise en charge de l’arabe varie selon le programme et sa version.", "Nastaliq — style associé à la calligraphie persane et ourdoue, utilisé dans certains contextes littéraires et décoratifs."] },
+        { heading: "Typographie arabe dans le design numérique moderne", paragraphs: ["La publication numérique permet d’utiliser des fichiers de polices arabes sur les appareils et logiciels compatibles, en complément des moyens traditionnels d’écriture et d’impression.", "Le design numérique arabe demande de prêter attention au sens d’écriture, à la liaison des lettres et aux signes diacritiques. Testez les polices sur les systèmes et navigateurs visés, et consultez les détails de chaque fichier avant usage.", "Pour une interface arabe, définissez le bon sens d’écriture HTML et testez le texte, les tailles et l’espacement sur différents appareils. Aucune valeur d’espacement ne convient à toutes les polices et à tous les écrans."] },
+        { heading: "Ce que propose xfontat", paragraphs: ["Le site propose notamment :"], items: ["Téléchargement gratuit des fichiers indiqués comme disponibles ; vérifiez la licence de chaque police avant usage ou redistribution.", "Aperçus interactifs pour saisir votre texte et voir le rendu avant le téléchargement.", "Catégories pour explorer les fichiers répertoriés.", "Articles sur les polices arabes et leur utilisation en design.", "Une interface pensée pour l’arabe avec prise en charge du sens droite-gauche.", "Informations sur les fichiers, formats et licences lorsqu’elles sont disponibles."] },
+        { heading: "Notre vision pour l’avenir", paragraphs: ["Nous souhaitons que xfontat dépasse le cadre d’un répertoire et accompagne la communauté du design arabe : des débutants aux professionnels et aux chercheurs en typographie arabe.", "Nous travaillons à des outils de design intégrés pour personnaliser les polices sur la plateforme, ainsi qu’à une recherche capable de suggérer des polices à partir de la description d’un projet."] },
       ],
     },
     contact: {
@@ -156,30 +183,36 @@ export const localizedStaticPages: Record<SiteLocale, {
       description: "Contactez xfontat au sujet du répertoire de polices arabes, des informations sur les fichiers ou d’un problème du site.",
       heading: "Nous contacter",
       intro: "Choisissez l’adresse correspondant à votre demande. Pour une question de droits d’utilisation, indiquez le nom de la police et sa page source.",
-      form: ["Nom", "Adresse e-mail", "Objet", "Message"],
+      form: ["Envoyez-nous un message", "Nom", "Saisissez votre nom", "Adresse e-mail", "Saisissez votre adresse e-mail", "Objet", "Objet du message", "Message", "Rédigez votre message ici…", "Envoyer le message", "Nous vous répondrons dès que possible. Merci de nous avoir contactés !"],
     },
     privacy: {
       title: "Politique de confidentialité",
       description: "Découvrez comment xfontat traite les informations lors de l’utilisation du site.",
       sections: [
-        { heading: "Introduction", body: ["Cette politique décrit les informations susceptibles d’être collectées et leur utilisation lorsque vous consultez xfontat."] },
-        { heading: "Informations et utilisation", body: ["Les informations techniques et d’utilisation peuvent inclure le navigateur, les pages consultées et les interactions avec les fichiers de polices.", "Ces informations peuvent servir à maintenir et améliorer le site et à comprendre l’utilisation de ses fonctionnalités."] },
-        { heading: "Cookies", body: ["Le site ou ses prestataires peuvent utiliser des cookies ou technologies similaires pour le fonctionnement et l’analyse. Vous pouvez gérer les cookies dans les paramètres de votre navigateur ; leur désactivation peut affecter certaines fonctions."] },
-        { heading: "Sécurité et partage", body: ["Des mesures raisonnables protègent les informations, mais aucune transmission en ligne ni méthode de stockage électronique ne peut être garantie totalement sécurisée.", "Nous ne vendons pas de données personnelles. Des données agrégées peuvent être utilisées à des fins d’analyse ou partagées si nécessaire au service."] },
-        { heading: "Vos choix et mises à jour", body: ["Vous pouvez nous contacter pour une demande ou question relative à la confidentialité. La politique peut être mise à jour ; la nouvelle version sera publiée sur cette page."] },
-        { heading: "Contact", body: ["Pour toute question sur la confidentialité, écrivez à privacy@arabic-fonts.com."] },
+        { heading: "Introduction", body: ["Dernière mise à jour : novembre 2025.", "Nous respectons votre vie privée et nous engageons à protéger vos données personnelles. Cette politique explique comment nous recueillons, utilisons et protégeons les informations lorsque vous utilisez notre site."] },
+        { heading: "Informations recueillies", body: ["Nous pouvons recueillir les types d’informations suivants :"], items: ["Informations de navigation, notamment l’adresse IP, le type de navigateur et les pages consultées.", "Informations d’utilisation, telles que les polices consultées et téléchargées.", "Cookies utilisés pour améliorer l’expérience utilisateur."] },
+        { heading: "Utilisation de vos informations", body: ["Nous utilisons les informations recueillies aux fins suivantes :"], items: ["Améliorer nos services et l’expérience utilisateur.", "Analyser les habitudes d’utilisation du site.", "Enregistrer vos préférences, par exemple le mode sombre ou clair.", "Proposer du contenu adapté à vos centres d’intérêt."] },
+        { heading: "Cookies", body: ["Nous utilisons des cookies pour améliorer votre expérience sur le site. Vous pouvez gérer vos préférences dans les paramètres de votre navigateur. Leur désactivation peut affecter certaines fonctions."] },
+        { heading: "Protection des données", body: ["Nous prenons des mesures de sécurité appropriées contre l’accès, la modification, la divulgation ou la destruction non autorisés des informations. Toutefois, aucune transmission en ligne ni méthode de stockage électronique n’est sécurisée à 100 %."] },
+        { heading: "Partage des informations", body: ["Nous ne vendons, ne louons ni ne partageons de données personnelles avec des tiers à des fins marketing. Des informations agrégées et non identifiantes peuvent être partagées à des fins d’analyse."] },
+        { heading: "Vos droits", body: ["Vous disposez des droits suivants concernant vos données :"], items: ["Le droit d’accéder à vos données personnelles.", "Le droit de rectifier des données inexactes.", "Le droit de demander la suppression de vos données.", "Le droit de vous opposer au traitement de vos données."] },
+        { heading: "Modifications de cette politique", body: ["Nous pouvons mettre à jour cette politique de confidentialité. Toute modification sera publiée sur cette page avec une nouvelle date de mise à jour."] },
+        { heading: "Contact", body: ["Pour toute question sur cette politique, contactez privacy@arabic-fonts.com."] },
       ],
     },
     terms: {
       title: "Conditions d’utilisation",
       description: "Consultez les conditions d’utilisation de xfontat et les licences propres à chaque fichier de police.",
       sections: [
-        { heading: "Acceptation", body: ["En utilisant xfontat, vous acceptez ces conditions. Si vous ne les acceptez pas, n’utilisez pas le site."] },
-        { heading: "Fichiers de polices et licences", body: ["Le téléchargement ne confère aucun droit au-delà de la licence applicable au fichier. Vérifiez la licence originale avant tout usage commercial, intégration, modification ou redistribution.", "Ne revendez pas et ne redistribuez pas des fichiers de polices séparément, sauf autorisation de la licence applicable. Respectez les droits des créateurs d’origine."] },
-        { heading: "Propriété intellectuelle", body: ["Les fichiers restent soumis aux droits et licences de leurs propriétaires respectifs. xfontat ne remplace ni ne modifie ces conditions."] },
-        { heading: "Usages interdits", body: ["N’utilisez pas le site de manière illégale, ne tentez pas d’accéder sans autorisation à ses systèmes, ne publiez pas de contenu nuisible, ne collectez pas automatiquement des données sans permission et ne portez pas atteinte aux droits d’autrui."] },
-        { heading: "Limitation et responsabilité", body: ["Le site et les fichiers sont fournis selon leur disponibilité, sans garantie de service continu ni de fichiers sans erreur. Vérifiez les détails avant utilisation.", "Dans la mesure permise par la loi, xfontat ne répond pas des pertes indirectes ou consécutives liées à l’utilisation du site ou des fichiers."] },
-        { heading: "Modifications et contact", body: ["Ces conditions peuvent être modifiées par publication d’une nouvelle version sur cette page. Pour toute question, écrivez à legal@arabic-fonts.com."] },
+        { heading: "Acceptation des conditions", body: ["Dernière mise à jour : novembre 2025.", "En utilisant xfontat, vous acceptez de respecter ces conditions. Si vous ne les acceptez pas, veuillez ne pas utiliser le site."] },
+        { heading: "Utilisation des polices", body: ["Les polices du site sont mises à disposition selon les conditions suivantes :"], items: ["Vous pouvez télécharger les polices gratuitement ; l’usage commercial dépend de la licence de chaque police.", "Vous ne pouvez pas revendre les polices ni les distribuer comme fichiers de police séparés.", "Vous pouvez intégrer les polices à vos projets et produits.", "Veuillez respecter les droits de propriété intellectuelle des créateurs d’origine."] },
+        { heading: "Droits de propriété intellectuelle", body: ["Toutes les polices disponibles sur le site appartiennent à leurs propriétaires et créateurs respectifs. Nous les proposons au service de la communauté et respectons les droits de tous les créateurs."] },
+        { heading: "Restrictions d’utilisation", body: ["Il vous est interdit de :"], items: ["Utiliser le site d’une manière contraire aux lois locales ou internationales.", "Tenter d’accéder sans autorisation aux systèmes du site.", "Publier du contenu nuisible ou abusif sur le site.", "Utiliser des outils automatisés pour collecter des données du site sans autorisation.", "Porter atteinte aux droits de propriété intellectuelle d’un tiers."] },
+        { heading: "Exclusion de garantie", body: ["Les polices et services sont fournis « en l’état », sans garantie d’aucune sorte. Nous ne garantissons ni l’absence d’erreurs dans les polices ni le fonctionnement continu du site. Vous utilisez le site et les polices à vos propres risques."] },
+        { heading: "Limitation de responsabilité", body: ["Nous ne sommes pas responsables des dommages directs, indirects, accessoires, spéciaux ou consécutifs résultant de l’utilisation du site ou des polices, ou de l’impossibilité de les utiliser."] },
+        { heading: "Modifications", body: ["Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications seront publiées sur cette page avec une nouvelle date de mise à jour. En continuant à utiliser le site, vous acceptez les modifications."] },
+        { heading: "Droit applicable", body: ["Ces conditions sont régies et interprétées conformément aux lois applicables, sans égard aux règles de conflit de lois."] },
+        { heading: "Contact", body: ["Pour toute question sur ces conditions, contactez legal@arabic-fonts.com."] },
       ],
     },
   },

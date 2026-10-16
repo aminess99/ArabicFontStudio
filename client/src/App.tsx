@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import FontCollection from "@/pages/FontCollection";
 import EnglishDirectory from "@/pages/EnglishDirectory";
-import LocalizedContentPage from "@/pages/LocalizedContentPage";
+const LocalizedContentPage = lazy(() => import("@/pages/LocalizedContentPage"));
 import {
   PurpleLogoPreview,
   YouTubeThumbnailPreview,
@@ -62,6 +62,7 @@ function Router() {
   return (
     <>
       <ScrollToTop />
+      <Suspense fallback={<div className="min-h-screen bg-background" aria-label="Loading page" />}>
       <Switch>
         <Route path="/en" component={EnglishDirectory} />
         <Route path="/en/fonts/:category" component={EnglishDirectory} />
@@ -85,6 +86,8 @@ function Router() {
         <Route path="/fr/privacy" component={LocalizedContentPage} />
         <Route path="/en/terms" component={LocalizedContentPage} />
         <Route path="/fr/terms" component={LocalizedContentPage} />
+        <Route path="/en/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
+        <Route path="/fr/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
         <Route path="/" component={Home} />
         <Route path="/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
         <Route path="/design-fonts" component={DesignFonts} />
@@ -99,6 +102,7 @@ function Router() {
         <Route path="/terms" component={Terms} />
         <Route component={NotFound} />
       </Switch>
+      </Suspense>
     </>
   );
 }

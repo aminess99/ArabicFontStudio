@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
@@ -6,7 +6,9 @@ import { getCollectionBySlug } from "@/lib/collectionsData";
 import { localizedCollections, localizedStaticPages } from "@/lib/localizedPagesContent";
 import { englishCategories, frenchCategories } from "@/lib/internationalContent";
 import { blogPosts } from "@/lib/blogData";
-import { localizedBlogPosts } from "@/lib/blogTranslations";
+import { fullBlogTranslations, localizedBlogPosts } from "@/lib/blogTranslations";
+import { renderMarkdownToHtml } from "@shared/markdown";
+import { generateFontFamily, loadFont } from "@/lib/fontLoader";
 import type { Font } from "@shared/schema";
 
 function categoryLabel(locale: "en" | "fr", arabicCategory: string) {
@@ -86,7 +88,12 @@ export default function LocalizedContentPage() {
   const blogSlug = rawPath.match(/^\/blog\/([^/]+)$/)?.[1];
   const isBlogIndex = rawPath === "/blog";
   const blogPost = blogSlug ? blogPosts.find((post) => post.slug === blogSlug) : undefined;
-  const localizedBlogPost = blogSlug ? localizedBlogPosts[locale][blogSlug] : undefined;
+  const summaryBlogPost = blogSlug ? localizedBlogPosts[locale][blogSlug] : undefined;
+  const fullTranslation = blogSlug ? fullBlogTranslations[blogSlug]?.[locale] : undefined;
+  const localizedBlogPost = fullTranslation
+    ? { ...fullTranslation, summary: fullTranslation.excerpt }
+    : summaryBlogPost;
+  const localizedBlogContent = fullTranslation?.content || summaryBlogPost?.summary || "";
   const isDesign = rawPath === "/design-fonts";
   const staticPageKey = rawPath.slice(1) as "about" | "contact" | "privacy" | "terms";
   const staticPage = ["about", "contact", "privacy", "terms"].includes(staticPageKey)
@@ -106,6 +113,10 @@ export default function LocalizedContentPage() {
     queryKey: [`/api/fonts?categories=${categoriesParam}`],
     enabled: Boolean(categoriesParam),
   });
+
+  useEffect(() => {
+    if (font) loadFont(generateFontFamily(font.name), font.fileUrl);
+  }, [font]);
 
   const canonicalPath = routeLanguagePath(rawPath, locale);
   const arabicPath = rawPath;
@@ -151,6 +162,7 @@ export default function LocalizedContentPage() {
   };
 
   const pageTitle = staticPage?.title;
+  const contactForm = staticPage && "form" in staticPage ? staticPage.form : [];
   const notFound = !fontSlug && !collectionSlug && !staticPage && !isDesign && !isBlogIndex && !(blogPost && localizedBlogPost);
 
   return (
@@ -184,7 +196,14 @@ export default function LocalizedContentPage() {
                 {currentLabel ? "Texte de prévisualisation" : "Preview text"}
                 <input className="rounded-md border bg-background px-3 py-2" value={previewText} onChange={(event) => setPreviewText(event.target.value)} dir="auto" />
               </label>
-              <p className="my-8 rounded-lg bg-muted/40 p-6 text-4xl leading-relaxed" lang="ar" dir="rtl">{previewText}</p>
+              <p
+                className="my-8 rounded-lg bg-muted/40 p-6 text-4xl leading-relaxed"
+                lang="ar"
+                dir="rtl"
+                style={{ fontFamily: generateFontFamily(font.name) }}
+              >
+                {previewText}
+              </p>
               <dl className="grid gap-4 rounded-lg border p-5 sm:grid-cols-2">
                 <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Catégorie" : "Category"}</dt><dd>{categoryLabel(locale, font.category)}</dd></div>
                 <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Format" : "Format"}</dt><dd>{font.fileFormat || "—"}</dd></div>
@@ -224,7 +243,7 @@ export default function LocalizedContentPage() {
             </p>
             <div className="mt-7 space-y-4">
               {blogPosts.map((post) => {
-                const translation = localizedBlogPosts[locale][post.slug];
+                const translation = fullBlogTranslations[post.slug]?.[locale] || localizedBlogPosts[locale][post.slug];
                 if (!translation) return null;
                 return (
                   <article key={post.slug} className="rounded-lg border p-5">
@@ -232,7 +251,10 @@ export default function LocalizedContentPage() {
                       <Link className="hover:underline" href={`/${locale}/blog/${post.slug}`}>{translation.title}</Link>
                     </h2>
                     <p className="mt-2 leading-7 text-muted-foreground">{translation.excerpt}</p>
-                    <p className="mt-3 text-xs text-muted-foreground">{post.date} · {post.readTime} {currentLabel ? "min de lecture" : "min read"}</p>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      {new Intl.DateTimeFormat(locale, { year: "numeric", month: "long", day: "numeric" }).format(new Date(post.dateISO))}
+                      {" · "}{post.readTime} {currentLabel ? "min de lecture" : "min read"}
+                    </p>
                   </article>
                 );
               })}
@@ -242,20 +264,15 @@ export default function LocalizedContentPage() {
           <article>
             <h1 className="text-3xl font-bold">{localizedBlogPost.title}</h1>
             <p className="mt-3 text-lg text-muted-foreground">{localizedBlogPost.excerpt}</p>
-            <section className="mt-7 rounded-lg border p-5">
-              <h2 className="font-semibold">{currentLabel ? "En bref" : "In brief"}</h2>
-              <p className="mt-2 leading-7">{localizedBlogPost.summary}</p>
-            </section>
-            <aside className="mt-7 rounded-lg bg-muted/40 p-5">
-              <p className="leading-7">
-                {currentLabel
-                  ? "Cet article complet est actuellement disponible en arabe. La synthèse ci-dessus est en français."
-                  : "The full article is currently available in Arabic. The summary above is in English."}
-              </p>
-              <Link className="mt-3 inline-block underline underline-offset-4" href={`/blog/${blogPost.slug}`} hrefLang="ar">
-                {currentLabel ? "Lire l’article original en arabe" : "Read the original Arabic article"}
-              </Link>
-            </aside>
+            <div
+              className="prose prose-neutral mt-8 max-w-none dark:prose-invert"
+              dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(
+                localizedBlogContent
+              ) }}
+            />
+            <Link className="mt-8 inline-block underline underline-offset-4" href={`/blog/${blogPost.slug}`} hrefLang="ar">
+              {currentLabel ? "Consulter la version arabe" : "View the Arabic version"}
+            </Link>
           </article>
         ) : staticPage ? (
           <article>
@@ -273,13 +290,41 @@ export default function LocalizedContentPage() {
                     </a>
                   ))}
                 </div>
+                <div className="mt-8 rounded-lg border bg-muted/30 p-6">
+                  <h2 className="text-xl font-semibold">{contactForm[0]}</h2>
+                  <div className="mt-5 space-y-4">
+                    <div>
+                      <label htmlFor="localized-contact-name" className="mb-2 block text-sm font-medium">{contactForm[1]}</label>
+                      <input id="localized-contact-name" type="text" placeholder={contactForm[2]} className="w-full rounded-lg border bg-background px-4 py-2" />
+                    </div>
+                    <div>
+                      <label htmlFor="localized-contact-email" className="mb-2 block text-sm font-medium">{contactForm[3]}</label>
+                      <input id="localized-contact-email" type="email" placeholder={contactForm[4]} className="w-full rounded-lg border bg-background px-4 py-2" />
+                    </div>
+                    <div>
+                      <label htmlFor="localized-contact-subject" className="mb-2 block text-sm font-medium">{contactForm[5]}</label>
+                      <input id="localized-contact-subject" type="text" placeholder={contactForm[6]} className="w-full rounded-lg border bg-background px-4 py-2" />
+                    </div>
+                    <div>
+                      <label htmlFor="localized-contact-message" className="mb-2 block text-sm font-medium">{contactForm[7]}</label>
+                      <textarea id="localized-contact-message" placeholder={contactForm[8]} className="min-h-36 w-full rounded-lg border bg-background px-4 py-2" />
+                    </div>
+                    <button type="button" className="w-full rounded-md bg-primary px-4 py-3 font-semibold text-primary-foreground">{contactForm[9]}</button>
+                    <p className="text-center text-sm text-muted-foreground">{contactForm[10]}</p>
+                  </div>
+                </div>
               </>
             ) : staticPage.sections?.map((section) => (
               <section className="mt-8" key={section.heading}>
                 <h2 className="text-xl font-semibold">{section.heading}</h2>
-                {("paragraphs" in section ? section.paragraphs : section.body).map((paragraph) => (
+                {(section.paragraphs ?? section.body ?? []).map((paragraph) => (
                   <p key={paragraph} className="mt-3 leading-7 text-muted-foreground">{paragraph}</p>
                 ))}
+                {section.items && (
+                  <ul className="mt-3 list-disc space-y-2 pl-6 text-muted-foreground">
+                    {section.items.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                )}
               </section>
             ))}
           </article>

@@ -1,4 +1,6 @@
 import type { SiteLocale } from "./localizedPagesContent";
+import generatedTranslations from "./blogPostTranslations.json";
+
 
 export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: string; excerpt: string; summary: string }>> = {
   en: {
@@ -166,3 +168,14 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
     },
   },
 };
+
+export interface FullBlogTranslation {
+  title: string;
+  excerpt: string;
+  content: string;
+}
+
+export const fullBlogTranslations = generatedTranslations as Record<
+  string,
+  Record<SiteLocale, FullBlogTranslation>
+>;
