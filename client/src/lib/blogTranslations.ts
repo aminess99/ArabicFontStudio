@@ -30,13 +30,13 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
       summary: "A font’s download availability is not the same as permission for every use. Read the original license, follow its restrictions, and credit or contact the creator where the terms require it.",
     },
     "afdal-10-khotot-arabiya-lil-tasmeem": {
-      title: "Arabic fonts for design: how to compare options",
-      excerpt: "A method for comparing font files for different design tasks without assuming one font is best for every project.",
+      title: "10 Arabic font files in the xfontat library to compare for design",
+      excerpt: "Compare available font files with your project and check each file’s format, source, and license.",
       summary: "There is no single font that fits every design. Compare candidate files with the project’s actual wording, size, medium, and language requirements, then review their licenses.",
     },
     "khotot-arabiya-lil-photoshop-majanan": {
-      title: "Using Arabic fonts in Photoshop: what to check",
-      excerpt: "Check file format, Arabic support, shaping, and compatibility with the software version you use.",
+      title: "Arabic fonts in Photoshop: compatibility and installation",
+      excerpt: "Test Arabic shaping, direction, file format, and compatibility with your Photoshop version.",
       summary: "Compatibility depends on the font file, operating system, and Photoshop version. Install a supported format, test connected Arabic text and direction, and verify the file’s license.",
     },
     "khotot-arabiya-lil-shiaarat-wal-logos": {
@@ -70,8 +70,8 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
       summary: "Preview the names, dates, and venue information at their final sizes. Decorative forms should not make essential details difficult to read; check print requirements and license terms.",
     },
     "khotot-arabiya-lil-alamat-al-tijariya": {
-      title: "Arabic fonts for brand identity projects",
-      excerpt: "Evaluate how the chosen font renders a brand name across sizes and use cases.",
+      title: "Choosing Arabic fonts for brand identity",
+      excerpt: "Evaluate how a font renders a brand name and check its license for the intended use.",
       summary: "Test the brand name in the intended identity applications, including small formats. Confirm the font’s license covers the planned commercial use.",
     },
     "khotot-arabiya-lil-wosham": {
@@ -112,13 +112,13 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
       summary: "La disponibilité au téléchargement n’autorise pas tous les usages. Lisez la licence originale, respectez ses conditions et créditez ou contactez le créateur si elles le demandent.",
     },
     "afdal-10-khotot-arabiya-lil-tasmeem": {
-      title: "Polices arabes pour le design : comparer les options",
-      excerpt: "Une méthode pour comparer des fichiers selon le projet sans supposer qu’une police convient à tout.",
+      title: "10 fichiers de polices arabes à comparer dans xfontat",
+      excerpt: "Comparez les fichiers disponibles à votre projet et vérifiez leur format, leur source et leur licence.",
       summary: "Aucune police ne convient à tous les projets. Comparez les fichiers avec le texte, la taille, le support et les besoins linguistiques réels, puis vérifiez leur licence.",
     },
     "khotot-arabiya-lil-photoshop-majanan": {
-      title: "Utiliser des polices arabes dans Photoshop : points à vérifier",
-      excerpt: "Vérifiez le format, la prise en charge de l’arabe et la compatibilité avec votre version du logiciel.",
+      title: "Polices arabes dans Photoshop : compatibilité et installation",
+      excerpt: "Testez le façonnage arabe, le sens d’écriture, le format et la compatibilité avec votre version de Photoshop.",
       summary: "La compatibilité dépend du fichier, du système et de la version de Photoshop. Installez un format pris en charge, testez les lettres arabes liées et le sens du texte, puis vérifiez la licence.",
     },
     "khotot-arabiya-lil-shiaarat-wal-logos": {
@@ -152,8 +152,8 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
       summary: "Prévisualisez noms, dates et lieu aux tailles finales. Les formes décoratives ne doivent pas rendre les informations difficiles à lire ; vérifiez les exigences d’impression et la licence.",
     },
     "khotot-arabiya-lil-alamat-al-tijariya": {
-      title: "Polices arabes pour l’identité de marque",
-      excerpt: "Évaluez le rendu du nom de marque à plusieurs tailles et dans ses usages prévus.",
+      title: "Choisir une police arabe pour une identité de marque",
+      excerpt: "Évaluez le rendu du nom de marque et vérifiez la licence pour l’usage prévu.",
       summary: "Testez le nom de marque dans les applications prévues, y compris aux petits formats. Vérifiez que la licence couvre l’usage commercial envisagé.",
     },
     "khotot-arabiya-lil-wosham": {
