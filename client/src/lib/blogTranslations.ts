@@ -75,9 +75,9 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
       summary: "Test the brand name in the intended identity applications, including small formats. Confirm the font’s license covers the planned commercial use.",
     },
     "khotot-arabiya-lil-wosham": {
-      title: "Arabic lettering for tattoo design: checks before use",
-      excerpt: "Verify the exact text, letter connections, and source before using Arabic lettering in a permanent design.",
-      summary: "Arabic lettering can change with context and connections. Verify the wording with a knowledgeable reader, inspect the exact rendered forms, and confirm permission for the font file.",
+      title: "Arabic lettering for tattoo design: reviewing text and licensing",
+      excerpt: "A linguistic and visual checklist for reviewing Arabic wording, letter connections, and font rights before use in a permanent design.",
+      summary: "Verify meaning, spelling, connected letters, and licensing in the final design. A font preview does not establish suitability for execution; this guide provides neither medical advice nor a religious ruling.",
     },
     "khotot-arabiya-lil-mawaqi-wal-tatbeeqat": {
       title: "Choosing an Arabic font for websites and apps",
@@ -157,9 +157,9 @@ export const localizedBlogPosts: Record<SiteLocale, Record<string, { title: stri
       summary: "Testez le nom de marque dans les applications prévues, y compris aux petits formats. Vérifiez que la licence couvre l’usage commercial envisagé.",
     },
     "khotot-arabiya-lil-wosham": {
-      title: "Lettrage arabe pour tatouage : vérifications avant usage",
-      excerpt: "Vérifiez le texte exact, les liaisons des lettres et la source avant un dessin permanent.",
-      summary: "Les formes arabes varient selon le contexte et les liaisons. Faites vérifier le texte par une personne compétente, examinez le rendu exact et confirmez les droits du fichier.",
+      title: "Lettrage arabe pour tatouage : vérifier le texte et la licence",
+      excerpt: "Une liste de vérification linguistique et visuelle pour contrôler le texte arabe, les liaisons des lettres et les droits de la police avant un dessin permanent.",
+      summary: "Vérifiez le sens, l’orthographe, les liaisons et la licence dans le dessin final. Un aperçu ne prouve pas qu’il convient à la réalisation ; ce guide ne fournit ni conseil médical ni avis religieux.",
     },
     "khotot-arabiya-lil-mawaqi-wal-tatbeeqat": {
       title: "Choisir une police arabe pour un site web ou une application",

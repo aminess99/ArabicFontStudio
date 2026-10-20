@@ -3,6 +3,7 @@ import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
+import { generateSlug } from "@/lib/slugify";
 import {
   englishCategories,
   englishHome,
@@ -24,10 +25,12 @@ function FontFileRow({
   font,
   previewText,
   copy,
+  locale,
 }: {
   font: Font;
   previewText: string;
   copy: typeof englishHome;
+  locale: "en" | "fr";
 }) {
   const [fontLoaded, setFontLoaded] = useState(false);
   const fontFamily = generateFontFamily(font.name);
@@ -53,12 +56,25 @@ function FontFileRow({
     <article className="border-b py-5" data-testid={`international-font-${font.id}`}>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="font-semibold break-words">{font.name || font.nameArabic}</h2>
+          <h2 className="font-semibold break-words">
+            <Link
+              href={`/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`}
+              className="hover:underline underline-offset-4"
+            >
+              {font.name || font.nameArabic}
+            </Link>
+          </h2>
           {font.nameArabic && (
             <p className="text-sm text-muted-foreground mt-1" lang="ar" dir="rtl">
               {font.nameArabic}
             </p>
           )}
+          <Link
+            href={`/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`}
+            className="mt-2 inline-block text-sm text-primary underline underline-offset-4"
+          >
+            {locale === "fr" ? "Voir la fiche de la police" : "View font details"}
+          </Link>
           <p
             className="break-words leading-relaxed mt-3"
             style={{
@@ -297,7 +313,7 @@ export default function EnglishDirectory() {
                 {isFrench ? "Résultats" : "Showing"} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} {isFrench ? "sur" : "of"} {total} {homeCopy.results}
               </p>
               {fonts.map((font) => (
-                <FontFileRow key={font.id} font={font} previewText={previewText} copy={homeCopy} />
+                <FontFileRow key={font.id} font={font} previewText={previewText} copy={homeCopy} locale={locale} />
               ))}
               {totalPages > 1 && (
                 <nav className="flex items-center justify-center gap-4 py-7" aria-label="Pagination">
