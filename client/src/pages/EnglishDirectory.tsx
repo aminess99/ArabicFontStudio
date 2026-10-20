@@ -51,6 +51,7 @@ function FontFileRow({
 
   const license = font.licenseNotice || font.license;
   const format = font.fileFormat || font.fileName.split(".").pop()?.toUpperCase();
+  const detailsPath = `/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`;
 
   return (
     <article className="border-b py-5" data-testid={`international-font-${font.id}`}>
@@ -58,7 +59,7 @@ function FontFileRow({
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold break-words">
             <Link
-              href={`/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`}
+              href={detailsPath}
               className="hover:underline underline-offset-4"
             >
               {font.name || font.nameArabic}
@@ -70,7 +71,7 @@ function FontFileRow({
             </p>
           )}
           <Link
-            href={`/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`}
+            href={detailsPath}
             className="mt-2 inline-block text-sm text-primary underline underline-offset-4"
           >
             {locale === "fr" ? "Voir la fiche de la police" : "View font details"}
@@ -103,14 +104,13 @@ function FontFileRow({
             )}
           </div>
         </div>
-        <a
-          href={font.fileUrl}
-          download={font.fileName}
+        <Link
+          href={detailsPath}
           className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
           data-testid={`international-download-${font.id}`}
         >
           {copy.download}
-        </a>
+        </Link>
       </div>
     </article>
   );

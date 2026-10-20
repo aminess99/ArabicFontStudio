@@ -4,11 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { getCollectionBySlug } from "@/lib/collectionsData";
 import { localizedCollections, localizedStaticPages } from "@/lib/localizedPagesContent";
-import { englishCategories, frenchCategories } from "@/lib/internationalContent";
+import { englishCategories, frenchCategories, englishHome, frenchHome } from "@/lib/internationalContent";
 import { blogPosts } from "@/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "@/lib/blogTranslations";
 import { renderMarkdownToHtml } from "@shared/markdown";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
+import { generateSlug } from "@/lib/slugify";
 import type { Font } from "@shared/schema";
 
 function categoryLabel(locale: "en" | "fr", arabicCategory: string) {
@@ -61,10 +62,13 @@ function LocalizedFooter({ locale }: { locale: "en" | "fr" }) {
 
 function FontFileLink({ font, locale }: { font: Font; locale: "en" | "fr" }) {
   const label = locale === "fr";
+  const detailsPath = `/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`;
   return (
     <article className="flex flex-wrap items-center justify-between gap-4 border-b py-4">
       <div>
-        <h2 className="font-semibold">{font.name}</h2>
+        <h2 className="font-semibold">
+          <Link href={detailsPath} className="hover:underline underline-offset-4">{font.name}</Link>
+        </h2>
         <p className="text-sm text-muted-foreground" lang="ar" dir="rtl">{font.nameArabic}</p>
         <p className="mt-1 text-xs text-muted-foreground">
           {label ? "Format" : "Format"}: {font.fileFormat || "—"}
@@ -72,9 +76,13 @@ function FontFileLink({ font, locale }: { font: Font; locale: "en" | "fr" }) {
           {label ? "Licence" : "License"}: {font.license || font.licenseNotice || (label ? "à vérifier à la source" : "check the source")}
         </p>
       </div>
-      <a className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" href={font.fileUrl} download={font.fileName}>
-        {label ? "Télécharger" : "Download"}
-      </a>
+      <Link
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        href={detailsPath}
+        data-testid={`international-collection-download-${font.id}`}
+      >
+        {label ? frenchHome.download : englishHome.download}
+      </Link>
     </article>
   );
 }
