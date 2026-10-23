@@ -4,18 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { getCollectionBySlug } from "@/lib/collectionsData";
 import { localizedCollections, localizedStaticPages } from "@/lib/localizedPagesContent";
-import { englishCategories, frenchCategories, englishHome, frenchHome } from "@/lib/internationalContent";
+import { englishHome, frenchHome } from "@/lib/internationalContent";
 import { blogPosts } from "@/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "@/lib/blogTranslations";
 import { renderMarkdownToHtml } from "@shared/markdown";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
+import {
+  fontCharacterMap,
+  getLocalizedFontPageContent,
+  localizedFontDetailCopy,
+} from "@/lib/localizedFontDetails";
 import type { Font } from "@shared/schema";
-
-function categoryLabel(locale: "en" | "fr", arabicCategory: string) {
-  const categories = locale === "fr" ? frenchCategories : englishCategories;
-  return categories.find((category) => category.arabicCategory === arabicCategory)?.name || arabicCategory;
-}
 
 function routeLanguagePath(path: string, locale: "en" | "fr") {
   return `/${locale}${path === "/" ? "" : path}`;
@@ -121,6 +121,10 @@ export default function LocalizedContentPage() {
     queryKey: [`/api/fonts?categories=${categoriesParam}`],
     enabled: Boolean(categoriesParam),
   });
+  const { data: sameCategoryFonts = [] } = useQuery<Font[]>({
+    queryKey: [`/api/fonts?category=${encodeURIComponent(font?.category || "")}`],
+    enabled: Boolean(font?.category),
+  });
 
   useEffect(() => {
     if (font) loadFont(generateFontFamily(font.name), font.fileUrl);
@@ -129,6 +133,8 @@ export default function LocalizedContentPage() {
   const canonicalPath = routeLanguagePath(rawPath, locale);
   const arabicPath = rawPath;
   const currentLabel = locale === "fr";
+  const fontLabels = localizedFontDetailCopy[locale];
+  const localizedFont = font ? getLocalizedFontPageContent(font, locale) : undefined;
   const alternates = [
     { lang: "en", href: `https://xfontat.com${routeLanguagePath(rawPath, "en")}` },
     { lang: "fr", href: `https://xfontat.com${routeLanguagePath(rawPath, "fr")}` },
@@ -137,11 +143,9 @@ export default function LocalizedContentPage() {
 
   let title = staticPage?.title || (currentLabel ? "xfontat" : "xfontat");
   let description = staticPage?.description || "";
-  if (font) {
-    title = `${font.name} — ${currentLabel ? "police arabe" : "Arabic font"} | xfontat`;
-    description = currentLabel
-      ? `Prévisualisez ${font.name}, consultez son format et sa licence, puis téléchargez le fichier.`
-      : `Preview ${font.name}, review its format and license, and download the file.`;
+  if (font && localizedFont) {
+    title = localizedFont.title;
+    description = localizedFont.description;
   } else if (translatedCollection) {
     title = `${translatedCollection.title} | xfontat`;
     description = translatedCollection.description;
@@ -160,14 +164,55 @@ export default function LocalizedContentPage() {
     description = localizedBlogPost.excerpt;
   }
 
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": font ? "CreativeWork" : "WebPage",
-    name: title,
-    description,
-    url: `https://xfontat.com${canonicalPath}`,
-    inLanguage: locale,
-  };
+  const schema = font && localizedFont
+    ? {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "CreativeWork",
+            name: font.name,
+            alternateName: font.nameArabic,
+            description,
+            url: `https://xfontat.com${canonicalPath}`,
+            inLanguage: locale,
+            genre: localizedFont.categoryName,
+            encodingFormat: font.fileFormat || undefined,
+            isBasedOn: font.sourceUrl || undefined,
+            contentUrl: `https://xfontat.com${font.fileUrl}`,
+          },
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: currentLabel ? "Accueil" : "Home",
+                item: `https://xfontat.com/${locale}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: localizedFont.categoryName,
+                item: `https://xfontat.com/${locale}/fonts/${localizedFont.category?.slug || "kufi"}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: font.name,
+                item: `https://xfontat.com${canonicalPath}`,
+              },
+            ],
+          },
+        ],
+      }
+    : {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: title,
+        description,
+        url: `https://xfontat.com${canonicalPath}`,
+        inLanguage: locale,
+      };
 
   const pageTitle = staticPage?.title;
   const contactForm = staticPage && "form" in staticPage ? staticPage.form : [];
@@ -191,37 +236,206 @@ export default function LocalizedContentPage() {
             <section><h1 className="text-3xl font-bold">{currentLabel ? "Police introuvable" : "Font not found"}</h1><Link className="mt-4 inline-block underline" href={`/${locale}`}>{currentLabel ? "Retour à l’accueil" : "Return home"}</Link></section>
           ) : (
             <article>
-              <nav className="mb-5 text-sm text-muted-foreground">
+              <nav className="mb-5 text-sm text-muted-foreground" aria-label={currentLabel ? "Fil d’Ariane" : "Breadcrumb"}>
                 <Link href={`/${locale}`}>{currentLabel ? "Accueil" : "Home"}</Link>
                 {" / "}
-                <Link href={`/${locale}/fonts/${englishCategories.find((item) => item.arabicCategory === font.category)?.slug || "kufi"}`}>
-                  {categoryLabel(locale, font.category)}
+                <Link href={`/${locale}/fonts/${localizedFont?.category?.slug || "kufi"}`}>
+                  {localizedFont?.categoryName}
                 </Link>
+                {" / "}
+                <span aria-current="page">{font.name}</span>
               </nav>
-              <h1 className="text-3xl font-bold">{font.name}</h1>
-              <p className="mt-1 text-muted-foreground" lang="ar" dir="rtl">{font.nameArabic}</p>
-              <label className="mt-7 grid gap-2 text-sm font-medium">
-                {currentLabel ? "Texte de prévisualisation" : "Preview text"}
-                <input className="rounded-md border bg-background px-3 py-2" value={previewText} onChange={(event) => setPreviewText(event.target.value)} dir="auto" />
-              </label>
-              <p
-                className="my-8 rounded-lg bg-muted/40 p-6 text-4xl leading-relaxed"
-                lang="ar"
-                dir="rtl"
-                style={{ fontFamily: generateFontFamily(font.name) }}
-              >
-                {previewText}
-              </p>
-              <dl className="grid gap-4 rounded-lg border p-5 sm:grid-cols-2">
-                <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Catégorie" : "Category"}</dt><dd>{categoryLabel(locale, font.category)}</dd></div>
-                <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Format" : "Format"}</dt><dd>{font.fileFormat || "—"}</dd></div>
-                <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Designer" : "Designer"}</dt><dd>{font.designer || "—"}</dd></div>
-                <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Licence" : "License"}</dt><dd>{font.license || font.licenseNotice || (currentLabel ? "Consultez la source" : "Check the source")}</dd></div>
-                {font.sourceUrl && <div><dt className="text-sm text-muted-foreground">{currentLabel ? "Source" : "Source"}</dt><dd><a className="underline" href={font.sourceUrl} target="_blank" rel="noreferrer">{currentLabel ? "Consulter la source" : "View source"}</a></dd></div>}
-              </dl>
+              <h1 className="text-3xl font-bold">{fontLabels.heading(font.name)}</h1>
+              <p className="mt-2 text-lg text-muted-foreground" lang="ar" dir="rtl">{font.nameArabic}</p>
+
+              <section className="mt-6 rounded-lg border bg-muted/20 p-5" aria-labelledby="font-about-heading">
+                <h2 id="font-about-heading" className="text-xl font-semibold">{fontLabels.aboutHeading}</h2>
+                <p className="mt-3 max-w-3xl leading-7">{localizedFont?.summary}</p>
+                <p className="mt-3 max-w-3xl leading-7">{localizedFont?.categoryDescription}</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {fontLabels.softwareCompatibility}
+                </p>
+              </section>
+
+              <section className="mt-7" aria-labelledby="font-preview-heading">
+                <h2 id="font-preview-heading" className="text-xl font-semibold">{fontLabels.previewSizesHeading}</h2>
+                <p
+                  className="mt-4 rounded-lg bg-muted/40 p-5 text-4xl leading-relaxed sm:text-5xl"
+                  lang="ar"
+                  dir="rtl"
+                  style={{ fontFamily: generateFontFamily(font.name) }}
+                >
+                  {previewText}
+                </p>
+                <label className="mt-4 grid gap-2 text-sm font-medium" htmlFor="localized-font-preview">
+                  {fontLabels.previewLabel}
+                  <input
+                    id="localized-font-preview"
+                    className="rounded-md border bg-background px-3 py-2"
+                    placeholder={fontLabels.previewPlaceholder}
+                    value={previewText}
+                    onChange={(event) => setPreviewText(event.target.value)}
+                    dir="auto"
+                  />
+                </label>
+                <div className="mt-6 grid gap-5 rounded-lg border p-5">
+                  {[48, 32, 20, 14].map((size, index) => (
+                    <div key={size}>
+                      <p className="mb-1 text-xs text-muted-foreground">{fontLabels.previewSizeLabels[index]} ({size}px)</p>
+                      <p
+                        className="break-words leading-relaxed"
+                        lang="ar"
+                        dir="rtl"
+                        style={{ fontFamily: generateFontFamily(font.name), fontSize: `${size}px`, lineHeight: 1.6 }}
+                      >
+                        {previewText}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-details-heading">
+                <h2 id="font-details-heading" className="text-xl font-semibold">{fontLabels.detailsHeading}</h2>
+                <dl className="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                  <div><dt className="text-sm text-muted-foreground">{fontLabels.nameLabel}</dt><dd className="mt-1 font-medium">{font.name}</dd></div>
+                  <div><dt className="text-sm text-muted-foreground">{fontLabels.arabicNameLabel}</dt><dd className="mt-1 font-medium" lang="ar" dir="rtl">{font.nameArabic}</dd></div>
+                  <div>
+                    <dt className="text-sm text-muted-foreground">{fontLabels.categoryLabel}</dt>
+                    <dd className="mt-1 font-medium"><Link className="underline underline-offset-4" href={`/${locale}/fonts/${localizedFont?.category?.slug || "kufi"}`}>{localizedFont?.categoryName}</Link></dd>
+                  </div>
+                  <div><dt className="text-sm text-muted-foreground">{fontLabels.formatLabel}</dt><dd className="mt-1 font-medium">{font.fileFormat || fontLabels.notListed}</dd></div>
+                  <div><dt className="text-sm text-muted-foreground">{fontLabels.styleLabel}</dt><dd className="mt-1 font-medium">{font.style || fontLabels.notListed}</dd></div>
+                  {font.designer && <div><dt className="text-sm text-muted-foreground">{fontLabels.designerLabel}</dt><dd className="mt-1 font-medium">{font.designer}</dd></div>}
+                  {font.license && (
+                    <div className="sm:col-span-2">
+                      <dt className="text-sm text-muted-foreground">{fontLabels.licenseLabel}</dt>
+                      <dd className="mt-1 font-medium">{font.license}</dd>
+                    </div>
+                  )}
+                  {font.copyright && <div className="sm:col-span-2"><dt className="text-sm text-muted-foreground">{fontLabels.copyrightLabel}</dt><dd className="mt-1">{font.copyright}</dd></div>}
+                  {font.sourceUrl && (
+                    <div>
+                      <dt className="text-sm text-muted-foreground">{fontLabels.sourceLabel}</dt>
+                      <dd className="mt-1"><a className="underline underline-offset-4" href={font.sourceUrl} target="_blank" rel="noopener noreferrer">{fontLabels.sourceLabel}</a></dd>
+                    </div>
+                  )}
+                  {font.licenseNotice && (
+                    <div className="sm:col-span-2 border-t pt-4">
+                      <h3 className="font-semibold">{fontLabels.licenseNoticeHeading}</h3>
+                      <p className="mt-2 text-sm text-muted-foreground">{fontLabels.licenseNoticeIntro}</p>
+                      <details className="mt-3 rounded-md border p-3">
+                        <summary className="cursor-pointer text-sm font-medium">{fontLabels.licenseNoticeHeading}</summary>
+                        <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed" lang="ar">{font.licenseNotice}</p>
+                      </details>
+                    </div>
+                  )}
+                </dl>
+              </section>
+
               <a className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 font-medium text-primary-foreground" href={font.fileUrl} download={font.fileName}>
-                {currentLabel ? "Télécharger le fichier" : "Download file"}
+                {fontLabels.download}
               </a>
+
+              {localizedFont?.useCases.length ? (
+                <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-uses-heading">
+                  <h2 id="font-uses-heading" className="text-xl font-semibold">{fontLabels.usesHeading}</h2>
+                  <ul className="mt-4 flex flex-wrap gap-2">
+                    {localizedFont.useCases.map((useCase) => <li key={useCase} className="rounded-md bg-muted px-3 py-1.5 text-sm">{useCase}</li>)}
+                  </ul>
+                </section>
+              ) : null}
+
+              <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-install-heading">
+                <h2 id="font-install-heading" className="text-xl font-semibold">{fontLabels.installHeading}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{fontLabels.installIntro}</p>
+                <div className="mt-5 grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <h3 className="font-semibold">{fontLabels.windowsHeading}</h3>
+                    <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                      {fontLabels.installSteps.windows.map((step) => <li key={step}>{step}</li>)}
+                    </ol>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{fontLabels.macHeading}</h3>
+                    <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                      {fontLabels.installSteps.mac.map((step) => <li key={step}>{step}</li>)}
+                    </ol>
+                  </div>
+                </div>
+              </section>
+
+              <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-character-map-heading">
+                <h2 id="font-character-map-heading" className="text-xl font-semibold">{fontLabels.characterMapHeading}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{fontLabels.characterMapIntro}</p>
+                <div className="mt-5 space-y-2">
+                  {fontCharacterMap.map((row, rowIndex) => (
+                    <div key={rowIndex} className="flex flex-wrap justify-center gap-1">
+                      {row.map((character, characterIndex) => (
+                        <span
+                          key={`${rowIndex}-${characterIndex}`}
+                          className="flex h-9 w-9 items-center justify-center rounded border text-sm"
+                          lang={/[ء-ي]/.test(character) ? "ar" : "en"}
+                          dir={/[ء-ي]/.test(character) ? "rtl" : "ltr"}
+                          style={{ fontFamily: generateFontFamily(font.name) }}
+                        >
+                          {character}
+                        </span>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                <figure className="mt-6 border-t pt-5">
+                  <figcaption className="mb-3 text-center text-sm font-medium">{fontLabels.characterMapImageCaption}</figcaption>
+                  <img
+                    src={`/font-previews/${generateSlug(font.name, font.fileName, font.category)}.webp`}
+                    alt={fontLabels.characterMapImageAlt(font.name)}
+                    width={1400}
+                    height={760}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-auto w-full rounded-md border bg-white"
+                  />
+                </figure>
+              </section>
+
+              {localizedFont?.faqs.length ? (
+                <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-faq-heading">
+                  <h2 id="font-faq-heading" className="text-xl font-semibold">{fontLabels.categoryFaqHeading}</h2>
+                  <div className="mt-4 space-y-5">
+                    {localizedFont.faqs.map((faq) => (
+                      <div key={faq.question}>
+                        <h3 className="font-medium">{faq.question}</h3>
+                        <p className="mt-1 leading-7 text-muted-foreground">{faq.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
+              {sameCategoryFonts.some((item) => item.id !== font.id) && (
+                <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="related-fonts-heading">
+                  <h2 id="related-fonts-heading" className="text-xl font-semibold">{fontLabels.relatedHeading}</h2>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {sameCategoryFonts.filter((item) => item.id !== font.id).slice(0, 6).map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}`}
+                        className="rounded-md border p-4 hover:bg-muted/50"
+                      >
+                        <span className="block font-medium">{item.name}</span>
+                        <span className="mt-1 block text-sm text-muted-foreground" lang="ar" dir="rtl">{item.nameArabic}</span>
+                        <span className="mt-2 block text-xs text-muted-foreground">{item.fileFormat || fontLabels.notListed}</span>
+                      </Link>
+                    ))}
+                  </div>
+                  {localizedFont?.category?.slug && (
+                    <Link className="mt-4 inline-block text-sm underline underline-offset-4" href={`/${locale}/fonts/${localizedFont.category.slug}`}>
+                      {fontLabels.browseCategory(localizedFont.categoryName)}
+                    </Link>
+                  )}
+                </section>
+              )}
             </article>
           )
         ) : translatedCollection && collectionData ? (

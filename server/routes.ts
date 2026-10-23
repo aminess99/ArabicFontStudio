@@ -22,6 +22,11 @@ import {
   localizedCollections,
   localizedStaticPages,
 } from "../client/src/lib/localizedPagesContent";
+import {
+  fontCharacterMap,
+  getLocalizedFontPageContent,
+  localizedFontDetailCopy,
+} from "../client/src/lib/localizedFontDetails";
 
 const categoryToSlug: Record<string, string> = {
   "ثلث": "thuluth",
@@ -1144,26 +1149,111 @@ ${faqHtml}
         const title = isFrench ? "Police introuvable | xfontat" : "Font not found | xfontat";
         return res.status(404).send(botHTML(title, title, canonical, title, `<p><a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a></p>`, undefined, undefined, { lang: locale }));
       }
-      const title = `${font.name} | xfontat`;
-      const description = isFrench
-        ? `Prévisualisez ${escapeHtml(font.name)}, consultez son format et sa licence, puis téléchargez le fichier.`
-        : `Preview ${escapeHtml(font.name)}, review its format and license, and download the file.`;
-      const category = (isFrench ? frenchCategories : englishCategories)
-        .find((item) => item.arabicCategory === font.category);
+      const localizedFont = getLocalizedFontPageContent(font, locale);
+      const copy = localizedFontDetailCopy[locale];
+      const categoryPath = `/${locale}/fonts/${localizedFont.category?.slug || "kufi"}`;
+      const previewPath = `/font-previews/${generateSlug(font.name, font.fileName, font.category)}.webp`;
+      const infoRows = [
+        `<div><dt>${copy.nameLabel}</dt><dd>${escapeHtml(font.name)}</dd></div>`,
+        `<div><dt>${copy.arabicNameLabel}</dt><dd lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</dd></div>`,
+        `<div><dt>${copy.categoryLabel}</dt><dd><a href="${categoryPath}">${escapeHtml(localizedFont.categoryName)}</a></dd></div>`,
+        `<div><dt>${copy.formatLabel}</dt><dd>${escapeHtml(font.fileFormat || copy.notListed)}</dd></div>`,
+        `<div><dt>${copy.styleLabel}</dt><dd>${escapeHtml(font.style || copy.notListed)}</dd></div>`,
+        font.designer ? `<div><dt>${copy.designerLabel}</dt><dd>${escapeHtml(font.designer)}</dd></div>` : "",
+        font.license ? `<div><dt>${copy.licenseLabel}</dt><dd>${escapeHtml(font.license)}</dd></div>` : "",
+        font.copyright ? `<div><dt>${copy.copyrightLabel}</dt><dd>${escapeHtml(font.copyright)}</dd></div>` : "",
+        font.sourceUrl ? `<div><dt>${copy.sourceLabel}</dt><dd><a href="${escapeHtml(font.sourceUrl)}" rel="nofollow">${copy.sourceLabel}</a></dd></div>` : "",
+      ].filter(Boolean).join("\n");
+      const categoryUses = localizedFont.useCases.length
+        ? `<section><h2>${copy.usesHeading}</h2><ul>${localizedFont.useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`
+        : "";
+      const licenseNotice = font.licenseNotice
+        ? `<section><h3>${copy.licenseNoticeHeading}</h3><p>${copy.licenseNoticeIntro}</p><details><summary>${copy.licenseNoticeHeading}</summary><p lang="ar" style="white-space:pre-wrap">${escapeHtml(font.licenseNotice)}</p></details></section>`
+        : "";
+      const characterRows = fontCharacterMap
+        .map((row) => `<p>${row.map((character) => `<span>${escapeHtml(character)}</span>`).join(" ")}</p>`)
+        .join("");
+      const installationSteps = (steps: readonly string[]) =>
+        `<ol>${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>`;
+      const faqSection = localizedFont.faqs.length
+        ? `<section><h2>${copy.categoryFaqHeading}</h2>${localizedFont.faqs.map((faq) => `<article><h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p></article>`).join("")}</section>`
+        : "";
+      const sameCategoryFonts = (await storage.getFontsByCategory(font.category))
+        .filter((item) => item.id !== font.id)
+        .slice(0, 5);
+      const relatedSection = sameCategoryFonts.length
+        ? `<section><h2>${copy.relatedHeading}</h2><ul>${sameCategoryFonts.map((item) => `<li><a href="/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}">${escapeHtml(item.name)} — <span lang="ar" dir="rtl">${escapeHtml(item.nameArabic)}</span></a></li>`).join("")}</ul><p><a href="${categoryPath}">${escapeHtml(copy.browseCategory(localizedFont.categoryName))}</a></p></section>`
+        : "";
       const body = `
+<nav aria-label="${isFrench ? "Fil d’Ariane" : "Breadcrumb"}">
+  <a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a> /
+  <a href="${categoryPath}">${escapeHtml(localizedFont.categoryName)}</a> /
+  <span>${escapeHtml(font.name)}</span>
+</nav>
 <p lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</p>
-<p>${isFrench ? "Catégorie" : "Category"}: ${category?.name || escapeHtml(font.category)}</p>
-<p>${isFrench ? "Format" : "Format"}: ${escapeHtml(font.fileFormat || "—")}</p>
-<p>${isFrench ? "Licence" : "License"}: ${escapeHtml(font.license || font.licenseNotice || (isFrench ? "Consultez la source" : "Check the source"))}</p>
-${font.sourceUrl ? `<p><a href="${escapeHtml(font.sourceUrl)}">${isFrench ? "Consulter la source" : "View source"}</a></p>` : ""}
-<p><a href="${escapeHtml(font.fileUrl)}" download>${isFrench ? "Télécharger le fichier" : "Download file"}</a></p>`;
+<section>
+  <h2>${copy.aboutHeading}</h2>
+  <p>${escapeHtml(localizedFont.summary)}</p>
+  <p>${escapeHtml(localizedFont.categoryDescription)}</p>
+  <p>${escapeHtml(copy.softwareCompatibility)}</p>
+</section>
+<section>
+  <h2>${copy.previewSizesHeading}</h2>
+  <p lang="ar" dir="rtl">${escapeHtml("بسم الله الرحمن الرحيم")}</p>
+  <figure>
+    <figcaption>${copy.characterMapImageCaption}</figcaption>
+    <img src="${previewPath}" alt="${escapeHtml(copy.characterMapImageAlt(font.name))}" width="1400" height="760" loading="lazy">
+  </figure>
+</section>
+<section>
+  <h2>${copy.detailsHeading}</h2>
+  <dl>${infoRows}</dl>
+  ${licenseNotice}
+</section>
+<p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${copy.download}</a></p>
+${categoryUses}
+<section>
+  <h2>${copy.installHeading}</h2>
+  <p>${copy.installIntro}</p>
+  <h3>${copy.windowsHeading}</h3>${installationSteps(copy.installSteps.windows)}
+  <h3>${copy.macHeading}</h3>${installationSteps(copy.installSteps.mac)}
+</section>
+<section>
+  <h2>${copy.characterMapHeading}</h2>
+  <p>${copy.characterMapIntro}</p>
+  ${characterRows}
+</section>
+${faqSection}
+${relatedSection}`;
+      const title = localizedFont.title;
+      const description = localizedFont.description;
+      const breadcrumbs = [
+        { "@type": "ListItem", position: 1, name: isFrench ? "Accueil" : "Home", item: `https://xfontat.com/${locale}` },
+        { "@type": "ListItem", position: 2, name: localizedFont.categoryName, item: `https://xfontat.com${categoryPath}` },
+        { "@type": "ListItem", position: 3, name: font.name, item: canonical },
+      ];
+      const jsonLd = [
+        {
+          "@type": "CreativeWork",
+          "name": font.name,
+          "alternateName": font.nameArabic,
+          "description": description,
+          "url": canonical,
+          "inLanguage": locale,
+          "genre": localizedFont.categoryName,
+          "encodingFormat": font.fileFormat || undefined,
+          "isBasedOn": font.sourceUrl || undefined,
+          "contentUrl": `https://xfontat.com${font.fileUrl}`,
+        },
+        { "@type": "BreadcrumbList", "itemListElement": breadcrumbs },
+      ];
       return res.send(botHTML(
-        title,
-        description,
+        escapeHtml(title),
+        escapeHtml(description),
         canonical,
-        font.name,
+        escapeHtml(copy.heading(font.name)),
         body,
-        { "@type": "CreativeWork", "name": font.name, "url": canonical, "inLanguage": locale },
+        jsonLd,
         undefined,
         { lang: locale, alternates }
       ));
