@@ -1,6 +1,13 @@
 import { storage } from "../storage";
 import fs from "fs";
 import path from "path";
+import type { InsertFont } from "@shared/schema";
+import {
+  buildCleanFontSlugAssignments,
+  generateLegacyFontSlug,
+  generateLegacyNameSlug,
+  getFontIdentity,
+} from "../../client/src/lib/slugify";
 
 const FONTS_DIR = path.join(process.cwd(), "client/public/fonts");
 const PROVENANCE_PATH = path.join(process.cwd(), "server/data/font-provenance.json");
@@ -82,9 +89,8 @@ function getFileFormat(fileName: string): string {
 export async function loadFonts() {
   console.log("🔄 Loading fonts from disk...");
   const provenanceByFile = loadFontProvenance();
-  
   const categories = Object.keys(categoryMap);
-  let totalFonts = 0;
+  const fontsToLoad: Array<InsertFont & { legacyHashedSlug: string; legacyNameSlug: string }> = [];
 
   for (const category of categories) {
     const categoryPath = path.join(FONTS_DIR, category);
@@ -112,7 +118,7 @@ export async function loadFonts() {
       const stats = fs.statSync(filePath);
       const addedAt = stats.mtime;
 
-      await storage.createFont({
+      const font: InsertFont = {
         name: fontName,
         nameArabic: metadata?.nameArabic ?? fontName,
         description: metadata?.description ?? `خط ${fontName} من فئة ${categoryMap[category]}`,
@@ -128,12 +134,45 @@ export async function loadFonts() {
         fileFormat: fileFormat,
         featured: isFeatured,
         addedAt: addedAt,
+      };
+      fontsToLoad.push({
+        ...font,
+        legacyHashedSlug: generateLegacyFontSlug(fontName, file, font.category),
+        legacyNameSlug: generateLegacyNameSlug(fontName),
       });
-
-      totalFonts++;
     }
   }
 
+  const cleanSlugs = buildCleanFontSlugAssignments(fontsToLoad);
+  const legacyNameCounts = new Map<string, number>();
+  for (const font of fontsToLoad) {
+    legacyNameCounts.set(font.legacyNameSlug, (legacyNameCounts.get(font.legacyNameSlug) || 0) + 1);
+  }
+
+  const inserts: InsertFont[] = fontsToLoad.map((font) => {
+    const { legacyHashedSlug, legacyNameSlug, ...insertFont } = font;
+    const identity = getFontIdentity(insertFont.category, insertFont.fileName);
+    return {
+      ...insertFont,
+      slug: cleanSlugs.get(identity),
+    };
+  });
+  const savedFonts = await storage.createFonts(inserts);
+  const savedByIdentity = new Map(
+    savedFonts.map((font) => [`${font.category}/${font.fileName}`, font]),
+  );
+  const aliases: Array<{ oldSlug: string; fontId: string }> = [];
+  for (const font of fontsToLoad) {
+    const savedFont = savedByIdentity.get(`${font.category}/${font.fileName}`);
+    if (!savedFont) throw new Error(`Font was not returned after database upsert: ${font.category}/${font.fileName}`);
+    aliases.push({ oldSlug: font.legacyHashedSlug, fontId: savedFont.id });
+    if (legacyNameCounts.get(font.legacyNameSlug) === 1) {
+      aliases.push({ oldSlug: font.legacyNameSlug, fontId: savedFont.id });
+    }
+  }
+  await storage.addSlugAliases(aliases);
+
+  const totalFonts = fontsToLoad.length;
   console.log(`✅ Successfully loaded ${totalFonts} fonts`);
   
   const allFonts = await storage.getAllFonts();

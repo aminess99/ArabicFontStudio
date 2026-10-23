@@ -10,6 +10,23 @@ interface SEOHeadProps {
   alternates?: { lang: string; href: string }[];
 }
 
+function buildAlternates(path: string, supplied: { lang: string; href: string }[]) {
+  const baseUrl = "https://xfontat.com";
+  const normalizedPath = path.replace(/\/+$/, "") || "/";
+  const pagePath = /^\/(en|fr)(?:\/|$)/.test(normalizedPath)
+    ? normalizedPath.replace(/^\/(en|fr)/, "") || "/"
+    : normalizedPath;
+  const localizedPath = (locale: "en" | "fr") => pagePath === "/" ? `/${locale}` : `/${locale}${pagePath}`;
+  const defaults = new Map([
+    ["ar", `${baseUrl}${pagePath}`],
+    ["en", `${baseUrl}${localizedPath("en")}`],
+    ["fr", `${baseUrl}${localizedPath("fr")}`],
+    ["x-default", `${baseUrl}${pagePath}`],
+  ]);
+  for (const alternate of supplied) defaults.set(alternate.lang, alternate.href);
+  return Array.from(defaults, ([lang, href]) => ({ lang, href }));
+}
+
 export function SEOHead({
   title,
   description,
@@ -21,7 +38,8 @@ export function SEOHead({
 }: SEOHeadProps) {
   const baseUrl = "https://xfontat.com";
   const fullUrl = `${baseUrl}${path}`;
-  const alternateLinksKey = JSON.stringify(alternates);
+  const resolvedAlternates = buildAlternates(path, alternates);
+  const alternateLinksKey = JSON.stringify(resolvedAlternates);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -55,7 +73,7 @@ export function SEOHead({
     }
 
     document.querySelectorAll('link[data-seo-alternate="true"]').forEach((link) => link.remove());
-    const alternateLinks = alternates.map(({ lang: alternateLang, href }) => {
+    const alternateLinks = resolvedAlternates.map(({ lang: alternateLang, href }) => {
       const link = document.createElement("link");
       link.rel = "alternate";
       link.hreflang = alternateLang;

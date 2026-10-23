@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { Heart } from "lucide-react";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
-import { generateSlug } from "@/lib/slugify";
+import { getCanonicalFontSlug } from "@/lib/slugify";
 import type { InternationalHomeCopy } from "@/lib/internationalContent";
 import type { Font } from "@shared/schema";
 
@@ -45,7 +45,7 @@ export function LocalizedFontRow({
   }, [fontFamily, font.fileUrl]);
 
   const format = font.fileFormat || font.fileName.split(".").pop()?.toUpperCase();
-  const detailsPath = `/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`;
+  const detailsPath = `/${locale}/font/${getCanonicalFontSlug(font)}`;
 
   return (
     <article className="border-b py-5" data-testid={`international-font-${font.id}`}>

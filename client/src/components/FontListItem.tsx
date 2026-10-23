@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
-import { generateSlug } from "@/lib/slugify";
+import { getCanonicalFontSlug } from "@/lib/slugify";
 
 interface FontListItemProps {
   id: string;
@@ -14,6 +14,7 @@ interface FontListItemProps {
   category: string;
   fileUrl: string;
   fileName: string;
+  slug?: string | null;
   previewText: string;
   fontSize: number;
   onDownload: () => void;
@@ -30,6 +31,7 @@ export function FontListItem({
   category,
   fileUrl,
   fileName,
+  slug,
   previewText,
   fontSize,
   onDownload,
@@ -121,7 +123,7 @@ export function FontListItem({
           
           <Button asChild className="flex-1 md:flex-none">
             <Link
-              href={`/font/${generateSlug(name, fileName, category)}`}
+              href={`/font/${getCanonicalFontSlug({ slug, name, fileName, category })}`}
               data-testid={`button-download-${name}`}
             >
               <Download className="ml-2 h-4 w-4" />

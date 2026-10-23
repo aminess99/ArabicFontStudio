@@ -10,7 +10,7 @@ import { blogPosts } from "@/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "@/lib/blogTranslations";
 import { renderMarkdownToHtml } from "@shared/markdown";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
-import { generateSlug } from "@/lib/slugify";
+import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { detectFontFamily, groupFontsByFamily } from "@/lib/fontFamily";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -166,7 +166,7 @@ function LocalizedFontVariantCard({
 }) {
   const [loaded, setLoaded] = useState(false);
   const family = generateFontFamily(font.name);
-  const detailsPath = `/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`;
+  const detailsPath = `/${locale}/font/${getCanonicalFontSlug(font)}`;
 
   useEffect(() => {
     let active = true;
@@ -407,7 +407,7 @@ export default function LocalizedContentPage() {
               "@type": "ListItem",
               position: index + 1,
               name: `${item.name} — ${getLocalizedFontWeightLabel(item.name, locale)}`,
-              url: `https://xfontat.com/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}`,
+              url: `https://xfontat.com/${locale}/font/${getCanonicalFontSlug(item)}`,
             })),
           }] : []),
           ...(relatedFonts.length ? [{
@@ -418,7 +418,7 @@ export default function LocalizedContentPage() {
               "@type": "ListItem",
               position: index + 1,
               name: item.name,
-              url: `https://xfontat.com/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}`,
+              url: `https://xfontat.com/${locale}/font/${getCanonicalFontSlug(item)}`,
             })),
           }] : []),
           {
@@ -463,7 +463,7 @@ export default function LocalizedContentPage() {
                 "@type": "ListItem",
                 position: index + 1,
                 name: group.family,
-                url: `https://xfontat.com/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+                url: `https://xfontat.com/${locale}/font/${getCanonicalFontSlug(group.primary)}`,
               })),
             },
             {
@@ -694,7 +694,7 @@ export default function LocalizedContentPage() {
                 <figure className="mt-6 border-t pt-5">
                   <figcaption className="mb-3 text-center text-sm font-medium">{fontLabels.characterMapImageCaption}</figcaption>
                   <img
-                    src={`/font-previews/${generateSlug(font.name, font.fileName, font.category)}.webp`}
+                    src={`/font-previews/${generateLegacyFontSlug(font.name, font.fileName, font.category)}.webp`}
                     alt={fontLabels.characterMapImageAlt(font.name)}
                     width={1400}
                     height={760}
@@ -743,7 +743,7 @@ export default function LocalizedContentPage() {
                     {relatedFonts.map((item) => (
                       <Link
                         key={item.id}
-                        href={`/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}`}
+                        href={`/${locale}/font/${getCanonicalFontSlug(item)}`}
                         className="rounded-md border p-4 hover:bg-muted/50"
                       >
                         <span className="block font-medium">{item.name}</span>

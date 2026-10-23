@@ -22,21 +22,21 @@ The frontend is built with React and TypeScript, utilizing Vite for bundling and
 - **Layout:** A list-based interface displays fonts, featuring a two-section header with global search, theme toggle, and a toolbar for preview text input and font size adjustment (16-72px).
 - **Interactive Elements:** Horizontal category filters, favorite font toggles, and a download button for each font are present.
 - **Preview System:** All fonts display the same customizable preview text at an adjustable size, facilitating easy comparison.
-- **SEO Elements:** Dynamic meta tags, JSON-LD schema markup (Organization, WebSite, CollectionPage, ItemList, WebPage, SoftwareApplication, Article, BreadcrumbList, FAQ), SEO-friendly slug URLs for fonts and blog posts, and sitemap generation are implemented.
+- **SEO Elements:** The Express route injects route-specific metadata and crawler-visible fallback content into the SPA shell, while React continues to render normally after load. A database-backed sitemap, clean font URLs, legacy redirects, localized hreflang tags, and true 404 responses support indexing.
 - **Blog and Collections:** Dedicated pages for blog articles and curated font collections based on use cases (e.g., "Fonts for Logos," "Fonts for Social Media") enhance content discoverability and SEO.
 
 ### Backend Architecture
 
-The backend is an Express.js server built with TypeScript, integrated with Vite via custom middleware for server-side rendering (SSR) compatibility.
+The backend is an Express.js server built with TypeScript. In development it uses Vite middleware; in production it serves the built static assets. A central HTML route resolves page data and injects crawler-ready metadata and fallback content before the SPA loads.
 
 **Data Management:**
-- **Data Storage:** While Drizzle ORM is configured for PostgreSQL (not actively connected yet), the current implementation uses an in-memory storage system (`MemStorage`).
-- **Font Data:** Fonts are defined with a schema including `id`, `name`, `nameArabic`, `description`, `designer`, `category`, `style`, `fileUrl`, `fileName`, `fileFormat`, `featured` (boolean), and `addedAt` (timestamp).
-- **Font Loading:** A server startup script (`load-fonts.ts`) scans the `/client/public/fonts` directory, categorizes fonts based on folder structure, extracts metadata, and uses file modification times for `addedAt` timestamps. It supports TTF, OTF, WOFF, and WOFF2 formats.
+- **Data Storage:** Drizzle ORM uses PostgreSQL through the `pg` driver. Font records and legacy-slug aliases persist in the database.
+- **Font Data:** Fonts are defined with a schema including `id`, clean `slug`, `name`, `nameArabic`, `description`, `designer`, `category`, `style`, `fileUrl`, `fileName`, `fileFormat`, `featured` (boolean), and `addedAt` (timestamp).
+- **Font Loading:** A server startup script (`load-fonts.ts`) scans `/client/public/fonts`, categorizes files by folder, extracts metadata, and upserts records using file modification times for `addedAt`. Old hashed URLs are retained as aliases and redirect to each font's clean slug. Supported formats are TTF, OTF, WOFF, and WOFF2.
 - **API Endpoints:** Standard RESTful endpoints are provided for `GET /api/fonts`, `GET /api/fonts/:id`, `POST /api/fonts`, and `DELETE /api/fonts/:id`.
 
 **Key Architectural Decisions:**
-- **Storage Abstraction:** An `IStorage` interface facilitates future migration to a persistent database.
+- **Storage Abstraction:** The storage interface keeps API handlers separate from PostgreSQL queries.
 - **File-based Font Discovery:** Automates the process of adding new fonts without manual database entries.
 - **Automatic AI Blog Generator:** A `node-cron` scheduled task (`server/blogGenerator.ts`) uses the Gemini model via Replit AI Integrations to generate two SEO-targeted blog articles daily. These articles are stored in `server/data/generatedPosts.json` and served via dedicated API endpoints.
 
@@ -45,7 +45,7 @@ The backend is an Express.js server built with TypeScript, integrated with Vite 
 **Core Libraries:**
 - **@tanstack/react-query:** For server state management and data fetching.
 - **drizzle-orm & drizzle-zod:** For database ORM and schema validation (configured for PostgreSQL).
-- **@neondatabase/serverless:** PostgreSQL driver (configured).
+- **pg:** PostgreSQL Node.js driver used by Drizzle ORM.
 - **zod:** For runtime type validation.
 - **node-cron:** For scheduling tasks (e.g., AI blog generation).
 - **Replit AI Integrations:** For accessing the Gemini model for content generation.

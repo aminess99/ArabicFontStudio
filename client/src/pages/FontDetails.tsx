@@ -10,7 +10,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
-import { generateSlug } from "@/lib/slugify";
+import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { getCategorySlug } from "@/lib/categorySlug";
 import { detectFontFamily, getWeightLabel } from "@/lib/fontFamily";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
@@ -100,7 +100,7 @@ function FamilyVariantCard({ variant }: { variant: Font }) {
     <div className="border rounded-lg p-4">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="min-w-0">
-          <Link href={`/font/${generateSlug(variant.name, variant.fileName, variant.category)}`}>
+          <Link href={`/font/${getCanonicalFontSlug(variant)}`}>
             <h3 className="text-sm font-medium truncate hover:underline">{variant.nameArabic}</h3>
           </Link>
           <p className="text-xs text-muted-foreground truncate">{variant.name}</p>
@@ -143,7 +143,7 @@ export default function FontDetails() {
   const fontFamily = font ? generateFontFamily(font.name) : '';
   const characterMapPreview = font
     ? {
-        src: `/font-previews/${generateSlug(font.name, font.fileName, font.category)}.webp`,
+        src: `/font-previews/${generateLegacyFontSlug(font.name, font.fileName, font.category)}.webp`,
         label: `خريطة حروف خط ${font.nameArabic || font.name} مع علامة مائية من xfontat.com`,
       }
     : undefined;
@@ -232,7 +232,7 @@ export default function FontDetails() {
     );
   }
 
-  const fontSlug = generateSlug(font.name, font.fileName, font.category);
+  const fontSlug = getCanonicalFontSlug(font);
   const categoryDesc = categoryDescriptions[font.category] || "خط عربي احترافي مناسب للتصميم والطباعة.";
   const useCases = categoryUseCases[font.category] || ["التصميم", "الطباعة"];
   const relatedArticles = getRelatedBlogPosts(font.category);
@@ -606,7 +606,7 @@ export default function FontDetails() {
                     {relatedFonts.map((relFont) => (
                       <Link
                         key={relFont.id}
-                        href={`/font/${generateSlug(relFont.name, relFont.fileName, relFont.category)}`}
+                        href={`/font/${getCanonicalFontSlug(relFont)}`}
                         className="border rounded-lg p-4 hover-elevate transition-all block"
                         data-testid={`link-related-font-${relFont.id}`}
                       >

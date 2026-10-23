@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { generateSlug } from "@/lib/slugify";
+import { getCanonicalFontSlug } from "@/lib/slugify";
 import { localizedCollections } from "@/lib/localizedPagesContent";
 import { groupFontsByFamily } from "@/lib/fontFamily";
 import {
@@ -115,7 +115,7 @@ export default function EnglishDirectory() {
               itemListElement: currentGroups.map((group, index) => ({
                 "@type": "ListItem",
                 position: index + 1 + (page - 1) * PAGE_SIZE,
-                url: `https://xfontat.com/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+                url: `https://xfontat.com/${locale}/font/${getCanonicalFontSlug(group.primary)}`,
                 name: group.family,
               })),
             },

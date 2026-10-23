@@ -8,7 +8,7 @@ import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
 import { blogPosts as staticBlogPosts } from "@/lib/blogData";
 import { getBlogInternalLinks } from "@/lib/blogInternalLinks";
-import { generateSlug } from "@/lib/slugify";
+import { getCanonicalFontSlug } from "@/lib/slugify";
 import { renderMarkdownToHtml } from "@shared/markdown";
 import type { Font } from "@shared/schema";
 
@@ -212,7 +212,7 @@ export default function BlogPost() {
                   {relatedFonts.slice(0, 4).map(font => (
                     <li key={font.id}>
                       <Link
-                        href={`/font/${generateSlug(font.name, font.fileName, font.category)}`}
+                        href={`/font/${getCanonicalFontSlug(font)}`}
                         className="font-medium hover:underline"
                       >
                         تحميل خط {font.nameArabic}

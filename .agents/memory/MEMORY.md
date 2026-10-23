@@ -1,4 +1,4 @@
-- [Cost optimization](cost-optimization.md) — keep unused Postgres DB for deploy validation; cache fonts long-term + compression to cut bandwidth costs
+- [Cost optimization](cost-optimization.md) — cache font files long-term and compress responses to reduce repeat-visitor bandwidth
 - [Font character previews](font-character-previews.md) — keep the HTML glyph map and add watermarked WebP previews as a supplementary visual layer
 - [Font catalog source](font-source.md) — the Arabic font collection was sourced from arbfonts.com
 - [Mockup sandbox dependencies](mockup-sandbox-dependencies.md) — artifact previews may need isolated Tailwind/Vite resolution when workspace dependencies differ

@@ -7,6 +7,8 @@ import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { collections } from "../client/src/lib/collectionsData";
 import { getBlogInternalLinks } from "../client/src/lib/blogInternalLinks";
 import { registerThumbnailRoutes } from "./thumbnailGenerator";
+import { registerSeoHtmlRoute } from "./seoHtml";
+import { generateLegacyFontSlug } from "../client/src/lib/slugify";
 import { renderMarkdownToHtml } from "@shared/markdown";
 import {
   englishCategories,
@@ -52,22 +54,8 @@ function slugifyPart(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-function stableHash(value: string): string {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(36);
-}
-
 function generateLegacySlug(fontName: string): string {
   return `${slugifyPart(fontName)}-font`;
-}
-
-function generateSlug(fontName: string, fileName: string, category: string): string {
-  const base = slugifyPart(fontName) || slugifyPart(fileName) || "arabic-font";
-  return `${base}-${stableHash(`${category}/${fileName}`)}-font`;
 }
 
 function getCategoryLabel(category: string): string {
@@ -93,7 +81,7 @@ async function renderBlogInternalLinks(post: {
     `<li><a href="/collection/${collection.slug}">${collection.titleArabic}</a></li>`
   ).join("\n");
   const fontLinks = fonts.slice(0, 4).map(font =>
-    `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${font.nameArabic}</a></li>`
+    `<li><a href="/font/${font.slug}">${font.nameArabic}</a></li>`
   ).join("\n");
 
   return `
@@ -329,18 +317,19 @@ function isKnownRoute(path: string): boolean {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  registerSeoHtmlRoute(app);
   registerThumbnailRoutes(app);
 
   // Dynamic rendering for search engine bots
 
   app.get("/font/:slug", async (req, res, next) => {
     const fonts = await storage.getAllFonts();
-    let font = fonts.find(f => generateSlug(f.name, f.fileName, f.category) === req.params.slug);
+    let font = fonts.find(f => f.slug === req.params.slug);
 
     if (!font) {
       const legacyFont = fonts.find(f => generateLegacySlug(f.name) === req.params.slug);
       if (legacyFont) {
-        return res.redirect(301, `/font/${generateSlug(legacyFont.name, legacyFont.fileName, legacyFont.category)}`);
+        return res.redirect(301, `/font/${legacyFont.slug}`);
       }
     }
 
@@ -406,7 +395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const title = `${categoryLabel} العربية - تحميل مجاني | xfontat`;
     const desc = `استكشف الخطوط ضمن تصنيف ${categoryLabel} وعاين الحروف. تختلف صيغ الملفات وتراخيصها؛ راجع صفحة كل خط.`;
     const links = catFonts.slice(0, 60).map(f =>
-      `<li><a href="/font/${generateSlug(f.name, f.fileName, f.category)}">${f.nameArabic} - ${f.name}</a></li>`
+      `<li><a href="/font/${f.slug}">${f.nameArabic} - ${f.name}</a></li>`
     ).join('\n');
     const content = categoryContent[arabicCat];
     const richContent = content ? `
@@ -440,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "item": {
             "@type": "SoftwareApplication",
             "name": f.nameArabic,
-            "url": `https://xfontat.com/font/${generateSlug(f.name, f.fileName, f.category)}`,
+            "url": `https://xfontat.com/font/${f.slug}`,
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           }
         }))
@@ -602,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const title = 'خطوط عربية للتصميم الحديث - تحميل مجاني | xfontat';
     const desc = "استكشف خطوطاً عربية للتصميم والهوية البصرية، وعاين النص بالحجم المستهدف. تختلف الصيغ والتراخيص؛ راجع صفحة كل خط.";
     const fontLinks = designFonts.slice(0, 50).map(f =>
-      `<li><a href="/font/${generateSlug(f.name, f.fileName, f.category)}">${f.nameArabic}</a></li>`
+      `<li><a href="/font/${f.slug}">${f.nameArabic}</a></li>`
     ).join('\n');
     const body = `
 <p>${desc}</p>
@@ -712,7 +701,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const useCaseList = collection.useCases.map(u => `<li>${u}</li>`).join('\n');
     const fonts = await storage.getFontsByCategories(collection.categories);
     const fontLinks = fonts.map(font =>
-      `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${font.nameArabic}</a></li>`
+      `<li><a href="/font/${font.slug}">${font.nameArabic}</a></li>`
     ).join('\n');
     const body = `
 <p>${collection.longDescription}</p>
@@ -745,7 +734,7 @@ ${faqHtml}`;
           "item": {
             "@type": "CreativeWork",
             "name": font.nameArabic,
-            "url": `https://xfontat.com/font/${generateSlug(font.name, font.fileName, font.category)}`,
+            "url": `https://xfontat.com/font/${font.slug}`,
           }
         })),
       },
@@ -879,7 +868,7 @@ ${faqHtml}`;
       .join("\n");
     const fontLinks = fontGroups
       .slice(0, 80)
-      .map((group) => `<li><a href="/en/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${englishHome.variantCountLabel(group.variants.length)}</span></li>`)
+      .map((group) => `<li><a href="/en/font/${group.primary.slug}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${englishHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const benefitItems = englishHome.benefits
       .map((item) => `<li><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></li>`)
@@ -936,7 +925,7 @@ ${faqHtml}`;
           "@type": "ListItem",
           "position": index + 1,
           "name": group.family,
-          "url": `https://xfontat.com/en/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+          "url": `https://xfontat.com/en/font/${group.primary.slug}`,
         })),
       },
       {
@@ -989,7 +978,7 @@ ${faqHtml}`;
     const fontGroups = groupFontsByFamily(fonts);
     const fontLinks = fontGroups
       .slice(0, 80)
-      .map((group) => `<li><a href="/en/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${englishHome.variantCountLabel(group.variants.length)}</span></li>`)
+      .map((group) => `<li><a href="/en/font/${group.primary.slug}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${englishHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const faqHtml = category.faqs
       .map((faq) => `<section><h3>${faq.question}</h3><p>${faq.answer}</p></section>`)
@@ -1053,7 +1042,7 @@ ${faqHtml}
       .join("\n");
     const fontLinks = fontGroups
       .slice(0, 80)
-      .map((group) => `<li><a href="/fr/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${frenchHome.variantCountLabel(group.variants.length)}</span></li>`)
+      .map((group) => `<li><a href="/fr/font/${group.primary.slug}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${frenchHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const benefitItems = frenchHome.benefits
       .map((item) => `<li><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></li>`)
@@ -1110,7 +1099,7 @@ ${faqHtml}
           "@type": "ListItem",
           "position": index + 1,
           "name": group.family,
-          "url": `https://xfontat.com/fr/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+          "url": `https://xfontat.com/fr/font/${group.primary.slug}`,
         })),
       },
       {
@@ -1163,7 +1152,7 @@ ${faqHtml}
     const fontGroups = groupFontsByFamily(fonts);
     const fontLinks = fontGroups
       .slice(0, 80)
-      .map((group) => `<li><a href="/fr/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${frenchHome.variantCountLabel(group.variants.length)}</span></li>`)
+      .map((group) => `<li><a href="/fr/font/${group.primary.slug}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${frenchHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const faqHtml = category.faqs
       .map((faq) => `<section><h3>${faq.question}</h3><p>${faq.answer}</p></section>`)
@@ -1232,7 +1221,7 @@ ${faqHtml}
     ];
 
     if (section === "font") {
-      const font = await storage.getFontBySlug(slug, generateSlug);
+      const font = await storage.getFontBySlug(slug);
       if (!font) {
         const title = isFrench ? "Police introuvable | xfontat" : "Font not found | xfontat";
         return res.status(404).send(botHTML(title, title, canonical, title, `<p><a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a></p>`, undefined, undefined, { lang: locale }));
@@ -1240,7 +1229,7 @@ ${faqHtml}
       const localizedFont = getLocalizedFontPageContent(font, locale);
       const copy = localizedFontDetailCopy[locale];
       const categoryPath = `/${locale}/fonts/${localizedFont.category?.slug || "kufi"}`;
-      const previewPath = `/font-previews/${generateSlug(font.name, font.fileName, font.category)}.webp`;
+      const previewPath = `/font-previews/${generateLegacyFontSlug(font.name, font.fileName, font.category)}.webp`;
       const infoRows = [
         `<div><dt>${copy.nameLabel}</dt><dd>${escapeHtml(font.name)}</dd></div>`,
         `<div><dt>${copy.arabicNameLabel}</dt><dd lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</dd></div>`,
@@ -1275,10 +1264,10 @@ ${faqHtml}
         item.id !== font.id && detectFontFamily(item.name) !== familyName
       )).slice(0, 5);
       const familyVariantsSection = familyVariants.length
-        ? `<section><h2>${copy.variantsHeading}</h2><ul>${familyVariants.map((item) => `<li><a href="/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}">${escapeHtml(item.name)}</a> — ${escapeHtml(getLocalizedFontWeightLabel(item.name, locale))} — ${escapeHtml(item.fileFormat || copy.notListed)} <a href="${escapeHtml(item.fileUrl)}" download="${escapeHtml(item.fileName)}">${copy.download}</a></li>`).join("")}</ul></section>`
+        ? `<section><h2>${copy.variantsHeading}</h2><ul>${familyVariants.map((item) => `<li><a href="/${locale}/font/${item.slug}">${escapeHtml(item.name)}</a> — ${escapeHtml(getLocalizedFontWeightLabel(item.name, locale))} — ${escapeHtml(item.fileFormat || copy.notListed)} <a href="${escapeHtml(item.fileUrl)}" download="${escapeHtml(item.fileName)}">${copy.download}</a></li>`).join("")}</ul></section>`
         : "";
       const relatedSection = relatedFonts.length
-        ? `<section><h2>${copy.relatedHeading}</h2><ul>${relatedFonts.map((item) => `<li><a href="/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}">${escapeHtml(item.name)} — <span lang="ar" dir="rtl">${escapeHtml(item.nameArabic)}</span></a></li>`).join("")}</ul><p><a href="${categoryPath}">${escapeHtml(copy.browseCategory(localizedFont.categoryName))}</a></p></section>`
+        ? `<section><h2>${copy.relatedHeading}</h2><ul>${relatedFonts.map((item) => `<li><a href="/${locale}/font/${item.slug}">${escapeHtml(item.name)} — <span lang="ar" dir="rtl">${escapeHtml(item.nameArabic)}</span></a></li>`).join("")}</ul><p><a href="${categoryPath}">${escapeHtml(copy.browseCategory(localizedFont.categoryName))}</a></p></section>`
         : "";
       const categoryKeywords: Record<string, string[]> = {
         "ثلث": ["ثلث", "خطوط عربية", "تصميم", "شعارات"],
@@ -1388,7 +1377,7 @@ ${articlesSection}
             "@type": "ListItem",
             "position": index + 1,
             "name": `${item.name} — ${getLocalizedFontWeightLabel(item.name, locale)}`,
-            "url": `https://xfontat.com/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}`,
+            "url": `https://xfontat.com/${locale}/font/${item.slug}`,
           })),
         },
         {
@@ -1431,7 +1420,7 @@ ${articlesSection}
       const fonts = await storage.getFontsByCategories(collection.categories);
       const fontGroups = groupFontsByFamily(fonts);
       const links = fontGroups.slice(0, 80).map((group) =>
-        `<li><a href="/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${isFrench ? frenchHome.variantCountLabel(group.variants.length) : englishHome.variantCountLabel(group.variants.length)}</span></li>`
+        `<li><a href="/${locale}/font/${group.primary.slug}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${isFrench ? frenchHome.variantCountLabel(group.variants.length) : englishHome.variantCountLabel(group.variants.length)}</span></li>`
       ).join("");
       const collectionFaqs = isFrench
         ? [
@@ -1486,7 +1475,7 @@ ${articlesSection}
                 "@type": "ListItem",
                 "position": index + 1,
                 "name": group.family,
-                "url": `https://xfontat.com/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+                "url": `https://xfontat.com/${locale}/font/${group.primary.slug}`,
               })),
             },
             { "@type": "FAQPage", "mainEntity": collectionFaqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } })) },
@@ -1625,7 +1614,7 @@ ${articlesSection}
       `<li><a href="/fonts/${categoryToSlug[c] || c}">${c}</a></li>`
     ).join('\n');
     const fontLinks = fonts.slice(0, 120).map(f =>
-      `<li><a href="/font/${generateSlug(f.name, f.fileName, f.category)}">${f.nameArabic}</a></li>`
+      `<li><a href="/font/${f.slug}">${f.nameArabic}</a></li>`
     ).join('\n');
     const body = `
 <p>${desc}</p>
@@ -1680,7 +1669,7 @@ ${articlesSection}
           "item": {
             "@type": "SoftwareApplication",
             "name": f.nameArabic,
-            "url": `https://xfontat.com/font/${generateSlug(f.name, f.fileName, f.category)}`,
+            "url": `https://xfontat.com/font/${f.slug}`,
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           }
         }))
@@ -1759,7 +1748,7 @@ ${articlesSection}
 
   app.get("/api/fonts/by-slug/:slug", async (req, res) => {
     try {
-      const font = await storage.getFontBySlug(req.params.slug, generateSlug);
+      const font = await storage.getFontBySlug(req.params.slug);
       if (!font) {
         return res.status(404).json({ error: "Font not found" });
       }
@@ -1810,134 +1799,6 @@ ${articlesSection}
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete font" });
-    }
-  });
-
-  app.get("/sitemap.xml", async (req, res) => {
-    try {
-      const baseUrl = "https://xfontat.com";
-
-      const staticPages = [
-        { url: "/", priority: "1.0", changefreq: "daily" },
-        { url: "/en", priority: "1.0", changefreq: "daily" },
-        { url: "/fr", priority: "1.0", changefreq: "daily" },
-        ...(["en", "fr"] as const).flatMap(locale => [
-          { url: `/${locale}/youtube-thumbnail-maker`, priority: "0.9", changefreq: "weekly" },
-          { url: `/${locale}/design-fonts`, priority: "0.8", changefreq: "weekly" },
-          { url: `/${locale}/blog`, priority: "0.7", changefreq: "weekly" },
-          { url: `/${locale}/about`, priority: "0.5", changefreq: "monthly" },
-          { url: `/${locale}/contact`, priority: "0.5", changefreq: "monthly" },
-          { url: `/${locale}/privacy`, priority: "0.3", changefreq: "yearly" },
-          { url: `/${locale}/terms`, priority: "0.3", changefreq: "yearly" },
-        ]),
-        { url: "/youtube-thumbnail-maker", priority: "0.9", changefreq: "weekly" },
-        { url: "/design-fonts", priority: "0.9", changefreq: "weekly" },
-        { url: "/blog", priority: "0.7", changefreq: "weekly" },
-        { url: "/about", priority: "0.5", changefreq: "monthly" },
-        { url: "/contact", priority: "0.5", changefreq: "monthly" },
-        { url: "/privacy", priority: "0.3", changefreq: "yearly" },
-        { url: "/terms", priority: "0.3", changefreq: "yearly" },
-      ];
-
-      const fonts = await storage.getAllFonts();
-      const categories = Array.from(new Set(fonts.map(font => font.category)));
-      const categoryPages = categories.map(cat => ({
-        url: `/fonts/${categoryToSlug[cat] || cat}`,
-        priority: "0.8",
-        changefreq: "weekly"
-      }));
-      const englishCategoryPages = englishCategories.map(category => ({
-        url: `/en/fonts/${category.slug}`,
-        priority: "0.8",
-        changefreq: "weekly",
-      }));
-      const frenchCategoryPages = frenchCategories.map(category => ({
-        url: `/fr/fonts/${category.slug}`,
-        priority: "0.8",
-        changefreq: "weekly",
-      }));
-
-      const seenFontUrls = new Set<string>();
-      const fontPages = fonts.flatMap(font => {
-        const url = `/font/${generateSlug(font.name, font.fileName, font.category)}`;
-        if (seenFontUrls.has(url)) return [];
-        seenFontUrls.add(url);
-        return [
-          {
-          url,
-          priority: "0.7",
-          changefreq: "monthly",
-          lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : undefined,
-          },
-          ...(["en", "fr"] as const).map(locale => ({
-            url: `/${locale}${url}`,
-            priority: "0.7",
-            changefreq: "monthly",
-            lastmod: font.addedAt ? new Date(font.addedAt).toISOString() : undefined,
-          })),
-        ];
-      });
-
-      const generatedBlogPosts = getGeneratedPosts().map(post => ({
-        slug: post.slug,
-        date: post.dateISO,
-      }));
-      const allBlogPostsForSitemap = [
-        ...staticBlogPosts.map(p => ({ slug: p.slug, date: p.dateISO })),
-        ...generatedBlogPosts,
-      ];
-      const seenSlugs = new Set<string>();
-      const blogPages = allBlogPostsForSitemap
-        .filter(post => {
-          if (seenSlugs.has(post.slug)) return false;
-          seenSlugs.add(post.slug);
-          return true;
-        })
-        .flatMap(post => {
-          const lastmod = new Date(post.date).toISOString();
-          const entries = [{ url: `/blog/${post.slug}`, priority: "0.6", changefreq: "monthly", lastmod }];
-          if (!localizedBlogPosts.en[post.slug] || !localizedBlogPosts.fr[post.slug]) return entries;
-          return [
-            ...entries,
-            { url: `/en/blog/${post.slug}`, priority: "0.6", changefreq: "monthly", lastmod },
-            { url: `/fr/blog/${post.slug}`, priority: "0.6", changefreq: "monthly", lastmod },
-          ];
-        });
-
-      const collectionSlugs = collections.map(c => c.slug);
-      const collectionPages = collectionSlugs.map(slug => ({
-        url: `/collection/${slug}`,
-        priority: "0.8",
-        changefreq: "weekly",
-      }));
-      const localizedCollectionPages = (["en", "fr"] as const).flatMap(locale =>
-        Object.keys(localizedCollections[locale]).map(slug => ({
-          url: `/${locale}/collection/${slug}`,
-          priority: "0.8",
-          changefreq: "weekly",
-        }))
-      );
-
-      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-
-      [...staticPages, ...categoryPages, ...englishCategoryPages, ...frenchCategoryPages, ...collectionPages, ...localizedCollectionPages, ...fontPages, ...blogPages].forEach((page: any) => {
-        xml += '  <url>\n';
-        xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
-        if (page.lastmod) {
-          xml += `    <lastmod>${page.lastmod}</lastmod>\n`;
-        }
-        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
-        xml += `    <priority>${page.priority}</priority>\n`;
-        xml += '  </url>\n';
-      });
-
-      xml += '</urlset>';
-
-      res.header('Content-Type', 'application/xml');
-      res.send(xml);
-    } catch (error) {
-      res.status(500).send('Error generating sitemap');
     }
   });
 
