@@ -6,4 +6,4 @@
 - [Thumbnail workspace](thumbnail-workspace.md) — keep creation controls and output in one responsive workspace; defer real auth and project history to the auth task
 - [Generated editorial review](generated-editorial-review.md) — AI blog content stays private until automated checks and explicit human verification both pass
 - [SEO route synchronization](seo-route-synchronization.md) — public routes need matching sitemap, crawler HTML, SPA metadata, and real 404 behavior
-- [Localized directory pages](localized-download-flow.md) — English/French home and detail pages should match Arabic content depth and remain crawlable
+- [Localized directory pages](localized-download-flow.md) — EN/FR pages should match Arabic structure and behavior across directory, category, collection, and font details

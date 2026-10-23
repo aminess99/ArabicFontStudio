@@ -24,9 +24,11 @@ import {
 } from "../client/src/lib/localizedPagesContent";
 import {
   fontCharacterMap,
+  getLocalizedFontWeightLabel,
   getLocalizedFontPageContent,
   localizedFontDetailCopy,
 } from "../client/src/lib/localizedFontDetails";
+import { detectFontFamily, groupFontsByFamily } from "../client/src/lib/fontFamily";
 
 const categoryToSlug: Record<string, string> = {
   "ثلث": "thuluth",
@@ -870,13 +872,14 @@ ${faqHtml}`;
     if (!isBot(req.headers["user-agent"] || "")) return next();
 
     const fonts = await storage.getAllFonts();
+    const fontGroups = groupFontsByFamily(fonts);
     const canonical = "https://xfontat.com/en";
     const categoryLinks = englishCategories
       .map((category) => `<li><a href="/en/fonts/${category.slug}">${escapeHtml(category.name)}</a></li>`)
       .join("\n");
-    const fontLinks = fonts
+    const fontLinks = fontGroups
       .slice(0, 80)
-      .map((font) => `<li><a href="/en/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — <span lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</span></a></li>`)
+      .map((group) => `<li><a href="/en/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${englishHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const benefitItems = englishHome.benefits
       .map((item) => `<li><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></li>`)
@@ -904,7 +907,7 @@ ${faqHtml}`;
 <p>${englishHome.searchLabel}: ${englishHome.searchPlaceholder}</p>
 <p>${englishHome.previewLabel}: ${englishHome.previewPlaceholder}</p>
 <p>${englishHome.previewSizeLabel}: 16–72px</p>
-<h2>Arabic font files in the directory</h2><ul>${fontLinks}</ul>
+<h2>Arabic font families in the directory</h2><p>${fontGroups.length} families across ${fonts.length} font files</p><ul>${fontLinks}</ul>
 <section><h2>${englishHome.benefitsHeading}</h2><ul>${benefitItems}</ul></section>
 <section><h2>${englishHome.projectGuidesHeading}</h2>${projectGuides}</section>
 <section><h2>${englishHome.categoryGuideHeading}</h2><p>${englishHome.categoryGuideIntro}</p>${categoryGuides}</section>
@@ -925,15 +928,15 @@ ${faqHtml}`;
         "description": englishHome.description,
         "url": canonical,
         "inLanguage": "en",
-        "numberOfItems": fonts.length,
+        "numberOfItems": fontGroups.length,
       },
       {
         "@type": "ItemList",
-        "itemListElement": fonts.slice(0, 80).map((font, index) => ({
+        "itemListElement": fontGroups.slice(0, 80).map((group, index) => ({
           "@type": "ListItem",
           "position": index + 1,
-          "name": font.name,
-          "url": `https://xfontat.com/en/font/${generateSlug(font.name, font.fileName, font.category)}`,
+          "name": group.family,
+          "url": `https://xfontat.com/en/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
         })),
       },
       {
@@ -983,9 +986,10 @@ ${faqHtml}`;
     if (!isBot(req.headers["user-agent"] || "")) return next();
 
     const fonts = await storage.getFontsByCategory(category.arabicCategory);
-    const fontLinks = fonts
+    const fontGroups = groupFontsByFamily(fonts);
+    const fontLinks = fontGroups
       .slice(0, 80)
-      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .map((group) => `<li><a href="/en/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${englishHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const faqHtml = category.faqs
       .map((faq) => `<section><h3>${faq.question}</h3><p>${faq.answer}</p></section>`)
@@ -994,7 +998,8 @@ ${faqHtml}`;
 <p>${category.intro}</p>
 <h2>Common uses</h2>
 <ul>${category.uses.map((use) => `<li>${use}</li>`).join("\n")}</ul>
-<h2>Font files in this category</h2>
+<h2>Font families in this category</h2>
+<p>${fontGroups.length} families across ${fonts.length} font files</p>
 <ul>${fontLinks}</ul>
 <h2>Common questions about ${category.name} fonts</h2>
 ${faqHtml}
@@ -1006,7 +1011,7 @@ ${faqHtml}
         "description": category.description,
         "url": canonical,
         "inLanguage": "en",
-        "numberOfItems": fonts.length,
+        "numberOfItems": fontGroups.length,
       },
       {
         "@type": "FAQPage",
@@ -1041,13 +1046,14 @@ ${faqHtml}
     if (!isBot(req.headers["user-agent"] || "")) return next();
 
     const fonts = await storage.getAllFonts();
+    const fontGroups = groupFontsByFamily(fonts);
     const canonical = "https://xfontat.com/fr";
     const categoryLinks = frenchCategories
       .map((category) => `<li><a href="/fr/fonts/${category.slug}">${escapeHtml(category.name)}</a></li>`)
       .join("\n");
-    const fontLinks = fonts
+    const fontLinks = fontGroups
       .slice(0, 80)
-      .map((font) => `<li><a href="/fr/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — <span lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</span></a></li>`)
+      .map((group) => `<li><a href="/fr/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${frenchHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const benefitItems = frenchHome.benefits
       .map((item) => `<li><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></li>`)
@@ -1075,7 +1081,7 @@ ${faqHtml}
 <p>${frenchHome.searchLabel} : ${frenchHome.searchPlaceholder}</p>
 <p>${frenchHome.previewLabel} : ${frenchHome.previewPlaceholder}</p>
 <p>${frenchHome.previewSizeLabel} : 16–72 px</p>
-<h2>Fichiers de polices arabes du répertoire</h2><ul>${fontLinks}</ul>
+<h2>Familles de polices arabes du répertoire</h2><p>${fontGroups.length} familles pour ${fonts.length} fichiers de polices</p><ul>${fontLinks}</ul>
 <section><h2>${frenchHome.benefitsHeading}</h2><ul>${benefitItems}</ul></section>
 <section><h2>${frenchHome.projectGuidesHeading}</h2>${projectGuides}</section>
 <section><h2>${frenchHome.categoryGuideHeading}</h2><p>${frenchHome.categoryGuideIntro}</p>${categoryGuides}</section>
@@ -1096,15 +1102,15 @@ ${faqHtml}
         "description": frenchHome.description,
         "url": canonical,
         "inLanguage": "fr",
-        "numberOfItems": fonts.length,
+        "numberOfItems": fontGroups.length,
       },
       {
         "@type": "ItemList",
-        "itemListElement": fonts.slice(0, 80).map((font, index) => ({
+        "itemListElement": fontGroups.slice(0, 80).map((group, index) => ({
           "@type": "ListItem",
           "position": index + 1,
-          "name": font.name,
-          "url": `https://xfontat.com/fr/font/${generateSlug(font.name, font.fileName, font.category)}`,
+          "name": group.family,
+          "url": `https://xfontat.com/fr/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
         })),
       },
       {
@@ -1154,9 +1160,10 @@ ${faqHtml}
     if (!isBot(req.headers["user-agent"] || "")) return next();
 
     const fonts = await storage.getFontsByCategory(category.arabicCategory);
-    const fontLinks = fonts
+    const fontGroups = groupFontsByFamily(fonts);
+    const fontLinks = fontGroups
       .slice(0, 80)
-      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .map((group) => `<li><a href="/fr/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${frenchHome.variantCountLabel(group.variants.length)}</span></li>`)
       .join("\n");
     const faqHtml = category.faqs
       .map((faq) => `<section><h3>${faq.question}</h3><p>${faq.answer}</p></section>`)
@@ -1165,7 +1172,8 @@ ${faqHtml}
 <p>${category.intro}</p>
 <h2>Utilisations courantes</h2>
 <ul>${category.uses.map((use) => `<li>${use}</li>`).join("\n")}</ul>
-<h2>Fichiers de cette catégorie</h2>
+<h2>Familles de polices de cette catégorie</h2>
+<p>${fontGroups.length} familles pour ${fonts.length} fichiers de polices</p>
 <ul>${fontLinks}</ul>
 <h2>Questions fréquentes sur les polices ${category.name}</h2>
 ${faqHtml}
@@ -1177,7 +1185,7 @@ ${faqHtml}
         "description": category.description,
         "url": canonical,
         "inLanguage": "fr",
-        "numberOfItems": fonts.length,
+        "numberOfItems": fontGroups.length,
       },
       {
         "@type": "FAQPage",
@@ -1238,7 +1246,7 @@ ${faqHtml}
         `<div><dt>${copy.arabicNameLabel}</dt><dd lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</dd></div>`,
         `<div><dt>${copy.categoryLabel}</dt><dd><a href="${categoryPath}">${escapeHtml(localizedFont.categoryName)}</a></dd></div>`,
         `<div><dt>${copy.formatLabel}</dt><dd>${escapeHtml(font.fileFormat || copy.notListed)}</dd></div>`,
-        `<div><dt>${copy.styleLabel}</dt><dd>${escapeHtml(font.style || copy.notListed)}</dd></div>`,
+        `<div><dt>${copy.styleLabel}</dt><dd>${escapeHtml(localizedFont.style)}</dd></div>`,
         font.designer ? `<div><dt>${copy.designerLabel}</dt><dd>${escapeHtml(font.designer)}</dd></div>` : "",
         font.license ? `<div><dt>${copy.licenseLabel}</dt><dd>${escapeHtml(font.license)}</dd></div>` : "",
         font.copyright ? `<div><dt>${copy.copyrightLabel}</dt><dd>${escapeHtml(font.copyright)}</dd></div>` : "",
@@ -1258,18 +1266,56 @@ ${faqHtml}
       const faqSection = localizedFont.faqs.length
         ? `<section><h2>${copy.categoryFaqHeading}</h2>${localizedFont.faqs.map((faq) => `<article><h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p></article>`).join("")}</section>`
         : "";
-      const sameCategoryFonts = (await storage.getFontsByCategory(font.category))
-        .filter((item) => item.id !== font.id)
-        .slice(0, 5);
-      const relatedSection = sameCategoryFonts.length
-        ? `<section><h2>${copy.relatedHeading}</h2><ul>${sameCategoryFonts.map((item) => `<li><a href="/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}">${escapeHtml(item.name)} — <span lang="ar" dir="rtl">${escapeHtml(item.nameArabic)}</span></a></li>`).join("")}</ul><p><a href="${categoryPath}">${escapeHtml(copy.browseCategory(localizedFont.categoryName))}</a></p></section>`
+      const categoryFonts = await storage.getFontsByCategory(font.category);
+      const familyName = detectFontFamily(font.name);
+      const familyVariants = categoryFonts.filter((item) => (
+        item.id !== font.id && detectFontFamily(item.name) === familyName
+      ));
+      const relatedFonts = categoryFonts.filter((item) => (
+        item.id !== font.id && detectFontFamily(item.name) !== familyName
+      )).slice(0, 5);
+      const familyVariantsSection = familyVariants.length
+        ? `<section><h2>${copy.variantsHeading}</h2><ul>${familyVariants.map((item) => `<li><a href="/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}">${escapeHtml(item.name)}</a> — ${escapeHtml(getLocalizedFontWeightLabel(item.name, locale))} — ${escapeHtml(item.fileFormat || copy.notListed)} <a href="${escapeHtml(item.fileUrl)}" download="${escapeHtml(item.fileName)}">${copy.download}</a></li>`).join("")}</ul></section>`
         : "";
+      const relatedSection = relatedFonts.length
+        ? `<section><h2>${copy.relatedHeading}</h2><ul>${relatedFonts.map((item) => `<li><a href="/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}">${escapeHtml(item.name)} — <span lang="ar" dir="rtl">${escapeHtml(item.nameArabic)}</span></a></li>`).join("")}</ul><p><a href="${categoryPath}">${escapeHtml(copy.browseCategory(localizedFont.categoryName))}</a></p></section>`
+        : "";
+      const categoryKeywords: Record<string, string[]> = {
+        "ثلث": ["ثلث", "خطوط عربية", "تصميم", "شعارات"],
+        "ديواني": ["ديواني", "مزخرفة", "خطوط عربية"],
+        "رقعة": ["رقعة", "خطوط عربية", "سوشال"],
+        "كوفي": ["كوفي", "شعارات", "لوجو", "تصميم"],
+        "نسخ": ["نسخ", "خطوط عربية", "فوتوشوب"],
+        "تصميم": ["تصميم", "شعارات", "فوتوشوب", "سوشال"],
+        "خطوط الحرة": ["غرافيتي", "خطوط حرة", "تصميم", "شعارات"],
+        "فوتوشوب": ["فوتوشوب", "تصميم", "سوشال"],
+        "نستعليق": ["نستعليق", "فارسي", "خطوط عربية"],
+      };
+      const articleKeywords = categoryKeywords[font.category] || ["خطوط عربية"];
+      const relatedArticles = staticBlogPosts
+        .filter((post) => articleKeywords.some((keyword) => post.title.includes(keyword) || post.keywords.some((item) => item.includes(keyword))))
+        .slice(0, 3)
+        .map((post) => {
+          const translation = fullBlogTranslations[post.slug]?.[locale] || localizedBlogPosts[locale][post.slug];
+          if (!translation) return "";
+          const excerpt = translation.excerpt;
+          return `<li><a href="/${locale}/blog/${post.slug}">${escapeHtml(translation.title)}</a><p>${escapeHtml(excerpt)}</p></li>`;
+        })
+        .filter(Boolean)
+        .join("");
+      const articlesSection = relatedArticles
+        ? `<section><h2>${copy.relatedArticlesHeading}</h2><ul>${relatedArticles}</ul></section>`
+        : "";
+      const categoryLinks = (locale === "fr" ? frenchCategories : englishCategories)
+        .map((item) => `<li><a href="/${locale}/fonts/${item.slug}">${escapeHtml(item.name)}</a></li>`)
+        .join("");
       const body = `
 <nav aria-label="${isFrench ? "Fil d’Ariane" : "Breadcrumb"}">
   <a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a> /
   <a href="${categoryPath}">${escapeHtml(localizedFont.categoryName)}</a> /
   <span>${escapeHtml(font.name)}</span>
 </nav>
+<h1>${escapeHtml(copy.heading(font.name))}</h1>
 <p lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</p>
 <section>
   <h2>${copy.aboutHeading}</h2>
@@ -1304,7 +1350,16 @@ ${categoryUses}
   ${characterRows}
 </section>
 ${faqSection}
-${relatedSection}`;
+${familyVariantsSection}
+${relatedSection}
+${articlesSection}
+<aside>
+  <h2>${copy.sidebarHeading}</h2>
+  <dl>${infoRows}</dl>
+  <p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${copy.download}</a></p>
+  <h3>${copy.categoriesHeading}</h3>
+  <ul>${categoryLinks}</ul>
+</aside>`;
       const title = localizedFont.title;
       const description = localizedFont.description;
       const breadcrumbs = [
@@ -1326,6 +1381,24 @@ ${relatedSection}`;
           "contentUrl": `https://xfontat.com${font.fileUrl}`,
         },
         { "@type": "BreadcrumbList", "itemListElement": breadcrumbs },
+        {
+          "@type": "ItemList",
+          "name": copy.variantsHeading,
+          "itemListElement": familyVariants.map((item, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": `${item.name} — ${getLocalizedFontWeightLabel(item.name, locale)}`,
+            "url": `https://xfontat.com/${locale}/font/${generateSlug(item.name, item.fileName, item.category)}`,
+          })),
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": localizedFont.faqs.map((faq) => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+          })),
+        },
       ];
       return res.send(botHTML(
         escapeHtml(title),
@@ -1356,26 +1429,69 @@ ${relatedSection}`;
       }
       const categoryNames = (isFrench ? frenchCategories : englishCategories);
       const fonts = await storage.getFontsByCategories(collection.categories);
-      const links = fonts.slice(0, 80).map((font) =>
-        `<li><a href="/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`
+      const fontGroups = groupFontsByFamily(fonts);
+      const links = fontGroups.slice(0, 80).map((group) =>
+        `<li><a href="/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${isFrench ? frenchHome.variantCountLabel(group.variants.length) : englishHome.variantCountLabel(group.variants.length)}</span></li>`
       ).join("");
+      const collectionFaqs = isFrench
+        ? [
+            { question: `Comment choisir une police dans « ${translated.title} » ?`, answer: "Prévisualisez le texte exact à sa taille prévue et vérifiez sa lisibilité. Consultez la fiche du fichier avant de le choisir." },
+            { question: "Puis-je utiliser ces polices à des fins commerciales ?", answer: "Les droits d’utilisation varient selon chaque fichier. Consultez sa licence et sa source avant tout usage commercial ou redistribution." },
+            { question: "Quels formats de fichiers sont disponibles ?", answer: "Les formats varient d’un fichier à l’autre. Consultez la fiche de chaque police pour vérifier son format et sa compatibilité." },
+          ]
+        : [
+            { question: `How should I choose a font from “${translated.title}”?`, answer: "Preview the exact text at its intended size and check readability. Review the individual file page before choosing a font." },
+            { question: "Can I use these fonts commercially?", answer: "Usage rights vary by file. Check its license and source before commercial use or redistribution." },
+            { question: "Which file formats are available?", answer: "Formats vary by file. Open each font’s detail page to check its format and compatibility." },
+          ];
+      const faqHtml = collectionFaqs
+        .map((faq) => `<article><h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p></article>`)
+        .join("");
+      const relatedCollections = Object.entries(localizedCollections[locale])
+        .filter(([otherSlug]) => otherSlug !== slug)
+        .map(([otherSlug, item]) => `<li><a href="/${locale}/collection/${otherSlug}">${escapeHtml(item.title)}</a></li>`)
+        .join("");
       const body = `
+<nav aria-label="${isFrench ? "Fil d’Ariane" : "Breadcrumb"}"><a href="/${locale}">${isFrench ? "Accueil" : "Home"}</a> / ${escapeHtml(translated.title)}</nav>
+<h1>${escapeHtml(translated.title)}</h1>
 <p>${translated.description}</p>
 <ul>${translated.useCases.map((item) => `<li>${item}</li>`).join("")}</ul>
 <h2>${isFrench ? "Catégories" : "Categories"}</h2>
 <ul>${collection.categories.map((name) => {
   const category = categoryNames.find((item) => item.arabicCategory === name);
-  return `<li>${category?.name || escapeHtml(name)}</li>`;
+  return category
+    ? `<li><a href="/${locale}/fonts/${category.slug}">${escapeHtml(category.name)}</a></li>`
+    : `<li>${escapeHtml(name)}</li>`;
 }).join("")}</ul>
-<h2>${isFrench ? "Fichiers de polices" : "Font files"}</h2>
-<ul>${links}</ul>`;
+<h2>${isFrench ? "Familles de polices" : "Font families"}</h2>
+<p>${isFrench ? `${fontGroups.length} familles pour ${fonts.length} fichiers de polices` : `${fontGroups.length} families across ${fonts.length} font files`}</p>
+<ul>${links}</ul>
+<section><h2>${isFrench ? "Questions fréquentes" : "Common questions"}</h2>${faqHtml}</section>
+<section><h2>${isFrench ? "Autres collections" : "Other collections"}</h2><ul>${relatedCollections}</ul></section>`;
       return res.send(botHTML(
         translated.title,
         translated.description,
         canonical,
         translated.title,
         body,
-        { "@type": "CollectionPage", "name": translated.title, "url": canonical, "inLanguage": locale, "numberOfItems": fonts.length },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            { "@type": "CollectionPage", "name": translated.title, "description": translated.description, "url": canonical, "inLanguage": locale, "numberOfItems": fontGroups.length },
+            {
+              "@type": "ItemList",
+              "name": translated.title,
+              "numberOfItems": fontGroups.length,
+              "itemListElement": fontGroups.slice(0, 80).map((group, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "name": group.family,
+                "url": `https://xfontat.com/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+              })),
+            },
+            { "@type": "FAQPage", "mainEntity": collectionFaqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } })) },
+          ],
+        },
         undefined,
         { lang: locale, alternates }
       ));

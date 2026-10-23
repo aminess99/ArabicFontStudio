@@ -64,8 +64,14 @@ export const englishHome = {
   previous: "Previous",
   next: "Next",
   home: "Home",
+  mainNavigation: "Main navigation",
+  designFonts: "Design fonts",
+  blog: "Blog",
   allCategories: "Browse styles",
   language: "العربية",
+  familyCountLabel: (count: number) => count === 1 ? "font family" : "font families",
+  fileCountLabel: (count: number) => count === 1 ? "font file" : "font files",
+  variantCountLabel: (count: number) => count === 1 ? "style" : "styles",
   footerAbout: "About",
   footerContact: "Contact",
   footerPrivacy: "Privacy",
@@ -356,8 +362,14 @@ export const frenchHome = {
   previous: "Précédent",
   next: "Suivant",
   home: "Accueil",
+  mainNavigation: "Navigation principale",
+  designFonts: "Polices de design",
+  blog: "Blog",
   allCategories: "Parcourir les styles",
   language: "العربية",
+  familyCountLabel: (count: number) => count === 1 ? "famille de polices" : "familles de polices",
+  fileCountLabel: (count: number) => count === 1 ? "fichier de police" : "fichiers de police",
+  variantCountLabel: (count: number) => count === 1 ? "variante" : "variantes",
   footerAbout: "À propos",
   footerContact: "Contact",
   footerPrivacy: "Confidentialité",
@@ -382,6 +394,8 @@ export const frenchHome = {
     },
   ],
 };
+
+export type InternationalHomeCopy = typeof englishHome | typeof frenchHome;
 
 export const frenchCategories: InternationalCategory[] = [
   {

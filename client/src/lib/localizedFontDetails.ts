@@ -2,6 +2,7 @@ import {
   englishCategories,
   frenchCategories,
 } from "./internationalContent";
+import { detectFontFamily } from "./fontFamily";
 
 export type FontDetailLocale = "en" | "fr";
 
@@ -50,6 +51,13 @@ export const localizedFontDetailCopy = {
     characterMapImageAlt: (fontName: string) => `Character preview for ${fontName}`,
     categoryFaqHeading: "Common questions about this style",
     relatedHeading: "More fonts in this category",
+    variantsHeading: "Other styles in this font family",
+    relatedArticlesHeading: "Related articles",
+    sidebarHeading: "Font information",
+    categoriesHeading: "Browse font categories",
+    addFavorite: "Add font to favorites",
+    removeFavorite: "Remove font from favorites",
+    regularWeight: "Regular",
     browseCategory: (categoryName: string) => `Browse all ${categoryName} fonts`,
     download: "Download file",
     notListed: "Not listed",
@@ -101,6 +109,13 @@ export const localizedFontDetailCopy = {
     characterMapImageAlt: (fontName: string) => `Aperçu des caractères de ${fontName}`,
     categoryFaqHeading: "Questions sur ce style",
     relatedHeading: "Autres polices de cette catégorie",
+    variantsHeading: "Autres styles de cette famille",
+    relatedArticlesHeading: "Articles associés",
+    sidebarHeading: "Informations sur la police",
+    categoriesHeading: "Parcourir les catégories",
+    addFavorite: "Ajouter aux favoris",
+    removeFavorite: "Retirer des favoris",
+    regularWeight: "Régulier",
     browseCategory: (categoryName: string) => `Voir toutes les polices ${categoryName}`,
     download: "Télécharger le fichier",
     notListed: "Non indiqué",
@@ -109,6 +124,9 @@ export const localizedFontDetailCopy = {
     softwareCompatibility: "Vérifiez le format du fichier et testez la police dans votre système et vos logiciels.",
   },
 } as const;
+
+export type LocalizedFontDetailCopy =
+  (typeof localizedFontDetailCopy)[FontDetailLocale];
 
 export function getLocalizedFontPageContent(
   font: { name: string; fileFormat: string; category: string; style?: string | null },
@@ -119,14 +137,16 @@ export function getLocalizedFontPageContent(
   const copy = localizedFontDetailCopy[locale];
   const categoryName = category?.name || copy.categoryFallback;
   const format = font.fileFormat || copy.notListed;
+  const style = getLocalizedFontStyleLabel(font.style, locale, copy.notListed);
 
   return {
     category,
     categoryName,
     categoryDescription: category?.intro || copy.categoryDescriptionFallback,
     summary: locale === "fr"
-      ? `${font.name} est un fichier de police arabe de catégorie ${categoryName}. Le style indiqué est ${font.style || copy.notListed} et le format du fichier est ${format}. Prévisualisez les caractères et consultez la licence et la source avant utilisation.`
-      : `${font.name} is an Arabic font file in the ${categoryName} category. The listed style is ${font.style || copy.notListed}, and the file format is ${format}. Preview the characters and review the license and source before use.`,
+      ? `${font.name} est un fichier de police arabe de catégorie ${categoryName}. Le style indiqué est ${style} et le format du fichier est ${format}. Prévisualisez les caractères et consultez la licence et la source avant utilisation.`
+      : `${font.name} is an Arabic font file in the ${categoryName} category. The listed style is ${style}, and the file format is ${format}. Preview the characters and review the license and source before use.`,
+    style,
     useCases: category?.uses || [],
     faqs: category?.faqs || [],
     title: locale === "fr"
@@ -136,6 +156,71 @@ export function getLocalizedFontPageContent(
       ? `Prévisualisez ${font.name}, une police arabe de la catégorie ${categoryName}. Vérifiez le format ${format}, la licence et la source avant de télécharger le fichier.`
       : `Preview ${font.name}, an Arabic font in the ${categoryName} category. Check the ${format} format, license and source before downloading the file.`,
   };
+}
+
+export function getLocalizedFontStyleLabel(
+  style: string | null | undefined,
+  locale: FontDetailLocale,
+  fallback: string,
+) {
+  if (!style?.trim()) return fallback;
+  const normalized = style.trim().normalize("NFD").replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "").toLowerCase();
+  const labels: Record<string, { en: string; fr: string }> = {
+    "عادي": { en: "Regular", fr: "Régulier" },
+    "منتظم": { en: "Regular", fr: "Régulier" },
+    "غامق": { en: "Bold", fr: "Gras" },
+    "عريض": { en: "Bold", fr: "Gras" },
+    "متوسط": { en: "Medium", fr: "Moyen" },
+    "خفيف": { en: "Light", fr: "Léger" },
+    "رقيق": { en: "Thin", fr: "Fin" },
+    "مائل": { en: "Italic", fr: "Italique" },
+    "ثقيل": { en: "Heavy", fr: "Très gras" },
+    "اسود": { en: "Black", fr: "Noir" },
+  };
+  const arabicLabel = labels[normalized]?.[locale];
+  if (arabicLabel) return arabicLabel;
+
+  const latinWeights: Record<string, { en: string; fr: string }> = {
+    regular: { en: "Regular", fr: "Régulier" },
+    bold: { en: "Bold", fr: "Gras" },
+    semibold: { en: "SemiBold", fr: "Semi-gras" },
+    extralight: { en: "ExtraLight", fr: "Extra-léger" },
+    medium: { en: "Medium", fr: "Moyen" },
+    light: { en: "Light", fr: "Léger" },
+    black: { en: "Black", fr: "Noir" },
+    semicondensed: { en: "SemiCondensed", fr: "Semi-condensé" },
+    italic: { en: "Italic", fr: "Italique" },
+    roman: { en: "Roman", fr: "Romain" },
+  };
+  return style.replace(/[A-Za-z]+/g, (token) => latinWeights[token.toLowerCase()]?.[locale] || token);
+}
+
+export function getLocalizedFontWeightLabel(fontName: string, locale: FontDetailLocale) {
+  const family = detectFontFamily(fontName);
+  const escapedFamily = family.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const suffix = fontName.replace(new RegExp(`^${escapedFamily}`, "i"), "").trim().replace(/^[-_\s]+/, "").trim();
+  const key = suffix.toLowerCase().replace(/[\s_-]+/g, "");
+  const labels: Record<string, { en: string; fr: string }> = {
+    regular: { en: "Regular", fr: "Régulier" },
+    normal: { en: "Regular", fr: "Régulier" },
+    roman: { en: "Roman", fr: "Romain" },
+    plain: { en: "Plain", fr: "Normal" },
+    medium: { en: "Medium", fr: "Moyen" },
+    semibold: { en: "Semi-bold", fr: "Semi-gras" },
+    demibold: { en: "Semi-bold", fr: "Semi-gras" },
+    bold: { en: "Bold", fr: "Gras" },
+    extrabold: { en: "Extra bold", fr: "Extra-gras" },
+    black: { en: "Black", fr: "Noir" },
+    heavy: { en: "Heavy", fr: "Très gras" },
+    thin: { en: "Thin", fr: "Fin" },
+    light: { en: "Light", fr: "Léger" },
+    extralight: { en: "Extra light", fr: "Extra-léger" },
+    ultralight: { en: "Ultra light", fr: "Ultra-léger" },
+    italic: { en: "Italic", fr: "Italique" },
+    condensed: { en: "Condensed", fr: "Condensé" },
+    oblique: { en: "Oblique", fr: "Oblique" },
+  };
+  return labels[key]?.[locale] || suffix || localizedFontDetailCopy[locale].regularWeight;
 }
 
 export const fontCharacterMap = [

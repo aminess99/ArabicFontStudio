@@ -7,8 +7,8 @@ English and French font-list buttons should open the corresponding font detail p
 
 Localized font detail pages should provide a substantive, translated equivalent of the Arabic detail page, with font-specific information and useful content available to both visitors and search crawlers. Preserve original font names, license terms, and source notes rather than inventing translations for them.
 
-English and French homepages should also preserve the Arabic directory’s content depth with translated guidance, category and collection links, FAQs, and matching crawler-facing HTML.
+English and French pages should match the Arabic experience in structure and behavior across home, category, collection, and font-detail pages. This includes browsing controls, family grouping and variants, favorites, pagination, side information, related resources, downloads, FAQs, and substantive localized page content. Translate interface copy while preserving original font names, designer names, license terms, and source notes.
 
 **Why:** The user requested the same experience as the Arabic site and believes complete localized pages can improve SEO in other languages.
 
-**How to apply:** Preserve this flow in directory, category, and collection listings. Keep the final detail-page download direct, and synchronize localized home/detail content with crawler-facing HTML and page metadata.
+**How to apply:** Keep controls and content depth consistent across every localized route. Font-list actions open detail pages in the selected language; the final download remains direct. Synchronize rendered pages, crawler-facing HTML, metadata, and structured data.

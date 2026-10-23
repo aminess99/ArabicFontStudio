@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Heart } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
-import { generateFontFamily, loadFont } from "@/lib/fontLoader";
+import { LocalizedFontRow } from "@/components/LocalizedFontRow";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { generateSlug } from "@/lib/slugify";
 import { localizedCollections } from "@/lib/localizedPagesContent";
+import { groupFontsByFamily } from "@/lib/fontFamily";
 import {
   englishCategories,
   englishHome,
@@ -16,138 +17,21 @@ import type { Font } from "@shared/schema";
 
 const PAGE_SIZE = 15;
 
-interface PagedFontResponse {
-  data: Font[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-function FontFileRow({
-  font,
-  previewText,
-  previewSize,
-  isFavorite,
-  onToggleFavorite,
-  copy,
-  locale,
-}: {
-  font: Font;
-  previewText: string;
-  previewSize: number;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
-  copy: typeof englishHome;
-  locale: "en" | "fr";
-}) {
-  const [fontLoaded, setFontLoaded] = useState(false);
-  const fontFamily = generateFontFamily(font.name);
-
-  useEffect(() => {
-    let active = true;
-    loadFont(fontFamily, font.fileUrl)
-      .then(() => {
-        if (active) setFontLoaded(true);
-      })
-      .catch(() => {
-        if (active) setFontLoaded(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [fontFamily, font.fileUrl]);
-
-  const license = font.license;
-  const format = font.fileFormat || font.fileName.split(".").pop()?.toUpperCase();
-  const detailsPath = `/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`;
-
-  return (
-    <article className="border-b py-5" data-testid={`international-font-${font.id}`}>
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="min-w-0 flex-1">
-          <h2 className="font-semibold break-words">
-            <Link
-              href={detailsPath}
-              className="hover:underline underline-offset-4"
-            >
-              {font.name || font.nameArabic}
-            </Link>
-          </h2>
-          {font.nameArabic && (
-            <p className="text-sm text-muted-foreground mt-1" lang="ar" dir="rtl">
-              {font.nameArabic}
-            </p>
-          )}
-          <Link
-            href={detailsPath}
-            className="mt-2 inline-block text-sm text-primary underline underline-offset-4"
-          >
-            {copy.viewDetails}
-          </Link>
-          <p
-            className="break-words leading-relaxed mt-3"
-            style={{
-              fontFamily: fontLoaded ? fontFamily : "inherit",
-              fontSize: `clamp(16px, 9vw, ${previewSize}px)`,
-            }}
-            lang="ar"
-            dir="rtl"
-          >
-            {previewText}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            {format && <span>{copy.formatLabel}: {format}</span>}
-            <span>
-              {copy.licenseLabel}: {license || copy.licenseUnknown}
-            </span>
-            {font.sourceUrl && (
-              <a
-                href={font.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="underline underline-offset-2 hover:text-foreground"
-              >
-                {copy.source}
-              </a>
-            )}
-          </div>
-        </div>
-        <div className="flex w-full shrink-0 items-center gap-2 md:w-auto">
-          <button
-            type="button"
-            onClick={onToggleFavorite}
-            className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${isFavorite ? "text-rose-500" : "text-muted-foreground"}`}
-            aria-label={isFavorite ? copy.favoriteRemove : copy.favoriteAdd}
-            aria-pressed={isFavorite}
-            data-testid={`international-favorite-${font.id}`}
-          >
-            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
-          </button>
-          <Link
-            href={detailsPath}
-            className="inline-flex min-h-10 flex-1 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 md:flex-none"
-            data-testid={`international-download-${font.id}`}
-          >
-            {copy.download}
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export default function EnglishDirectory() {
   const pathname = typeof window === "undefined" ? "/en" : window.location.pathname;
   const locale = pathname === "/fr" || pathname.startsWith("/fr/") ? "fr" : "en";
   const isFrench = locale === "fr";
   const homeCopy = isFrench ? frenchHome : englishHome;
   const categories = isFrench ? frenchCategories : englishCategories;
+  const designCategory = categories.find((item) => item.arabicCategory === "تصميم");
   const [, englishCategoryParams] = useRoute("/en/fonts/:category");
   const [, frenchCategoryParams] = useRoute("/fr/fonts/:category");
   const categorySlug = englishCategoryParams?.category || frenchCategoryParams?.category;
   const category = categories.find((item) => item.slug === categorySlug);
   const invalidCategory = Boolean(categorySlug && !category);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => (
+    typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("q") || ""
+  ));
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [previewSize, setPreviewSize] = useState(48);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -157,21 +41,30 @@ export default function EnglishDirectory() {
     setPage(1);
   }, [search, categorySlug]);
 
-  const queryParams = new URLSearchParams({
-    page: String(page),
-    limit: String(PAGE_SIZE),
-  });
-  if (category) queryParams.set("category", category.arabicCategory);
-  if (search.trim()) queryParams.set("q", search.trim());
-
-  const { data, isLoading, isError, refetch } = useQuery<PagedFontResponse>({
-    queryKey: [`/api/fonts?${queryParams.toString()}`],
+  const fontQueryPath = category
+    ? `/api/fonts?category=${encodeURIComponent(category.arabicCategory)}`
+    : "/api/fonts";
+  const { data: allFonts = [], isLoading, isError, refetch } = useQuery<Font[]>({
+    queryKey: [fontQueryPath],
     enabled: !invalidCategory,
   });
 
-  const fonts = data?.data ?? [];
-  const total = data?.total ?? 0;
+  const fonts = useMemo(
+    () => allFonts
+      .filter((font) => {
+        if (!search.trim()) return true;
+        const needle = search.trim().toLowerCase();
+        return font.name.toLowerCase().includes(needle)
+          || font.nameArabic.includes(search.trim())
+          || Boolean(font.designer?.toLowerCase().includes(needle));
+      })
+      .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime()),
+    [allFonts, search],
+  );
+  const groupedFonts = useMemo(() => groupFontsByFamily(fonts), [fonts]);
+  const total = groupedFonts.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const currentGroups = groupedFonts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const title = category?.title ?? homeCopy.title;
   const description = category?.description ?? homeCopy.description;
   const path = category ? `/${locale}/fonts/${category.slug}` : `/${locale}`;
@@ -219,11 +112,11 @@ export default function EnglishDirectory() {
             },
             {
               "@type": "ItemList",
-              itemListElement: fonts.map((font, index) => ({
+              itemListElement: currentGroups.map((group, index) => ({
                 "@type": "ListItem",
                 position: index + 1 + (page - 1) * PAGE_SIZE,
-                url: `https://xfontat.com/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`,
-                name: font.name,
+                url: `https://xfontat.com/${locale}/font/${generateSlug(group.primary.name, group.primary.fileName, group.primary.category)}`,
+                name: group.family,
               })),
             },
             {
@@ -276,23 +169,70 @@ export default function EnglishDirectory() {
         alternates={alternates}
       />
 
-      <header className="border-b bg-background">
-        <div className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-4">
-          <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
-            <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
-          </Link>
-          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" aria-label="Font styles">
-            <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
-            {categories.slice(0, 5).map((item) => (
-              <Link key={item.slug} href={`/${locale}/fonts/${item.slug}`} className="hover:underline">
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex gap-2 text-sm">
-            <Link href={category ? `/en/fonts/${category.slug}` : "/en"} hrefLang="en" className="rounded-md border px-2 py-2 hover:bg-muted">EN</Link>
-            <Link href={category ? `/fr/fonts/${category.slug}` : "/fr"} hrefLang="fr" className="rounded-md border px-2 py-2 hover:bg-muted">FR</Link>
-            <Link href={arabicPath} hrefLang="ar" className="rounded-md border px-2 py-2 hover:bg-muted">{homeCopy.language}</Link>
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
+        <div className="container mx-auto px-3 py-3 md:px-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
+              <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
+            </Link>
+            <nav className="hidden items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
+              <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
+              {categories.slice(0, 5).map((item) => (
+                <Link key={item.slug} href={`/${locale}/fonts/${item.slug}`} className="hover:underline">
+                  {item.name}
+                </Link>
+              ))}
+              <Link href={`/${locale}/fonts/${designCategory?.slug || "tasmeem"}`} className="hover:underline">{homeCopy.designFonts}</Link>
+              <Link href={`/${locale}/blog`} className="hover:underline">{homeCopy.blog}</Link>
+            </nav>
+            <div className="flex items-center gap-2 text-sm">
+              <Link href={category ? `/en/fonts/${category.slug}` : "/en"} hrefLang="en" className="rounded-md border px-2 py-2 hover:bg-muted">EN</Link>
+              <Link href={category ? `/fr/fonts/${category.slug}` : "/fr"} hrefLang="fr" className="rounded-md border px-2 py-2 hover:bg-muted">FR</Link>
+              <Link href={arabicPath} hrefLang="ar" className="rounded-md border px-2 py-2 hover:bg-muted">{homeCopy.language}</Link>
+              <ThemeToggle label={isFrench ? "Changer le thème" : "Toggle theme"} />
+            </div>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_240px]">
+            <label className="grid gap-1 text-xs font-medium">
+              {homeCopy.searchLabel}
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={homeCopy.searchPlaceholder}
+                className="h-10 rounded-md border bg-background px-3 text-base font-normal"
+                data-testid="english-font-search"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium">
+              {homeCopy.previewLabel}
+              <input
+                type="text"
+                value={previewText}
+                onChange={(event) => setPreviewText(event.target.value)}
+                placeholder={homeCopy.previewPlaceholder}
+                className="h-10 rounded-md border bg-background px-3 text-base font-normal"
+                dir="auto"
+                data-testid="english-font-preview"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium">
+              <span className="flex items-center justify-between gap-3">
+                <span>{homeCopy.previewSizeLabel}</span>
+                <span className="text-xs text-muted-foreground">{previewSize}px</span>
+              </span>
+              <input
+                type="range"
+                min={16}
+                max={72}
+                step={2}
+                value={previewSize}
+                onChange={(event) => setPreviewSize(Number(event.target.value))}
+                aria-label={`${homeCopy.previewSizeLabel}: ${previewSize}px`}
+                className="h-10 w-full accent-primary"
+                data-testid="international-preview-size"
+              />
+            </label>
           </div>
         </div>
       </header>
@@ -337,52 +277,6 @@ export default function EnglishDirectory() {
           </section>
         )}
 
-        <section className="py-6" aria-label={homeCopy.searchPreviewHeading}>
-          <h2 className="sr-only">{homeCopy.searchPreviewHeading}</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            <label className="grid gap-2 text-sm font-medium">
-              {homeCopy.searchLabel}
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder={homeCopy.searchPlaceholder}
-                className="h-11 rounded-md border bg-background px-3 text-base font-normal"
-                data-testid="english-font-search"
-              />
-            </label>
-            <label className="grid gap-2 text-sm font-medium">
-              {homeCopy.previewLabel}
-              <input
-                type="text"
-                value={previewText}
-                onChange={(event) => setPreviewText(event.target.value)}
-                placeholder={homeCopy.previewPlaceholder}
-                className="h-11 rounded-md border bg-background px-3 text-base font-normal"
-                dir="auto"
-                data-testid="english-font-preview"
-              />
-            </label>
-            <label className="grid gap-2 text-sm font-medium">
-              <span className="flex items-center justify-between gap-3">
-                <span>{homeCopy.previewSizeLabel}</span>
-                <span className="text-xs text-muted-foreground">{previewSize}px</span>
-              </span>
-              <input
-                type="range"
-                min={16}
-                max={72}
-                step={2}
-                value={previewSize}
-                onChange={(event) => setPreviewSize(Number(event.target.value))}
-                aria-label={`${homeCopy.previewSizeLabel}: ${previewSize}px`}
-                className="h-11 w-full accent-primary"
-                data-testid="international-preview-size"
-              />
-            </label>
-          </div>
-        </section>
-
         <section aria-live="polite">
           {isLoading ? (
             <p className="py-10 text-center text-muted-foreground">{homeCopy.loading}</p>
@@ -398,16 +292,19 @@ export default function EnglishDirectory() {
           ) : (
             <>
               <p className="border-b py-3 text-sm text-muted-foreground">
-                {isFrench ? "Résultats" : "Showing"} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} {isFrench ? "sur" : "of"} {total} {homeCopy.results}
+                {isFrench
+                  ? `Affichage ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} sur ${total} ${homeCopy.familyCountLabel(total)} (${fonts.length} ${homeCopy.fileCountLabel(fonts.length)})`
+                  : `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} of ${total} ${homeCopy.familyCountLabel(total)} (${fonts.length} ${homeCopy.fileCountLabel(fonts.length)})`}
               </p>
-              {fonts.map((font) => (
-                <FontFileRow
-                  key={font.id}
-                  font={font}
+              {currentGroups.map((group) => (
+                <LocalizedFontRow
+                  key={group.primary.id}
+                  font={group.primary}
                   previewText={previewText}
                   previewSize={previewSize}
-                  isFavorite={favorites.has(font.id)}
-                  onToggleFavorite={() => toggleFavorite(font.id)}
+                  variantCount={group.variants.length}
+                  isFavorite={favorites.has(group.primary.id)}
+                  onToggleFavorite={() => toggleFavorite(group.primary.id)}
                   copy={homeCopy}
                   locale={locale}
                 />
