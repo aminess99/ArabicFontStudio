@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { Heart } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
 import { generateSlug } from "@/lib/slugify";
+import { localizedCollections } from "@/lib/localizedPagesContent";
 import {
   englishCategories,
   englishHome,
@@ -24,11 +26,17 @@ interface PagedFontResponse {
 function FontFileRow({
   font,
   previewText,
+  previewSize,
+  isFavorite,
+  onToggleFavorite,
   copy,
   locale,
 }: {
   font: Font;
   previewText: string;
+  previewSize: number;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
   copy: typeof englishHome;
   locale: "en" | "fr";
 }) {
@@ -49,7 +57,7 @@ function FontFileRow({
     };
   }, [fontFamily, font.fileUrl]);
 
-  const license = font.licenseNotice || font.license;
+  const license = font.license;
   const format = font.fileFormat || font.fileName.split(".").pop()?.toUpperCase();
   const detailsPath = `/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`;
 
@@ -74,13 +82,13 @@ function FontFileRow({
             href={detailsPath}
             className="mt-2 inline-block text-sm text-primary underline underline-offset-4"
           >
-            {locale === "fr" ? "Voir la fiche de la police" : "View font details"}
+            {copy.viewDetails}
           </Link>
           <p
             className="break-words leading-relaxed mt-3"
             style={{
               fontFamily: fontLoaded ? fontFamily : "inherit",
-              fontSize: "clamp(1.6rem, 4vw, 2.5rem)",
+              fontSize: `clamp(16px, 9vw, ${previewSize}px)`,
             }}
             lang="ar"
             dir="rtl"
@@ -88,7 +96,7 @@ function FontFileRow({
             {previewText}
           </p>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            {format && <span>Format: {format}</span>}
+            {format && <span>{copy.formatLabel}: {format}</span>}
             <span>
               {copy.licenseLabel}: {license || copy.licenseUnknown}
             </span>
@@ -104,13 +112,25 @@ function FontFileRow({
             )}
           </div>
         </div>
-        <Link
-          href={detailsPath}
-          className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-          data-testid={`international-download-${font.id}`}
-        >
-          {copy.download}
-        </Link>
+        <div className="flex w-full shrink-0 items-center gap-2 md:w-auto">
+          <button
+            type="button"
+            onClick={onToggleFavorite}
+            className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${isFavorite ? "text-rose-500" : "text-muted-foreground"}`}
+            aria-label={isFavorite ? copy.favoriteRemove : copy.favoriteAdd}
+            aria-pressed={isFavorite}
+            data-testid={`international-favorite-${font.id}`}
+          >
+            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
+          </button>
+          <Link
+            href={detailsPath}
+            className="inline-flex min-h-10 flex-1 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 md:flex-none"
+            data-testid={`international-download-${font.id}`}
+          >
+            {copy.download}
+          </Link>
+        </div>
       </div>
     </article>
   );
@@ -129,6 +149,8 @@ export default function EnglishDirectory() {
   const invalidCategory = Boolean(categorySlug && !category);
   const [search, setSearch] = useState("");
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
+  const [previewSize, setPreviewSize] = useState(48);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -157,6 +179,7 @@ export default function EnglishDirectory() {
   const heading = category?.name ?? homeCopy.heading;
   const intro = category?.intro ?? homeCopy.intro;
   const faqs = category?.faqs ?? homeCopy.faqs;
+  const homeCollectionEntries = Object.entries(localizedCollections[locale]);
   const alternates = [
     { lang: "en", href: `https://xfontat.com/${category ? `en/fonts/${category.slug}` : "en"}` },
     { lang: "fr", href: `https://xfontat.com/${category ? `fr/fonts/${category.slug}` : "fr"}` },
@@ -166,15 +189,62 @@ export default function EnglishDirectory() {
 
   const schema = invalidCategory
     ? undefined
-    : {
-        "@context": "https://schema.org",
-        "@type": category ? "CollectionPage" : "WebPage",
-        name: heading,
-        description,
-        url: `https://xfontat.com${path}`,
-        inLanguage: locale,
-        ...(category && data ? { numberOfItems: total } : {}),
-      };
+    : category
+      ? {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: heading,
+          description,
+          url: `https://xfontat.com${path}`,
+          inLanguage: locale,
+          numberOfItems: total,
+        }
+      : {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              name: "xfontat",
+              url: `https://xfontat.com/${locale}`,
+              description: homeCopy.description,
+              inLanguage: locale,
+            },
+            {
+              "@type": "CollectionPage",
+              name: homeCopy.title,
+              description: homeCopy.description,
+              url: `https://xfontat.com/${locale}`,
+              inLanguage: locale,
+              numberOfItems: total,
+            },
+            {
+              "@type": "ItemList",
+              itemListElement: fonts.map((font, index) => ({
+                "@type": "ListItem",
+                position: index + 1 + (page - 1) * PAGE_SIZE,
+                url: `https://xfontat.com/${locale}/font/${generateSlug(font.name, font.fileName, font.category)}`,
+                name: font.name,
+              })),
+            },
+            {
+              "@type": "FAQPage",
+              mainEntity: homeCopy.faqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: { "@type": "Answer", text: faq.answer },
+              })),
+            },
+          ],
+        };
+
+  const toggleFavorite = (fontId: string) => {
+    setFavorites((current) => {
+      const next = new Set(current);
+      if (next.has(fontId)) next.delete(fontId);
+      else next.add(fontId);
+      return next;
+    });
+  };
 
   if (invalidCategory) {
     return (
@@ -208,8 +278,8 @@ export default function EnglishDirectory() {
 
       <header className="border-b bg-background">
         <div className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-4">
-          <Link href={`/${locale}`} className="text-xl font-bold tracking-tight" aria-label={`xfontat ${locale} home`}>
-            xfontat
+          <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
+            <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
           </Link>
           <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" aria-label="Font styles">
             <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
@@ -267,8 +337,9 @@ export default function EnglishDirectory() {
           </section>
         )}
 
-        <section className="py-6" aria-label="Search and preview">
-          <div className="grid gap-4 md:grid-cols-2">
+        <section className="py-6" aria-label={homeCopy.searchPreviewHeading}>
+          <h2 className="sr-only">{homeCopy.searchPreviewHeading}</h2>
+          <div className="grid gap-4 md:grid-cols-3">
             <label className="grid gap-2 text-sm font-medium">
               {homeCopy.searchLabel}
               <input
@@ -292,6 +363,23 @@ export default function EnglishDirectory() {
                 data-testid="english-font-preview"
               />
             </label>
+            <label className="grid gap-2 text-sm font-medium">
+              <span className="flex items-center justify-between gap-3">
+                <span>{homeCopy.previewSizeLabel}</span>
+                <span className="text-xs text-muted-foreground">{previewSize}px</span>
+              </span>
+              <input
+                type="range"
+                min={16}
+                max={72}
+                step={2}
+                value={previewSize}
+                onChange={(event) => setPreviewSize(Number(event.target.value))}
+                aria-label={`${homeCopy.previewSizeLabel}: ${previewSize}px`}
+                className="h-11 w-full accent-primary"
+                data-testid="international-preview-size"
+              />
+            </label>
           </div>
         </section>
 
@@ -313,7 +401,16 @@ export default function EnglishDirectory() {
                 {isFrench ? "Résultats" : "Showing"} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} {isFrench ? "sur" : "of"} {total} {homeCopy.results}
               </p>
               {fonts.map((font) => (
-                <FontFileRow key={font.id} font={font} previewText={previewText} copy={homeCopy} locale={locale} />
+                <FontFileRow
+                  key={font.id}
+                  font={font}
+                  previewText={previewText}
+                  previewSize={previewSize}
+                  isFavorite={favorites.has(font.id)}
+                  onToggleFavorite={() => toggleFavorite(font.id)}
+                  copy={homeCopy}
+                  locale={locale}
+                />
               ))}
               {totalPages > 1 && (
                 <nav className="flex items-center justify-center gap-4 py-7" aria-label="Pagination">
@@ -338,6 +435,78 @@ export default function EnglishDirectory() {
           )}
         </section>
 
+        {!category && (
+          <>
+            <section className="mt-10 border-t pt-8">
+              <h2 className="text-2xl font-bold">{homeCopy.benefitsHeading}</h2>
+              <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {homeCopy.benefits.map((item) => (
+                  <li key={item.title} className="rounded-lg border p-5">
+                    <span className="mb-3 block h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="mt-10 border-t pt-8">
+              <h2 className="text-2xl font-bold">{homeCopy.projectGuidesHeading}</h2>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {homeCopy.projectGuides.map((guide) => (
+                  <article key={guide.title} className="rounded-lg border p-5">
+                    <h3 className="font-semibold">{guide.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{guide.description}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-10 border-t pt-8">
+              <h2 className="text-2xl font-bold">{homeCopy.categoryGuideHeading}</h2>
+              <p className="mt-2 max-w-3xl leading-7 text-muted-foreground">{homeCopy.categoryGuideIntro}</p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {categories.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/${locale}/fonts/${item.slug}`}
+                    className="rounded-lg border p-5 transition-colors hover:bg-muted/40"
+                  >
+                    <h3 className="font-semibold">{item.name}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.intro}</p>
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {item.uses.slice(0, 3).map((use) => (
+                        <li key={use} className="rounded-md bg-muted px-2 py-1 text-xs">{use}</li>
+                      ))}
+                    </ul>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-10 border-t pt-8">
+              <h2 className="text-2xl font-bold">{homeCopy.collectionsHeading}</h2>
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {homeCollectionEntries.map(([slug, collection]) => (
+                  <Link
+                    key={slug}
+                    href={`/${locale}/collection/${slug}`}
+                    className="rounded-lg border p-4 text-center transition-colors hover:bg-muted/40"
+                  >
+                    <h3 className="font-semibold">{collection.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{collection.description}</p>
+                    <ul className="mt-3 flex flex-wrap justify-center gap-2">
+                      {collection.useCases.slice(0, 3).map((use) => (
+                        <li key={use} className="rounded-md bg-muted px-2 py-1 text-xs">{use}</li>
+                      ))}
+                    </ul>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
         <section className="mt-10 border-t pt-8">
           <h2 className="text-2xl font-bold">{category ? (isFrench ? `À propos des polices arabes ${category.name}` : `About ${category.name} Arabic fonts`) : homeCopy.faqHeading}</h2>
           <div className="mt-5 space-y-5">
@@ -350,6 +519,16 @@ export default function EnglishDirectory() {
           </div>
         </section>
       </main>
+
+      <footer className="mt-auto border-t">
+        <div className="container mx-auto flex flex-wrap gap-x-5 gap-y-3 px-4 py-6 text-sm text-muted-foreground">
+          <Link href={`/${locale}/about`}>{homeCopy.footerAbout}</Link>
+          <Link href={`/${locale}/contact`}>{homeCopy.footerContact}</Link>
+          <Link href={`/${locale}/privacy`}>{homeCopy.footerPrivacy}</Link>
+          <Link href={`/${locale}/terms`}>{homeCopy.footerTerms}</Link>
+          <span>© {new Date().getFullYear()} xfontat</span>
+        </div>
+      </footer>
     </div>
   );
 }

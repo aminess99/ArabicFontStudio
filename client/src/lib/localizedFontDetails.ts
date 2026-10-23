@@ -111,7 +111,7 @@ export const localizedFontDetailCopy = {
 } as const;
 
 export function getLocalizedFontPageContent(
-  font: { name: string; fileFormat: string; category: string },
+  font: { name: string; fileFormat: string; category: string; style?: string | null },
   locale: FontDetailLocale,
 ) {
   const categories = locale === "fr" ? frenchCategories : englishCategories;

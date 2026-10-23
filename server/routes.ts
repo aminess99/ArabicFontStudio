@@ -872,22 +872,45 @@ ${faqHtml}`;
     const fonts = await storage.getAllFonts();
     const canonical = "https://xfontat.com/en";
     const categoryLinks = englishCategories
-      .map((category) => `<li><a href="/en/fonts/${category.slug}">${category.name}</a></li>`)
+      .map((category) => `<li><a href="/en/fonts/${category.slug}">${escapeHtml(category.name)}</a></li>`)
       .join("\n");
     const fontLinks = fonts
       .slice(0, 80)
-      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .map((font) => `<li><a href="/en/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — <span lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</span></a></li>`)
+      .join("\n");
+    const benefitItems = englishHome.benefits
+      .map((item) => `<li><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></li>`)
+      .join("\n");
+    const projectGuides = englishHome.projectGuides
+      .map((item) => `<article><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></article>`)
+      .join("\n");
+    const categoryGuides = englishCategories
+      .map((category) => `<article><h3><a href="/en/fonts/${category.slug}">${escapeHtml(category.name)}</a></h3><p>${escapeHtml(category.intro)}</p><ul>${category.uses.map((use) => `<li>${escapeHtml(use)}</li>`).join("")}</ul></article>`)
+      .join("\n");
+    const collections = Object.entries(localizedCollections.en)
+      .map(([slug, collection]) => `<article><h3><a href="/en/collection/${slug}">${escapeHtml(collection.title)}</a></h3><p>${escapeHtml(collection.description)}</p><ul>${collection.useCases.map((use) => `<li>${escapeHtml(use)}</li>`).join("")}</ul></article>`)
+      .join("\n");
+    const faqs = englishHome.faqs
+      .map((faq) => `<article><h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p></article>`)
       .join("\n");
     const body = `
 <p>${englishHome.intro}</p>
-<h2>Browse Arabic font styles</h2>
-<ul>${categoryLinks}</ul>
+<section><h2>Browse Arabic font styles</h2><ul>${categoryLinks}</ul></section>
 <h2>${englishHome.aboutHeading}</h2>
 <p>${englishHome.about}</p>
 <h2>${englishHome.licenseHeading}</h2>
 <p>${englishHome.license}</p>
-<h2>Arabic font files in the directory</h2>
-<ul>${fontLinks}</ul>`;
+<h2>${englishHome.searchPreviewHeading}</h2>
+<p>${englishHome.searchLabel}: ${englishHome.searchPlaceholder}</p>
+<p>${englishHome.previewLabel}: ${englishHome.previewPlaceholder}</p>
+<p>${englishHome.previewSizeLabel}: 16–72px</p>
+<h2>Arabic font files in the directory</h2><ul>${fontLinks}</ul>
+<section><h2>${englishHome.benefitsHeading}</h2><ul>${benefitItems}</ul></section>
+<section><h2>${englishHome.projectGuidesHeading}</h2>${projectGuides}</section>
+<section><h2>${englishHome.categoryGuideHeading}</h2><p>${englishHome.categoryGuideIntro}</p>${categoryGuides}</section>
+<section><h2>${englishHome.collectionsHeading}</h2>${collections}</section>
+<section><h2>${englishHome.faqHeading}</h2>${faqs}</section>
+<footer><a href="/en/about">${englishHome.footerAbout}</a> | <a href="/en/contact">${englishHome.footerContact}</a> | <a href="/en/privacy">${englishHome.footerPrivacy}</a> | <a href="/en/terms">${englishHome.footerTerms}</a></footer>`;
     const jsonLd = [
       {
         "@type": "WebSite",
@@ -903,6 +926,23 @@ ${faqHtml}`;
         "url": canonical,
         "inLanguage": "en",
         "numberOfItems": fonts.length,
+      },
+      {
+        "@type": "ItemList",
+        "itemListElement": fonts.slice(0, 80).map((font, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": font.name,
+          "url": `https://xfontat.com/en/font/${generateSlug(font.name, font.fileName, font.category)}`,
+        })),
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": englishHome.faqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+        })),
       },
     ];
     res.send(botHTML(
@@ -1003,22 +1043,45 @@ ${faqHtml}
     const fonts = await storage.getAllFonts();
     const canonical = "https://xfontat.com/fr";
     const categoryLinks = frenchCategories
-      .map((category) => `<li><a href="/fr/fonts/${category.slug}">${category.name}</a></li>`)
+      .map((category) => `<li><a href="/fr/fonts/${category.slug}">${escapeHtml(category.name)}</a></li>`)
       .join("\n");
     const fontLinks = fonts
       .slice(0, 80)
-      .map((font) => `<li><a href="/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — ${escapeHtml(font.nameArabic)}</a></li>`)
+      .map((font) => `<li><a href="/fr/font/${generateSlug(font.name, font.fileName, font.category)}">${escapeHtml(font.name)} — <span lang="ar" dir="rtl">${escapeHtml(font.nameArabic)}</span></a></li>`)
+      .join("\n");
+    const benefitItems = frenchHome.benefits
+      .map((item) => `<li><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></li>`)
+      .join("\n");
+    const projectGuides = frenchHome.projectGuides
+      .map((item) => `<article><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p></article>`)
+      .join("\n");
+    const categoryGuides = frenchCategories
+      .map((category) => `<article><h3><a href="/fr/fonts/${category.slug}">${escapeHtml(category.name)}</a></h3><p>${escapeHtml(category.intro)}</p><ul>${category.uses.map((use) => `<li>${escapeHtml(use)}</li>`).join("")}</ul></article>`)
+      .join("\n");
+    const collections = Object.entries(localizedCollections.fr)
+      .map(([slug, collection]) => `<article><h3><a href="/fr/collection/${slug}">${escapeHtml(collection.title)}</a></h3><p>${escapeHtml(collection.description)}</p><ul>${collection.useCases.map((use) => `<li>${escapeHtml(use)}</li>`).join("")}</ul></article>`)
+      .join("\n");
+    const faqs = frenchHome.faqs
+      .map((faq) => `<article><h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p></article>`)
       .join("\n");
     const body = `
 <p>${frenchHome.intro}</p>
-<h2>Parcourir les styles de polices arabes</h2>
-<ul>${categoryLinks}</ul>
+<section><h2>Parcourir les styles de polices arabes</h2><ul>${categoryLinks}</ul></section>
 <h2>${frenchHome.aboutHeading}</h2>
 <p>${frenchHome.about}</p>
 <h2>${frenchHome.licenseHeading}</h2>
 <p>${frenchHome.license}</p>
-<h2>Fichiers de polices arabes de la bibliothèque</h2>
-<ul>${fontLinks}</ul>`;
+<h2>${frenchHome.searchPreviewHeading}</h2>
+<p>${frenchHome.searchLabel} : ${frenchHome.searchPlaceholder}</p>
+<p>${frenchHome.previewLabel} : ${frenchHome.previewPlaceholder}</p>
+<p>${frenchHome.previewSizeLabel} : 16–72 px</p>
+<h2>Fichiers de polices arabes du répertoire</h2><ul>${fontLinks}</ul>
+<section><h2>${frenchHome.benefitsHeading}</h2><ul>${benefitItems}</ul></section>
+<section><h2>${frenchHome.projectGuidesHeading}</h2>${projectGuides}</section>
+<section><h2>${frenchHome.categoryGuideHeading}</h2><p>${frenchHome.categoryGuideIntro}</p>${categoryGuides}</section>
+<section><h2>${frenchHome.collectionsHeading}</h2>${collections}</section>
+<section><h2>${frenchHome.faqHeading}</h2>${faqs}</section>
+<footer><a href="/fr/about">${frenchHome.footerAbout}</a> | <a href="/fr/contact">${frenchHome.footerContact}</a> | <a href="/fr/privacy">${frenchHome.footerPrivacy}</a> | <a href="/fr/terms">${frenchHome.footerTerms}</a></footer>`;
     const jsonLd = [
       {
         "@type": "WebSite",
@@ -1034,6 +1097,23 @@ ${faqHtml}
         "url": canonical,
         "inLanguage": "fr",
         "numberOfItems": fonts.length,
+      },
+      {
+        "@type": "ItemList",
+        "itemListElement": fonts.slice(0, 80).map((font, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": font.name,
+          "url": `https://xfontat.com/fr/font/${generateSlug(font.name, font.fileName, font.category)}`,
+        })),
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": frenchHome.faqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+        })),
       },
     ];
     res.send(botHTML(
