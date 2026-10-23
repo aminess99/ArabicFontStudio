@@ -592,10 +592,11 @@ function injectRootFallback(html: string, page: SeoPage): string {
 }
 
 async function loadIndexTemplate(): Promise<string> {
-  const candidates = [
-    path.resolve(process.cwd(), "client/index.html"),
-    path.resolve(process.cwd(), "dist/public/index.html"),
-  ];
+  const sourceIndex = path.resolve(process.cwd(), "client/index.html");
+  const builtIndex = path.resolve(process.cwd(), "dist/public/index.html");
+  const candidates = process.env.NODE_ENV === "production"
+    ? [builtIndex, sourceIndex]
+    : [sourceIndex, builtIndex];
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return fs.promises.readFile(candidate, "utf8");
   }
