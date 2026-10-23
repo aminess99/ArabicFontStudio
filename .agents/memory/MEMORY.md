@@ -7,3 +7,4 @@
 - [Generated editorial review](generated-editorial-review.md) — AI blog content stays private until automated checks and explicit human verification both pass
 - [SEO route synchronization](seo-route-synchronization.md) — public routes need matching sitemap, crawler HTML, SPA metadata, and real 404 behavior
 - [Localized directory pages](localized-download-flow.md) — EN/FR pages should match Arabic structure and behavior across directory, category, collection, and font details
+- [Dependency security](dependency-security.md) — keep npm/pnpm overrides aligned; use the guarded braces fork until upstream fixes nesting-depth exhaustion
