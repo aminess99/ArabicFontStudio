@@ -20,6 +20,8 @@ import { categoryContent, categoryDescriptions, categoryUseCases } from "../clie
 import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDetails";
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
 import { CARDS_HUB, OCCASIONS, getOccasion, occasionPath } from "../client/src/lib/greetingCards";
+import * as home from "../client/src/lib/homeContent";
+import { howToPosts } from "../client/src/lib/howToPosts";
 import { getGeneratedPosts } from "./blogGenerator";
 import { storage } from "./storage";
 import { transformSeoHtml } from "./vite";
@@ -213,23 +215,76 @@ function localizedHomeText(locale: Locale): {
   };
 }
 
+// Mirrors Home.tsx section by section, using the same shared copy.
+function resolveArabicHome(fonts: Font[]): SeoPage {
+  const unique = fonts.filter((font) => !font.duplicateOf);
+  const counts = new Map<string, number>();
+  for (const font of unique) counts.set(font.category, (counts.get(font.category) || 0) + 1);
+  const stats = { total: unique.length, categories: Array.from(counts, ([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count) };
+  const latest = unique.slice(0, 8);
+  const list = (items: string[]) => `<ul>${items.join("")}</ul>`;
+  const link = (href: string, label: string, extra = "") => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a>${extra ? ` — ${escapeHtml(extra)}` : ""}</li>`;
+  const categoryLinks = englishCategories
+    .filter((category) => counts.get(category.arabicCategory))
+    .map((category) => link(getCategoryPath("ar", category.slug), `خطوط ${category.arabicCategory}`, `${counts.get(category.arabicCategory)} خطاً`));
+  const bodyHtml = [
+    `<p>${escapeHtml(home.homeIntro(stats))}</p>`,
+    `<section><h2>تصنيفات الخطوط العربية</h2>${list(categoryLinks)}</section>`,
+    `<section><h2>${escapeHtml(home.homeTools.heading)}</h2>${list(home.homeTools.items.map((tool) => link(tool.href, tool.title, tool.text)))}</section>`,
+    `<section><h2>${escapeHtml(home.homeLatestHeading)}</h2>${list(latest.map((font) => link(getFontPath("ar", font), `خط ${font.nameArabic}`, `${font.category}، أضيف ${dateToIso(font.addedAt)?.slice(0, 10) || ""}`)))}</section>`,
+    `<section><h2>${escapeHtml(home.homeAbout.heading)}</h2>${home.homeAbout.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}<h3>${escapeHtml(home.homeAbout.whyHeading)}</h3>${list(home.homeAbout.why.map((item) => `<li><strong>${escapeHtml(item.title)}:</strong> ${escapeHtml(item.desc)}</li>`))}</section>`,
+    `<section><h2>${escapeHtml(home.homeChoose.heading)}</h2>${home.homeChoose.items.map((item) => `<h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.content)}</p>`).join("")}</section>`,
+    `<section><h2>${escapeHtml(home.homeCategoryGuide.heading)}</h2><p>${escapeHtml(home.homeCategoryGuide.intro)}</p>${list(home.homeCategoryGuide.items.map((item) => `<li><strong>${escapeHtml(item.name)}:</strong> ${escapeHtml(item.desc)}</li>`))}</section>`,
+    `<section><h2>${escapeHtml(home.homeCollections.heading)}</h2>${list(home.homeCollections.items.map((item) => link(`/collection/${item.slug}`, item.name, item.desc)))}</section>`,
+    `<section><h2>${escapeHtml(home.homeGuidesHeading)}</h2>${list(howToPosts.map((post) => link(`/blog/${post.slug}`, post.title)))}</section>`,
+    faqHtml("الأسئلة الشائعة", home.homeFaqs),
+  ].join("");
+  return {
+    locale: "ar",
+    path: "/",
+    title: home.homeTitle,
+    description: home.homeDescription,
+    heading: home.homeHeading,
+    imagePath: "/og-image.png",
+    bodyHtml,
+    alternates: pageAlternates("/"),
+    jsonLd: [
+      {
+        "@type": "CollectionPage",
+        name: home.homeHeading,
+        description: home.homeDescription,
+        url: `${SITE_ORIGIN}/`,
+        inLanguage: "ar",
+        numberOfItems: stats.total,
+      },
+      {
+        "@type": "ItemList",
+        name: home.homeLatestHeading,
+        itemListElement: latest.map((font, index) => ({ "@type": "ListItem", position: index + 1, name: font.nameArabic, url: `${SITE_ORIGIN}${getFontPath("ar", font)}` })),
+      },
+      faqNode(home.homeFaqs),
+    ],
+  };
+}
+
 function resolveHome(locale: Locale, fonts: Font[]): SeoPage {
+  if (locale === "ar") return resolveArabicHome(fonts);
   const copy = localizedHomeText(locale);
   const categories = englishCategories.map((category) => (
     `<li><a href="${escapeHtml(getCategoryPath(locale, category.slug))}">${escapeHtml(categoryLabel(locale, category.slug))}</a></li>`
   )).join("");
   const collectionLinks = collections.map((collection) => {
-    const localized = locale === "ar" ? null : localizedCollections[locale][collection.slug];
-    if (locale !== "ar" && !localized) return "";
-    const label = localized?.title || collection.titleArabic;
+    const localized = localizedCollections[locale][collection.slug];
+    if (!localized) return "";
+    const label = localized.title;
     return `<li><a href="${escapeHtml(pathForLocale(locale, `/collection/${collection.slug}`))}">${escapeHtml(label)}</a></li>`;
   }).join("");
-  const featuredFonts = fonts.slice(0, 20);
+  const featuredFonts = fonts.filter((font) => !font.duplicateOf).slice(0, 20);
   const bodyHtml = [
     `<p>${escapeHtml(copy.intro)}</p>`,
     `<section><h2>${escapeHtml(copy.browse)}</h2><ul>${categories}</ul></section>`,
     `<section><h2>${escapeHtml(copy.collections)}</h2><ul>${collectionLinks}</ul></section>`,
-    `<section><h2>${escapeHtml(locale === "fr" ? "Polices à découvrir" : locale === "en" ? "Fonts to explore" : "خطوط مقترحة للتصفح")}</h2>${fontLinkList(featuredFonts, locale)}</section>`,
+    `<section><h2>${escapeHtml(locale === "fr" ? "Polices à découvrir" : "Fonts to explore")}</h2>${fontLinkList(featuredFonts, locale)}</section>`,
   ].join("");
   return {
     locale,
@@ -390,7 +445,7 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
     : "";
   const previewSlug = generateLegacyFontSlug(font.name, font.fileName, font.category);
   const previewFile = path.join(process.cwd(), "client/public/font-previews", `${previewSlug}.webp`);
-  const imagePath = fs.existsSync(previewFile) ? `/font-previews/${previewSlug}.webp` : "/logo.png";
+  const imagePath = fs.existsSync(previewFile) ? `/font-previews/${previewSlug}.webp` : "/og-image.png";
   const pagePath = getFontPath(locale, font);
   const bodyHtml = [
     `<p>${escapeHtml(summary)}</p>`,
@@ -863,7 +918,7 @@ async function loadIndexTemplate(): Promise<string> {
 
 async function renderPage(req: Request, res: Response, page: SeoPage, status = 200) {
   const canonical = `${SITE_ORIGIN}${page.canonicalPath || page.path}`;
-  const image = `${SITE_ORIGIN}${page.imagePath || "/logo.png"}`;
+  const image = `${SITE_ORIGIN}${page.imagePath || "/og-image.png"}`;
   const localeTag = page.locale === "ar" ? "ar_AR" : page.locale === "fr" ? "fr_FR" : "en_US";
   let html = await loadIndexTemplate();
 

@@ -1,3 +1,5 @@
+import { homeFaqs } from "./homeContent";
+
 export const SITE_ORIGIN = "https://xfontat.com";
 
 export const organizationSchema = {
@@ -98,47 +100,10 @@ export function createFAQSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "كيف أحمل الخطوط من xfontat؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "افتح صفحة الخط واضغط على زر التنزيل؛ تعرض الصفحة الصيغة المتاحة لهذا الملف."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "هل جميع الخطوط مجانية للتحميل؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "نعم، جميع الخطوط في مكتبة xfontat متاحة للتحميل مجاناً بدون أي رسوم أو اشتراكات."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "ما الفرق بين صيغ الخطوط المختلفة؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "تختلف الصيغ المتاحة وخصائصها بحسب الملف. راجع صفحة الخط ومتطلبات البرنامج أو المتصفح المستهدف قبل الاستخدام."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "كيف أستخدم الخطوط في المشاريع التجارية؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "التحميل مجاني، لكن حقوق الاستخدام التجاري تختلف من خط إلى آخر. تحقق من رخصة كل خط قبل استخدامه في مشروع تجاري."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "هل يعمل الخط على نظام التشغيل الذي أستخدمه؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "يعتمد التوافق على صيغة الملف ونظام التشغيل والتطبيق. اختبر الخط في البيئة التي ستستخدمه فيها."
-        }
-      }
-    ]
+    "mainEntity": homeFaqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
+    })),
   };
 }

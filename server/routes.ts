@@ -1694,6 +1694,22 @@ ${articlesSection}
     }
   });
 
+  // Counts and newest fonts for the home page; duplicate copies are left out.
+  app.get("/api/home-summary", async (_req, res) => {
+    try {
+      const fonts = (await storage.getAllFonts()).filter((font) => !font.duplicateOf);
+      const counts = new Map<string, number>();
+      for (const font of fonts) counts.set(font.category, (counts.get(font.category) || 0) + 1);
+      res.json({
+        total: fonts.length,
+        categories: Array.from(counts, ([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count),
+        latest: fonts.slice(0, 8),
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to load summary" });
+    }
+  });
+
   app.get("/api/fonts/by-slug/:slug", async (req, res) => {
     try {
       const font = await storage.getFontBySlug(req.params.slug);
