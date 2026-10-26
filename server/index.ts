@@ -1,7 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import compression from "compression";
+import { sql } from "drizzle-orm";
 import { registerRoutes } from "./routes";
+import { db } from "./db";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -30,6 +32,15 @@ app.use(express.static(path.resolve(import.meta.dirname, "..", "client", "public
     }
   },
 }));
+
+app.get("/healthz", async (_req, res) => {
+  try {
+    await db.execute(sql`select 1`);
+    res.status(200).json({ status: "ok" });
+  } catch {
+    res.status(503).json({ status: "database_unavailable" });
+  }
+});
 
 app.use((req, res, next) => {
   const start = Date.now();

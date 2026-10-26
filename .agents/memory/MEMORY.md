@@ -8,3 +8,4 @@
 - [SEO route synchronization](seo-route-synchronization.md) — public routes need matching sitemap, crawler HTML, SPA metadata, and real 404 behavior
 - [Localized directory pages](localized-download-flow.md) — EN/FR pages should match Arabic structure and behavior across directory, category, collection, and font details
 - [Dependency security](dependency-security.md) — keep npm/pnpm overrides aligned; use the guarded braces fork until upstream fixes nesting-depth exhaustion
+- [External hosting handoff](external-hosting-handoff.md) — confirm GitHub is actually ready before transferring source to an external host

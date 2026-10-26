@@ -3,15 +3,32 @@ import fs from "fs";
 import path from "path";
 import cron from "node-cron";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
-  httpOptions: {
-    apiVersion: "",
-    baseUrl: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
-  },
-});
+const geminiApiKey =
+  process.env.GEMINI_API_KEY || process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+const geminiBaseUrl =
+  process.env.GEMINI_BASE_URL ||
+  process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+const ai = geminiApiKey
+  ? new GoogleGenAI({
+      apiKey: geminiApiKey,
+      ...(geminiBaseUrl
+        ? {
+            httpOptions: {
+              apiVersion: "",
+              baseUrl: geminiBaseUrl,
+            },
+          }
+        : {}),
+    })
+  : null;
 
-const DATA_FILE = path.join(process.cwd(), "server", "data", "generatedPosts.json");
+const DEFAULT_DATA_FILE = path.join(
+  process.cwd(),
+  "server",
+  "data",
+  "generatedPosts.json",
+);
+const DATA_FILE = process.env.GENERATED_POSTS_FILE || DEFAULT_DATA_FILE;
 
 export interface GeneratedPost {
   slug: string;
@@ -41,6 +58,10 @@ interface QualityReport {
 }
 function loadAllPosts(): GeneratedPost[] {
   try {
+    if (!fs.existsSync(DATA_FILE) && DATA_FILE !== DEFAULT_DATA_FILE && fs.existsSync(DEFAULT_DATA_FILE)) {
+      fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
+      fs.copyFileSync(DEFAULT_DATA_FILE, DATA_FILE);
+    }
     if (!fs.existsSync(DATA_FILE)) return [];
     const raw = fs.readFileSync(DATA_FILE, "utf-8");
     const posts = JSON.parse(raw) as Array<Omit<GeneratedPost, "dateModified"> & { dateModified?: string }>;
@@ -133,6 +154,11 @@ async function generateSinglePost(
   topic: string,
   existingPosts: GeneratedPost[],
 ): Promise<GeneratedPost | null> {
+  if (!ai) {
+    console.error("Gemini API key is not configured; skipping blog generation.");
+    return null;
+  }
+
   const prompt = `أنت كاتب محتوى SEO متخصص في الخطوط العربية. اكتب مقالاً احترافياً باللغة العربية عن الموضوع التالي:
 
 الموضوع: ${topic}
