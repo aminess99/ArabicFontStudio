@@ -7,11 +7,28 @@ import { db } from "./db";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+app.disable("x-powered-by");
 app.use(compression());
-// Thumbnail reference images arrive as base64 data URLs; keep the parser
-// limit above the 6MB image limit enforced by the thumbnail endpoint.
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: false }));
+
+// Basic browser protections. No Content-Security-Policy yet: AdSense and
+// Analytics load scripts from many Google domains.
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
+
+// Thumbnail reference images arrive as base64 data URLs; keep that parser
+// limit above the 6MB image limit enforced by the thumbnail endpoint. Every
+// other request body stays small.
+app.use("/api/thumbnail/generate", express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
 // Explicitly allow indexing for all HTML pages
 app.use((req, res, next) => {
