@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
 import { IntlFooter, IntlHeader } from "@/components/IntlShell";
+import { ToolTiles } from "@/components/ToolTiles";
 import { getCanonicalFontSlug } from "@/lib/slugify";
 import { localizedCollections } from "@/lib/localizedPagesContent";
 import { groupFontsByFamily } from "@/lib/fontFamily";
@@ -270,20 +271,9 @@ export default function EnglishDirectory() {
         </section>
 
         {!category && (
-          <section className="border-b pb-4">
-            <h2 className="sr-only md:not-sr-only md:mb-3 md:text-xl md:font-semibold">{homeCopy.toolsHeading}</h2>
-            {/* Compact chips on phones; full cards from md up. */}
-            <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-5 md:gap-3 md:overflow-visible md:px-0">
-              {homeCopy.tools.map((tool) => (
-                <li key={tool.href} className="shrink-0 md:shrink">
-                  <Link href={tool.href} className="block h-full whitespace-nowrap rounded-full border bg-card px-3 py-1.5 text-sm hover:border-primary md:whitespace-normal md:rounded-lg md:p-4">
-                    <span className="block font-medium md:font-semibold">{tool.title}</span>
-                    <span className="mt-1 hidden text-sm text-muted-foreground md:block">{tool.description}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <div className="border-b pb-4">
+            <ToolTiles heading={homeCopy.toolsHeading} tools={homeCopy.tools.map((tool) => ({ href: tool.href, icon: tool.icon, title: tool.title, text: tool.description }))} />
+          </div>
         )}
 
         <section aria-live="polite">

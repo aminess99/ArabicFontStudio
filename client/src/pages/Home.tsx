@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Gift, ImageDown, Sparkles, Keyboard } from "lucide-react";
+import { ToolTiles, type ToolTile } from "@/components/ToolTiles";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
@@ -41,11 +41,11 @@ interface PagedFontResponse {
 
 const KNOWN_CATEGORIES = ["ثلث", "ديواني", "رقعة", "كوفي", "نسخ", "تصميم", "خطوط الحرة", "فوتوشوب", "نستعليق"];
 
-const TOOL_CARDS = [
-  { id: "text-to-image", href: "/arabic-text-to-image", icon: ImageDown, title: "اكتب اسمك بالخط العربي", text: "اختر خطاً من المكتبة وحمّل النص صورة PNG." },
-  { id: "tahnia", href: "/tahnia", icon: Gift, title: "بطاقات تهنئة باسمك", text: "رمضان والعيد والزواج والمولود بخطوط عربية جميلة." },
-  { id: "zakhrafa", href: "/zakhrafa", icon: Sparkles, title: "زخرفة الأسماء", text: "أشكال مزخرفة جاهزة للنسخ في الألعاب ووسائل التواصل." },
-  { id: "keyboard", href: "/keyboard", icon: Keyboard, title: "كيبورد عربي اونلاين", text: "اكتب بالعربي من أي جهاز مع التشكيل، ثم انسخ النص." },
+const TOOL_CARDS: ToolTile[] = [
+  { href: "/arabic-text-to-image", icon: "generator", title: "اكتب اسمك بالخط العربي", text: "اختر خطاً من المكتبة وحمّل النص صورة PNG." },
+  { href: "/tahnia", icon: "cards", title: "بطاقات تهنئة باسمك", text: "رمضان والعيد والزواج والمولود بخطوط عربية جميلة." },
+  { href: "/zakhrafa", icon: "zakhrafa", title: "زخرفة الأسماء", text: "أشكال مزخرفة جاهزة للنسخ في الألعاب ووسائل التواصل." },
+  { href: "/keyboard", icon: "keyboard", title: "كيبورد عربي اونلاين", text: "اكتب بالعربي من أي جهاز مع التشكيل، ثم انسخ النص." },
 ];
 
 export default function Home() {
@@ -153,24 +153,7 @@ export default function Home() {
         <h1 className="text-2xl md:text-3xl font-bold mb-2">{homeHeading}</h1>
         <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{homeIntro(summary)}</p>
         {!searchQuery && (
-          <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-            {TOOL_CARDS.map((tool) => (
-              <li key={tool.href}>
-                {/* Compact tiles on phones so the font list stays near the top. */}
-                <Link
-                  href={tool.href}
-                  className="group flex h-full flex-col items-center gap-2 rounded-lg border bg-card p-3 text-center transition-colors hover:border-primary sm:flex-row sm:items-start sm:gap-3 sm:p-4 sm:text-start"
-                  data-testid={`card-tool-${tool.id}`}
-                >
-                  <tool.icon className="h-5 w-5 shrink-0 text-primary sm:mt-0.5" aria-hidden="true" />
-                  <span>
-                    <span className="block text-xs font-semibold leading-snug group-hover:text-primary transition-colors sm:text-base">{tool.title}</span>
-                    <span className="mt-1 hidden text-sm text-muted-foreground leading-relaxed sm:block">{tool.text}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <ToolTiles tools={TOOL_CARDS} />
         )}
       </section>
 
