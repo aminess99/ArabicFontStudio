@@ -1,3 +1,5 @@
+import { howToPosts } from "./howToPosts";
+
 export interface BlogPostData {
   slug: string;
   title: string;
@@ -11,7 +13,7 @@ export interface BlogPostData {
   keywords: string[];
 }
 
-export const blogPosts: BlogPostData[] = [
+const editorialPosts: BlogPostData[] = [
   {
     slug: "daleel-ikhtiyar-alkhat-alarabi",
     title: "دليل شامل لاختيار الخط العربي المناسب",
@@ -1039,3 +1041,5 @@ console.log(document.fonts.check('16px "MyArabicFont"'));
     keywords: ["خطوط المواقع", "خطوط ويب عربية", "RTL fonts", "خطوط تطبيقات", "خطوط CSS عربية"]
   }
 ];
+
+export const blogPosts: BlogPostData[] = [...howToPosts, ...editorialPosts];
