@@ -392,6 +392,9 @@ export default function FontDetails() {
                   <Download className="ml-2 h-5 w-5" />
                   تحميل خط {font.nameArabic}
                 </Button>
+                <Button size="lg" variant="outline" className="text-base" asChild data-testid="link-write-with-font">
+                  <Link href={`/arabic-text-to-image?font=${encodeURIComponent(fontSlug)}`}>اكتب اسمك بهذا الخط</Link>
+                </Button>
                 <Button
                   variant="outline"
                   size="icon"

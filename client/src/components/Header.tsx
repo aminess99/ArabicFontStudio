@@ -40,6 +40,12 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
               <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-blog">
                 المدونة
               </Link>
+              <Link href="/arabic-text-to-image" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-text-to-image">
+                اكتب اسمك بالخط
+              </Link>
+              <Link href="/zakhrafa" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-zakhrafa">
+                زخرفة
+              </Link>
             </nav>
 
             <div className="relative flex-1 max-w-xs md:max-w-md">

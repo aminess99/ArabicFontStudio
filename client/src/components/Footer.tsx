@@ -56,6 +56,21 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/arabic-text-to-image" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-text-to-image">
+                  كتابة الاسم بالخط العربي
+                </Link>
+              </li>
+              <li>
+                <Link href="/zakhrafa" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-zakhrafa">
+                  زخرفة الأسماء
+                </Link>
+              </li>
+              <li>
+                <Link href="/youtube-thumbnail-maker" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-thumbnail">
+                  صانع صور يوتيوب المصغرة
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-about">
                   من نحن
                 </Link>
