@@ -17,6 +17,8 @@ services:
         value: production
       - key: VITE_GA_MEASUREMENT_ID
         value: G-PRERSDYJ5N
+      - key: VITE_CLARITY_PROJECT_ID
+        sync: false
       - key: GENERATED_POSTS_FILE
         value: /var/data/generatedPosts.json
       - key: DATABASE_URL

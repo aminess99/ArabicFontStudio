@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { initGA } from "./lib/analytics";
+import { initClarity, initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 // Each page is its own chunk so visitors only download the page they open.
 const Home = lazy(() => import("@/pages/Home"));
@@ -141,6 +141,7 @@ export default function App() {
     if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
       initGA();
     }
+    initClarity();
   }, []);
 
   return (

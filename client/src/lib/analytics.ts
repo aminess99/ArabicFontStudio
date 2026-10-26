@@ -53,3 +53,18 @@ export const trackEvent = (
     value: value,
   });
 };
+
+// Microsoft Clarity session recordings and heatmaps, enabled when
+// VITE_CLARITY_PROJECT_ID is set at build time.
+export const initClarity = () => {
+  const projectId = import.meta.env.VITE_CLARITY_PROJECT_ID;
+  if (!projectId || !/^[a-z0-9]+$/i.test(projectId)) return;
+  const w = window as unknown as { clarity?: { (...args: unknown[]): void; q?: unknown[][] } };
+  if (w.clarity) return;
+  const queue: unknown[][] = [];
+  w.clarity = Object.assign((...args: unknown[]) => { queue.push(args); }, { q: queue });
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `https://www.clarity.ms/tag/${projectId}`;
+  document.head.appendChild(script);
+};

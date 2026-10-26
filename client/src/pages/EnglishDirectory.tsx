@@ -3,9 +3,7 @@ import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
-import { LocalizedMobileMenu } from "@/components/LocalizedMobileMenu";
-import { intlNav } from "@/lib/intlTools";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { IntlFooter, IntlHeader } from "@/components/IntlShell";
 import { getCanonicalFontSlug } from "@/lib/slugify";
 import { localizedCollections } from "@/lib/localizedPagesContent";
 import { groupFontsByFamily } from "@/lib/fontFamily";
@@ -25,7 +23,6 @@ export default function EnglishDirectory() {
   const isFrench = locale === "fr";
   const homeCopy = isFrench ? frenchHome : englishHome;
   const categories = isFrench ? frenchCategories : englishCategories;
-  const designCategory = categories.find((item) => item.arabicCategory === "تصميم");
   const [, englishCategoryParams] = useRoute("/en/fonts/:category");
   const [, frenchCategoryParams] = useRoute("/fr/fonts/:category");
   const categorySlug = englishCategoryParams?.category || frenchCategoryParams?.category;
@@ -172,43 +169,14 @@ export default function EnglishDirectory() {
         alternates={alternates}
       />
 
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-3 py-3 md:px-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-1">
-              <LocalizedMobileMenu
-                locale={locale}
-                links={[
-                  { href: `/${locale}`, label: homeCopy.home },
-                  ...intlNav[locale].filter((item) => item.id !== "fonts" && item.id !== "blog").map(({ href, label }) => ({ href, label })),
-                  ...categories.map((item) => ({ href: `/${locale}/fonts/${item.slug}`, label: item.name })),
-                  { href: `/${locale}/blog`, label: homeCopy.blog },
-                ]}
-              />
-              <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
-                <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
-              </Link>
-            </div>
-            <nav className="hidden items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
-              <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
-              {categories.slice(0, 3).map((item) => (
-                <Link key={item.slug} href={`/${locale}/fonts/${item.slug}`} className="hover:underline">
-                  {item.name}
-                </Link>
-              ))}
-              <Link href={`/${locale}/fonts/${designCategory?.slug || "tasmeem"}`} className="hover:underline">{homeCopy.designFonts}</Link>
-              {intlNav[locale].filter((item) => item.id === "keyboard" || item.id === "names" || item.id === "generator").map((item) => (
-                <Link key={item.href} href={item.href} className="hover:underline">{item.label}</Link>
-              ))}
-              <Link href={`/${locale}/blog`} className="hover:underline">{homeCopy.blog}</Link>
-            </nav>
-            <div className="flex items-center gap-2 text-sm">
-              <Link href={category ? `/en/fonts/${category.slug}` : "/en"} hrefLang="en" className="rounded-md border px-2 py-2 hover:bg-muted">EN</Link>
-              <Link href={category ? `/fr/fonts/${category.slug}` : "/fr"} hrefLang="fr" className="rounded-md border px-2 py-2 hover:bg-muted">FR</Link>
-              <Link href={arabicPath} hrefLang="ar" className="rounded-md border px-2 py-2 hover:bg-muted">{homeCopy.language}</Link>
-              <ThemeToggle label={isFrench ? "Changer le thème" : "Toggle theme"} />
-            </div>
-          </div>
+      <IntlHeader
+        locale={locale}
+        languages={{
+          ar: arabicPath,
+          en: category ? `/en/fonts/${category.slug}` : "/en",
+          fr: category ? `/fr/fonts/${category.slug}` : "/fr",
+        }}
+      >
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_240px]">
             {/* Preview controls fold away on phones so the font list starts near the top. */}
             <label className="order-1 grid gap-1 text-xs font-medium sm:order-none">
@@ -260,8 +228,7 @@ export default function EnglishDirectory() {
               />
             </label>
           </div>
-        </div>
-      </header>
+      </IntlHeader>
 
       <main className="container mx-auto px-4 py-6 md:py-10">
         <nav className="mb-5 flex flex-wrap gap-2" aria-label={homeCopy.allCategories}>
@@ -462,15 +429,7 @@ export default function EnglishDirectory() {
         </section>
       </main>
 
-      <footer className="mt-auto border-t">
-        <div className="container mx-auto flex flex-wrap gap-x-5 gap-y-3 px-4 py-6 text-sm text-muted-foreground">
-          <Link href={`/${locale}/about`}>{homeCopy.footerAbout}</Link>
-          <Link href={`/${locale}/contact`}>{homeCopy.footerContact}</Link>
-          <Link href={`/${locale}/privacy`}>{homeCopy.footerPrivacy}</Link>
-          <Link href={`/${locale}/terms`}>{homeCopy.footerTerms}</Link>
-          <span>© {new Date().getFullYear()} xfontat</span>
-        </div>
-      </footer>
+      <IntlFooter locale={locale} />
     </div>
   );
 }
