@@ -129,7 +129,7 @@ export type LocalizedFontDetailCopy =
   (typeof localizedFontDetailCopy)[FontDetailLocale];
 
 export function getLocalizedFontPageContent(
-  font: { name: string; fileFormat: string; category: string; style?: string | null },
+  font: { name: string; fileFormat: string; category: string; style?: string | null; duplicateOf?: string | null },
   locale: FontDetailLocale,
 ) {
   const categories = locale === "fr" ? frenchCategories : englishCategories;
@@ -150,8 +150,8 @@ export function getLocalizedFontPageContent(
     useCases: category?.uses || [],
     faqs: category?.faqs || [],
     title: locale === "fr"
-      ? `Télécharger la police arabe ${font.name} | xfontat`
-      : `Download ${font.name} Arabic Font | xfontat`,
+      ? `Télécharger la police arabe ${font.name}${font.duplicateOf ? ` (${categoryName})` : ""} | xfontat`
+      : `Download ${font.name} Arabic Font${font.duplicateOf ? ` (${categoryName})` : ""} | xfontat`,
     description: locale === "fr"
       ? `Prévisualisez ${font.name}, une police arabe de la catégorie ${categoryName}. Vérifiez le format ${format}, la licence et la source avant de télécharger le fichier.`
       : `Preview ${font.name}, an Arabic font in the ${categoryName} category. Check the ${format} format, license and source before downloading the file.`,

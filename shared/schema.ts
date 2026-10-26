@@ -26,6 +26,8 @@ export const fontsTable = pgTable("fonts", {
   fileFormat: text("file_format").notNull(),
   featured: boolean("featured").notNull().default(false),
   addedAt: timestamp("added_at", { withTimezone: true, mode: "date" }).notNull(),
+  // Slug of the font whose file is byte-identical to this one, if any.
+  duplicateOf: text("duplicate_of"),
 }, (table) => [
   uniqueIndex("fonts_category_file_name_unique").on(table.category, table.fileName),
   index("fonts_category_idx").on(table.category),
@@ -56,6 +58,7 @@ export const insertFontSchema = z.object({
   slug: z.string().optional(),
   featured: z.boolean().default(false),
   addedAt: z.date().optional(),
+  duplicateOf: z.string().optional().nullable(),
 });
 
 export type InsertFont = z.infer<typeof insertFontSchema>;

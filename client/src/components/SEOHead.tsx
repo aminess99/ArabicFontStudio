@@ -8,6 +8,15 @@ interface SEOHeadProps {
   lang?: string;
   direction?: "ltr" | "rtl";
   alternates?: { lang: string; href: string }[];
+  // Defaults to path; set when another page holds the same content.
+  canonicalPath?: string;
+}
+
+const MAX_TITLE_LENGTH = 65;
+
+// Mirrors fitTitle in server/seoHtml.ts so the rendered title matches the SSR one.
+function fitTitle(title: string) {
+  return title.length > MAX_TITLE_LENGTH ? title.replace(/\s*\|\s*xfontat$/, "") : title;
 }
 
 function buildAlternates(path: string, supplied: { lang: string; href: string }[]) {
@@ -35,9 +44,11 @@ export function SEOHead({
   lang = "ar",
   direction = "rtl",
   alternates = [],
+  canonicalPath,
 }: SEOHeadProps) {
   const baseUrl = "https://xfontat.com";
-  const fullUrl = `${baseUrl}${path}`;
+  const fullUrl = `${baseUrl}${canonicalPath || path}`;
+  title = fitTitle(title);
   const resolvedAlternates = buildAlternates(path, alternates);
   const alternateLinksKey = JSON.stringify(resolvedAlternates);
 
