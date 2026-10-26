@@ -19,6 +19,21 @@ import { generateLegacyFontSlug } from "../client/src/lib/slugify";
 import { categoryContent, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
 import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDetails";
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
+import {
+  findIntlTool,
+  generatorCopy,
+  keyboardCopy,
+  namesHubCopy,
+  phrasesHubCopy,
+  tattooCopy,
+  toolPaths,
+  type IntlLocale,
+} from "../client/src/lib/intlTools";
+import { arabicNames, getArabicName, namePath, relatedNames, NAME_PATHS } from "../client/src/lib/arabicNames";
+import { arabicPhrases, getArabicPhrase, phrasePath, PHRASE_PATHS } from "../client/src/lib/arabicPhrases";
+import { spellArabic } from "../client/src/lib/arabicLetters";
+import { blogPostPath, localizedBlogSlug, originalBlogSlug } from "../client/src/lib/blogSlugs";
+import { nameContent, phraseContent, phraseLabel, type DetailContent } from "../client/src/lib/intlContent";
 import { CARDS_HUB, OCCASIONS, getOccasion, occasionPath } from "../client/src/lib/greetingCards";
 import * as home from "../client/src/lib/homeContent";
 import { howToPosts } from "../client/src/lib/howToPosts";
@@ -280,11 +295,18 @@ function resolveHome(locale: Locale, fonts: Font[]): SeoPage {
     return `<li><a href="${escapeHtml(pathForLocale(locale, `/collection/${collection.slug}`))}">${escapeHtml(label)}</a></li>`;
   }).join("");
   const featuredFonts = fonts.filter((font) => !font.duplicateOf).slice(0, 20);
+  const full = locale === "fr" ? frenchHome : englishHome;
   const bodyHtml = [
     `<p>${escapeHtml(copy.intro)}</p>`,
+    `<section><h2>${escapeHtml(full.toolsHeading)}</h2><ul>${full.tools.map((tool) => `<li><a href="${escapeHtml(tool.href)}">${escapeHtml(tool.title)}</a>: ${escapeHtml(tool.description)}</li>`).join("")}</ul></section>`,
+    `<section><h2>${escapeHtml(full.aboutHeading)}</h2><p>${escapeHtml(full.about)}</p></section>`,
+    `<section><h2>${escapeHtml(full.licenseHeading)}</h2><p>${escapeHtml(full.license)}</p></section>`,
+    `<section><h2>${escapeHtml(full.benefitsHeading)}</h2><ul>${full.benefits.map((item) => `<li><strong>${escapeHtml(item.title)}</strong>: ${escapeHtml(item.description)}</li>`).join("")}</ul></section>`,
+    `<section><h2>${escapeHtml(full.projectGuidesHeading)}</h2>${full.projectGuides.map((guide) => `<h3>${escapeHtml(guide.title)}</h3><p>${escapeHtml(guide.description)}</p>`).join("")}</section>`,
     `<section><h2>${escapeHtml(copy.browse)}</h2><ul>${categories}</ul></section>`,
     `<section><h2>${escapeHtml(copy.collections)}</h2><ul>${collectionLinks}</ul></section>`,
     `<section><h2>${escapeHtml(locale === "fr" ? "Polices à découvrir" : "Fonts to explore")}</h2>${fontLinkList(featuredFonts, locale)}</section>`,
+    faqHtml(full.faqHeading, full.faqs),
   ].join("");
   return {
     locale,
@@ -294,6 +316,10 @@ function resolveHome(locale: Locale, fonts: Font[]): SeoPage {
     heading: copy.heading,
     bodyHtml,
     alternates: pageAlternates("/"),
+    jsonLd: [
+      { "@type": "CollectionPage", name: copy.heading, description: copy.description, url: `${SITE_ORIGIN}${pathForLocale(locale, "/")}`, inLanguage: locale },
+      faqNode(full.faqs),
+    ],
   };
 }
 
@@ -304,7 +330,7 @@ function resolveCategory(locale: Locale, slug: string, fonts: Font[]): SeoPage |
   const localizedCategory = locale === "fr"
     ? frenchCategories.find((item) => item.slug === slug)
     : category;
-  const heading = locale === "ar" ? category.arabicCategory : localizedCategory?.name || category.name;
+  const heading = locale === "ar" ? category.arabicCategory : localizedCategory?.heading || localizedCategory?.name || category.name;
   const title = locale === "ar"
     ? `${category.arabicCategory} - خطوط عربية للتحميل والمعاينة | xfontat`
     : localizedCategory?.title || `${heading} Arabic Fonts | xfontat`;
@@ -317,7 +343,7 @@ function resolveCategory(locale: Locale, slug: string, fonts: Font[]): SeoPage |
   const guide = locale === "ar" ? categoryContent[category.arabicCategory] : undefined;
   const guideHtml = guide
     ? `<p>${escapeHtml(guide.intro)}</p><section><h2>نبذة عن ${escapeHtml(category.arabicCategory)}</h2><p>${escapeHtml(guide.history)}</p></section><section><h2>نصائح الاستخدام</h2><p>${escapeHtml(guide.usageTips)}</p></section>`
-    : "";
+    : (localizedCategory?.guide || []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
   const faqs = locale === "ar"
     ? (guide ? [{ question: `أسئلة عن خط ${category.arabicCategory}`, answer: guide.faq }] : [])
     : (locale === "fr" ? frenchCategories.find((item) => item.slug === slug)?.faqs : category.faqs) || [];
@@ -621,7 +647,7 @@ function resolveBlogIndex(locale: Locale, posts: BlogPost[]): SeoPage {
       ? "Practical guides to Arabic fonts, file formats, font licenses, and digital typography."
       : "اقرأ مقالات عملية عن الخطوط العربية وصيغ الملفات والتراخيص والطباعة الرقمية.";
   const list = translatedPosts.map((post) =>
-    `<li><a href="${escapeHtml(pathForLocale(locale, `/blog/${post.slug}`))}">${escapeHtml(post.label)}</a><p>${escapeHtml(post.excerpt)}</p></li>`
+    `<li><a href="${escapeHtml(blogPostPath(locale, post.slug))}">${escapeHtml(post.label)}</a><p>${escapeHtml(post.excerpt)}</p></li>`
   ).join("");
   return {
     locale,
@@ -658,8 +684,21 @@ function articleJsonLd(post: BlogPost, locale: Locale, headline: string, descrip
   ];
 }
 
-function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): SeoPage | null {
+function blogAlternates(slug: string): SeoPage["alternates"] {
+  return {
+    ar: `${SITE_ORIGIN}/blog/${slug}`,
+    en: `${SITE_ORIGIN}${blogPostPath("en", slug)}`,
+    fr: `${SITE_ORIGIN}${blogPostPath("fr", slug)}`,
+    "x-default": `${SITE_ORIGIN}/blog/${slug}`,
+  };
+}
+
+function resolveBlogArticle(locale: Locale, requestedSlug: string, posts: BlogPost[]): SeoPage | null {
+  const slug = locale === "ar" ? requestedSlug : originalBlogSlug(locale, requestedSlug);
   const post = posts.find((item) => item.slug === slug);
+  if (post && locale !== "ar" && requestedSlug !== localizedBlogSlug(locale, slug)) {
+    throw Object.assign(new Error("Blog slug alias"), { status: 301, location: blogPostPath(locale, slug) });
+  }
   if (!post) return null;
   if (locale === "ar") {
     const title = post.title;
@@ -671,7 +710,7 @@ function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): Se
       description,
       heading: title,
       bodyHtml: `${renderMarkdownLite(post.content || description)}<p><a href="/blog">جميع المقالات</a></p>`,
-      alternates: pageAlternates(`/blog/${slug}`),
+      alternates: blogAlternates(slug),
       jsonLd: articleJsonLd(post, "ar", title, description, `/blog/${slug}`),
     };
   }
@@ -683,24 +722,24 @@ function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): Se
       : "This article is not yet available in this language.";
     return {
       locale,
-      path: pathForLocale(locale, `/blog/${slug}`),
+      path: blogPostPath(locale, slug),
       title,
       description,
       heading: title,
       noindex: true,
       bodyHtml: `<p>${escapeHtml(description)}</p><p><a href="/blog/${slug}">${escapeHtml(locale === "fr" ? "Lire l’article en arabe" : "Read the Arabic article")}</a></p>`,
-      alternates: pageAlternates(`/blog/${slug}`),
+      alternates: blogAlternates(slug),
     };
   }
   return {
     locale,
-    path: pathForLocale(locale, `/blog/${slug}`),
+    path: blogPostPath(locale, slug),
     title: `${translation.title} | xfontat`,
     description: translation.excerpt || translation.title,
     heading: translation.title,
     bodyHtml: `${renderMarkdownLite(translation.content)}<p><a href="${escapeHtml(pathForLocale(locale, "/blog"))}">${escapeHtml(locale === "fr" ? "Tous les articles" : "All articles")}</a></p>`,
-    alternates: pageAlternates(`/blog/${slug}`),
-    jsonLd: articleJsonLd(post, locale, translation.title, translation.excerpt || translation.title, pathForLocale(locale, `/blog/${slug}`)),
+    alternates: blogAlternates(slug),
+    jsonLd: articleJsonLd(post, locale, translation.title, translation.excerpt || translation.title, blogPostPath(locale, slug)),
   };
 }
 
@@ -715,7 +754,7 @@ function resolveToolPage(tool: ToolPageCopy): SeoPage {
   const related = [zakhrafaPage, textToImagePage]
     .filter((item) => item !== tool)
     .map((item) => `<li><a href="${escapeHtml(item.path)}">${escapeHtml(item.heading)}</a></li>`)
-    .join("");
+    .join("") + `<li><a href="${toolPaths.keyboard.ar}">${escapeHtml(keyboardCopy.ar.heading)}</a></li>`;
   return {
     locale: "ar",
     path: tool.path,
@@ -724,7 +763,7 @@ function resolveToolPage(tool: ToolPageCopy): SeoPage {
     heading: tool.heading,
     bodyHtml: `<p>${escapeHtml(tool.intro)}</p>${sections}<section><h2>أسئلة شائعة</h2>${faqs}</section><ul>${related}<li><a href="/">مكتبة الخطوط العربية</a></li></ul>`
       ,
-    alternates: { ar: url, "x-default": url },
+    alternates: tool === textToImagePage ? intlAlternates(toolPaths.generator) : { ar: url, "x-default": url },
     jsonLd: [
       breadcrumbNode([["الرئيسية", "/"], [tool.heading, tool.path]]),
       {
@@ -827,7 +866,176 @@ function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): Se
   return null;
 }
 
+// Tools and guides with their own path in each language (see intlTools.ts).
+function intlAlternates(paths: Partial<Record<IntlLocale, string>>): SeoPage["alternates"] {
+  const alternates: SeoPage["alternates"] = {};
+  for (const [lang, toolPath] of Object.entries(paths) as Array<[IntlLocale, string]>) alternates[lang] = `${SITE_ORIGIN}${toolPath}`;
+  alternates["x-default"] = `${SITE_ORIGIN}${paths.ar || paths.en}`;
+  return alternates;
+}
+
+function sectionsHtml(sections: Array<{ heading: string; body: string }>): string {
+  return sections.map((section) => `<section><h2>${escapeHtml(section.heading)}</h2><p>${escapeHtml(section.body)}</p></section>`).join("");
+}
+
+function linkListHtml(links: Array<[string, string]>): string {
+  return `<ul>${links.map(([href, label]) => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`).join("")}</ul>`;
+}
+
+function intlToolLinks(locale: "en" | "fr"): Array<[string, string]> {
+  return locale === "fr"
+    ? [[toolPaths.keyboard.fr!, "Clavier arabe en ligne"], [toolPaths.names.fr!, "Prénoms en arabe"], [toolPaths.generator.fr!, "Générateur de police arabe"], [toolPaths.tattoo.fr!, "Polices arabes pour tatouage"], [toolPaths.phrases.fr!, "Mots et expressions arabes"], ["/fr", "Bibliothèque de polices arabes"]]
+    : [[toolPaths.keyboard.en!, "Online Arabic keyboard"], [toolPaths.names.en!, "Names in Arabic"], [toolPaths.generator.en!, "Arabic font generator"], [toolPaths.tattoo.en!, "Arabic tattoo fonts"], [toolPaths.phrases.en!, "Arabic words and phrases"], ["/en", "Arabic font library"]];
+}
+
+function webAppNode(name: string, description: string, url: string, locale: IntlLocale): object {
+  return { "@type": "WebApplication", name, description, url, applicationCategory: "DesignApplication", operatingSystem: "Web", inLanguage: locale, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } };
+}
+
+function homeCrumb(locale: IntlLocale): [string, string] {
+  return locale === "ar" ? ["الرئيسية", "/"] : locale === "fr" ? ["Accueil", "/fr"] : ["Home", "/en"];
+}
+
+function resolveIntlToolPage(id: "keyboard" | "generator" | "tattoo", locale: IntlLocale): SeoPage | null {
+  const copy = id === "keyboard" ? keyboardCopy[locale]
+    : locale === "ar" ? null
+    : id === "generator" ? generatorCopy[locale] : tattooCopy[locale];
+  if (!copy) return null;
+  const faqHeading = locale === "ar" ? "أسئلة شائعة" : locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
+  const related = locale === "ar"
+    ? linkListHtml([[textToImagePage.path, textToImagePage.heading], [zakhrafaPage.path, zakhrafaPage.heading], ["/", "مكتبة الخطوط العربية"]])
+    : linkListHtml(intlToolLinks(locale).filter(([href]) => href !== copy.path));
+  const extra = id === "tattoo" && locale !== "ar"
+    ? `<section><h2>${locale === "fr" ? "Mots arabes populaires en tatouage" : "Popular Arabic tattoo words"}</h2>${linkListHtml(arabicPhrases.filter((phrase) => phrase.kind === "word").map((phrase) => [phrasePath(locale, phrase.slug), `${phraseLabel(phrase, locale)} — ${phrase.arabic}`]))}</section>`
+    : "";
+  return {
+    locale,
+    path: copy.path,
+    title: copy.title,
+    description: copy.description,
+    heading: copy.heading,
+    bodyHtml: `<p>${escapeHtml(copy.intro)}</p>${sectionsHtml(copy.sections)}${extra}${faqHtml(faqHeading, copy.faqs)}${related}`,
+    alternates: intlAlternates(toolPaths[id]),
+    jsonLd: [
+      breadcrumbNode([homeCrumb(locale), [copy.heading, copy.path]]),
+      webAppNode(copy.heading, copy.description, `${SITE_ORIGIN}${copy.path}`, locale),
+      toolFaqSchema(copy),
+    ],
+  };
+}
+
+function detailHtml(locale: "en" | "fr", content: DetailContent, arabic: string, word: string, showLetters: boolean): string {
+  const facts = `<dl>${content.facts.map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`).join("")}</dl>`;
+  const letters = showLetters ? spellArabic(arabic, locale) : [];
+  const lettersHtml = letters.length
+    ? `<section><h2>${escapeHtml(locale === "fr" ? `Écrire ${word} en arabe, lettre par lettre` : `How to write ${word} in Arabic, letter by letter`)}</h2><ol>${letters.map((letter) => `<li><span lang="ar">${escapeHtml(letter.char)}</span> ${escapeHtml(letter.name)}: ${escapeHtml(letter.sound)}</li>`).join("")}</ol></section>`
+    : "";
+  const calligraphy = `<section><h2>${escapeHtml(locale === "fr" ? `${word} en calligraphie arabe` : `${word} in Arabic calligraphy`)}</h2><p>${escapeHtml(locale === "fr"
+    ? `${word} (${arabic}) en thuluth, nastaliq, coufique, naskh et polices décoratives, à télécharger en PNG transparent.`
+    : `${word} (${arabic}) in Thuluth, Nastaliq, Kufi, Naskh and display fonts, each downloadable as a transparent PNG.`)}</p></section>`;
+  const faqHeading = locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
+  return `<p>${escapeHtml(content.intro)}</p><p lang="ar" dir="rtl">${escapeHtml(arabic)}</p>${facts}${lettersHtml}${calligraphy}${sectionsHtml(content.sections)}${faqHtml(faqHeading, content.faqs)}`;
+}
+
+function resolveNamesPage(locale: "en" | "fr", slug?: string): SeoPage | null {
+  const hub = namesHubCopy[locale];
+  if (!slug) {
+    const list = (gender: "f" | "m") => linkListHtml(arabicNames.filter((name) => name.gender === gender).sort((a, b) => a.latin.localeCompare(b.latin)).map((name) => [namePath(locale, name.slug), `${name.latin} — ${name.arabic}`]));
+    const faqHeading = locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
+    return {
+      locale,
+      path: hub.path,
+      title: hub.title,
+      description: hub.description,
+      heading: hub.heading,
+      bodyHtml: `<p>${escapeHtml(hub.intro)}</p><section><h2>${locale === "fr" ? "Prénoms féminins" : "Girls' names"}</h2>${list("f")}</section><section><h2>${locale === "fr" ? "Prénoms masculins" : "Boys' names"}</h2>${list("m")}</section>${sectionsHtml(hub.sections)}${faqHtml(faqHeading, hub.faqs)}${linkListHtml(intlToolLinks(locale))}`,
+      alternates: intlAlternates(toolPaths.names),
+      jsonLd: [
+        breadcrumbNode([homeCrumb(locale), [hub.heading, hub.path]]),
+        { "@type": "CollectionPage", name: hub.heading, description: hub.description, url: `${SITE_ORIGIN}${hub.path}`, inLanguage: locale },
+        faqNode(hub.faqs),
+      ],
+    };
+  }
+  const name = getArabicName(slug);
+  if (!name) return null;
+  const content = nameContent(name, locale);
+  const pagePath = namePath(locale, name.slug);
+  const related = `<section><h2>${locale === "fr" ? "Prénoms proches" : "Related names"}</h2>${linkListHtml(relatedNames(name).map((item) => [namePath(locale, item.slug), `${item.latin} — ${item.arabic}`]))}</section>`;
+  return {
+    locale,
+    path: pagePath,
+    title: content.title,
+    description: content.description,
+    heading: content.heading,
+    bodyHtml: `${detailHtml(locale, content, name.arabic, name.latin, true)}${related}${linkListHtml(intlToolLinks(locale))}`,
+    alternates: intlAlternates({ en: namePath("en", name.slug), fr: namePath("fr", name.slug) }),
+    jsonLd: [
+      breadcrumbNode([homeCrumb(locale), [hub.heading, NAME_PATHS[locale]], [content.heading, pagePath]]),
+      { "@type": "WebPage", name: content.heading, description: content.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
+      faqNode(content.faqs),
+    ],
+  };
+}
+
+function resolvePhrasesPage(locale: "en" | "fr", slug?: string): SeoPage | null {
+  const hub = phrasesHubCopy[locale];
+  const faqHeading = locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
+  if (!slug) {
+    return {
+      locale,
+      path: hub.path,
+      title: hub.title,
+      description: hub.description,
+      heading: hub.heading,
+      bodyHtml: `<p>${escapeHtml(hub.intro)}</p>${linkListHtml(arabicPhrases.map((phrase) => [phrasePath(locale, phrase.slug), `${phraseLabel(phrase, locale)} — ${phrase.arabic}: ${phrase[locale].meaning}`]))}${sectionsHtml(hub.sections)}${faqHtml(faqHeading, hub.faqs)}${linkListHtml(intlToolLinks(locale))}`,
+      alternates: intlAlternates(toolPaths.phrases),
+      jsonLd: [
+        breadcrumbNode([homeCrumb(locale), [hub.heading, hub.path]]),
+        { "@type": "CollectionPage", name: hub.heading, description: hub.description, url: `${SITE_ORIGIN}${hub.path}`, inLanguage: locale },
+        faqNode(hub.faqs),
+      ],
+    };
+  }
+  const phrase = getArabicPhrase(slug);
+  if (!phrase) return null;
+  const content = phraseContent(phrase, locale);
+  const pagePath = phrasePath(locale, phrase.slug);
+  const label = phraseLabel(phrase, locale);
+  const others = `<section><h2>${locale === "fr" ? "Autres mots et expressions arabes" : "More Arabic words and phrases"}</h2>${linkListHtml(arabicPhrases.filter((item) => item.slug !== phrase.slug).slice(0, 12).map((item) => [phrasePath(locale, item.slug), phraseLabel(item, locale)]))}</section>`;
+  return {
+    locale,
+    path: pagePath,
+    title: content.title,
+    description: content.description,
+    heading: content.heading,
+    bodyHtml: `${detailHtml(locale, content, phrase.arabic, label, !phrase.arabic.includes(" "))}${others}${linkListHtml(intlToolLinks(locale))}`,
+    alternates: intlAlternates({ en: phrasePath("en", phrase.slug), fr: phrasePath("fr", phrase.slug) }),
+    jsonLd: [
+      breadcrumbNode([homeCrumb(locale), [hub.heading, PHRASE_PATHS[locale]], [content.heading, pagePath]]),
+      { "@type": "WebPage", name: content.heading, description: content.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
+      faqNode(content.faqs),
+    ],
+  };
+}
+
+function resolveIntlPage(pathname: string): SeoPage | null | undefined {
+  const tool = findIntlTool(pathname);
+  if (tool && (tool.id === "keyboard" || tool.id === "tattoo" || (tool.id === "generator" && tool.locale !== "ar"))) {
+    return resolveIntlToolPage(tool.id, tool.locale);
+  }
+  for (const locale of ["en", "fr"] as const) {
+    if (pathname === NAME_PATHS[locale]) return resolveNamesPage(locale);
+    if (pathname.startsWith(`${NAME_PATHS[locale]}/`)) return resolveNamesPage(locale, decodeURIComponent(pathname.slice(NAME_PATHS[locale].length + 1)));
+    if (pathname === PHRASE_PATHS[locale]) return resolvePhrasesPage(locale);
+    if (pathname.startsWith(`${PHRASE_PATHS[locale]}/`)) return resolvePhrasesPage(locale, decodeURIComponent(pathname.slice(PHRASE_PATHS[locale].length + 1)));
+  }
+  return undefined;
+}
+
 async function resolvePage(pathname: string): Promise<SeoPage | null> {
+  const intlPage = resolveIntlPage(normalizePath(pathname));
+  if (intlPage !== undefined) return intlPage;
   const { locale, pagePath } = getLocaleAndPath(pathname);
   const fonts = await storage.getAllFonts();
   const posts = getAllBlogPosts();
@@ -1068,15 +1276,31 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
     const lastmod = dateToIso(post.dateModified || post.dateISO);
     add(`/blog/${post.slug}`, lastmod);
     if (fullBlogTranslations[post.slug]?.en?.content?.trim()) {
-      add(`/en/blog/${post.slug}`, lastmod);
+      add(blogPostPath("en", post.slug), lastmod);
     }
     if (fullBlogTranslations[post.slug]?.fr?.content?.trim()) {
-      add(`/fr/blog/${post.slug}`, lastmod);
+      add(blogPostPath("fr", post.slug), lastmod);
     }
   }
 
   for (const tool of [zakhrafaPage, textToImagePage]) {
     add(tool.path, sourceLastmod("client/src/lib/toolPages.ts"));
+  }
+  const intlLastmod = sourceLastmod("client/src/lib/intlTools.ts");
+  for (const paths of Object.values(toolPaths)) {
+    for (const toolPath of Object.values(paths)) {
+      if (toolPath !== textToImagePage.path) add(toolPath, intlLastmod);
+    }
+  }
+  const namesLastmod = sourceLastmod("client/src/lib/arabicNames.ts", "client/src/lib/intlContent.ts");
+  for (const name of arabicNames) {
+    add(namePath("en", name.slug), namesLastmod);
+    add(namePath("fr", name.slug), namesLastmod);
+  }
+  const phrasesLastmod = sourceLastmod("client/src/lib/arabicPhrases.ts", "client/src/lib/intlContent.ts");
+  for (const phrase of arabicPhrases) {
+    add(phrasePath("en", phrase.slug), phrasesLastmod);
+    add(phrasePath("fr", phrase.slug), phrasesLastmod);
   }
   const cardsLastmod = sourceLastmod("client/src/lib/greetingCards.ts");
   add(CARDS_HUB.path, cardsLastmod);
@@ -1130,6 +1354,12 @@ async function renderLlmsTxt(res: Response): Promise<void> {
     ...tools,
     `- [منشئ صور يوتيوب المصغرة](${SITE_ORIGIN}/youtube-thumbnail-maker): AI YouTube thumbnail maker with Arabic titles.`,
     `- [${CARDS_HUB.heading}](${SITE_ORIGIN}${CARDS_HUB.path}): ${CARDS_HUB.description}`,
+    `- [${keyboardCopy.ar.heading}](${SITE_ORIGIN}${keyboardCopy.ar.path}): ${keyboardCopy.ar.description}`,
+    `- [${keyboardCopy.en.heading}](${SITE_ORIGIN}${keyboardCopy.en.path}): ${keyboardCopy.en.description}`,
+    `- [${generatorCopy.en.heading}](${SITE_ORIGIN}${generatorCopy.en.path}): ${generatorCopy.en.description}`,
+    `- [${tattooCopy.en.heading}](${SITE_ORIGIN}${tattooCopy.en.path}): ${tattooCopy.en.description}`,
+    `- [${namesHubCopy.en.heading}](${SITE_ORIGIN}${namesHubCopy.en.path}): ${namesHubCopy.en.description}`,
+    `- [${phrasesHubCopy.en.heading}](${SITE_ORIGIN}${phrasesHubCopy.en.path}): ${phrasesHubCopy.en.description}`,
     ...OCCASIONS.map((occasion) => `  - [${occasion.heading}](${SITE_ORIGIN}${occasionPath(occasion.slug)})`),
     "",
     "## Guides",

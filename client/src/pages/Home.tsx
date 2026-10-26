@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Gift, ImageDown, Sparkles, Youtube } from "lucide-react";
+import { Gift, ImageDown, Sparkles, Keyboard } from "lucide-react";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
@@ -45,7 +45,7 @@ const TOOL_CARDS = [
   { id: "text-to-image", href: "/arabic-text-to-image", icon: ImageDown, title: "اكتب اسمك بالخط العربي", text: "اختر خطاً من المكتبة وحمّل النص صورة PNG." },
   { id: "tahnia", href: "/tahnia", icon: Gift, title: "بطاقات تهنئة باسمك", text: "رمضان والعيد والزواج والمولود بخطوط عربية جميلة." },
   { id: "zakhrafa", href: "/zakhrafa", icon: Sparkles, title: "زخرفة الأسماء", text: "أشكال مزخرفة جاهزة للنسخ في الألعاب ووسائل التواصل." },
-  { id: "thumbnail", href: "/youtube-thumbnail-maker", icon: Youtube, title: "صانع صور يوتيوب المصغرة", text: "صورة مصغرة بعنوان عربي بمقاس 1280×720." },
+  { id: "keyboard", href: "/keyboard", icon: Keyboard, title: "كيبورد عربي اونلاين", text: "اكتب بالعربي من أي جهاز مع التشكيل، ثم انسخ النص." },
 ];
 
 export default function Home() {

@@ -25,6 +25,10 @@ const LocalizedContentPage = lazy(() => import("@/pages/LocalizedContentPage"));
 const Zakhrafa = lazy(() => import("@/pages/Zakhrafa"));
 const ArabicTextToImage = lazy(() => import("@/pages/ArabicTextToImage"));
 const GreetingCards = lazy(() => import("@/pages/GreetingCards"));
+const ArabicKeyboard = lazy(() => import("@/pages/ArabicKeyboard"));
+const TattooFonts = lazy(() => import("@/pages/TattooFonts"));
+const NamesPage = lazy(() => import("@/pages/InArabicPages").then((m) => ({ default: m.NamesPage })));
+const PhrasesPage = lazy(() => import("@/pages/InArabicPages").then((m) => ({ default: m.PhrasesPage })));
 const PurpleLogoPreview = lazy(() =>
   import("@/pages/AIStudioPreview").then((m) => ({ default: m.PurpleLogoPreview })),
 );
@@ -70,6 +74,21 @@ function Router() {
       <ScrollToTop />
       <Suspense fallback={<div className="min-h-screen bg-background" aria-label="Loading page" />}>
       <Switch>
+        <Route path="/keyboard" component={ArabicKeyboard} />
+        <Route path="/en/arabic-keyboard" component={ArabicKeyboard} />
+        <Route path="/fr/clavier-arabe" component={ArabicKeyboard} />
+        <Route path="/en/arabic-font-generator" component={ArabicTextToImage} />
+        <Route path="/fr/generateur-police-arabe" component={ArabicTextToImage} />
+        <Route path="/en/arabic-tattoo-fonts" component={TattooFonts} />
+        <Route path="/fr/police-arabe-tatouage" component={TattooFonts} />
+        <Route path="/en/names-in-arabic" component={NamesPage} />
+        <Route path="/en/names-in-arabic/:slug" component={NamesPage} />
+        <Route path="/fr/prenoms-en-arabe" component={NamesPage} />
+        <Route path="/fr/prenoms-en-arabe/:slug" component={NamesPage} />
+        <Route path="/en/arabic-phrases" component={PhrasesPage} />
+        <Route path="/en/arabic-phrases/:slug" component={PhrasesPage} />
+        <Route path="/fr/expressions-arabes" component={PhrasesPage} />
+        <Route path="/fr/expressions-arabes/:slug" component={PhrasesPage} />
         <Route path="/en" component={EnglishDirectory} />
         <Route path="/en/fonts/:category" component={EnglishDirectory} />
         <Route path="/fr" component={EnglishDirectory} />

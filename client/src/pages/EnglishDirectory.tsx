@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
 import { LocalizedMobileMenu } from "@/components/LocalizedMobileMenu";
+import { intlNav } from "@/lib/intlTools";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getCanonicalFontSlug } from "@/lib/slugify";
 import { localizedCollections } from "@/lib/localizedPagesContent";
@@ -71,7 +72,7 @@ export default function EnglishDirectory() {
   const description = category?.description ?? homeCopy.description;
   const path = category ? `/${locale}/fonts/${category.slug}` : `/${locale}`;
   const arabicPath = category ? `/fonts/${category.slug}` : "/";
-  const heading = category?.name ?? homeCopy.heading;
+  const heading = category ? category.heading ?? category.name : homeCopy.heading;
   const intro = category?.intro ?? homeCopy.intro;
   const faqs = category?.faqs ?? homeCopy.faqs;
   const homeCollectionEntries = Object.entries(localizedCollections[locale]);
@@ -179,6 +180,7 @@ export default function EnglishDirectory() {
                 locale={locale}
                 links={[
                   { href: `/${locale}`, label: homeCopy.home },
+                  ...intlNav[locale].filter((item) => item.id !== "fonts" && item.id !== "blog").map(({ href, label }) => ({ href, label })),
                   ...categories.map((item) => ({ href: `/${locale}/fonts/${item.slug}`, label: item.name })),
                   { href: `/${locale}/blog`, label: homeCopy.blog },
                 ]}
@@ -189,12 +191,15 @@ export default function EnglishDirectory() {
             </div>
             <nav className="hidden items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
               <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
-              {categories.slice(0, 5).map((item) => (
+              {categories.slice(0, 3).map((item) => (
                 <Link key={item.slug} href={`/${locale}/fonts/${item.slug}`} className="hover:underline">
                   {item.name}
                 </Link>
               ))}
               <Link href={`/${locale}/fonts/${designCategory?.slug || "tasmeem"}`} className="hover:underline">{homeCopy.designFonts}</Link>
+              {intlNav[locale].filter((item) => item.id === "keyboard" || item.id === "names" || item.id === "generator").map((item) => (
+                <Link key={item.href} href={item.href} className="hover:underline">{item.label}</Link>
+              ))}
               <Link href={`/${locale}/blog`} className="hover:underline">{homeCopy.blog}</Link>
             </nav>
             <div className="flex items-center gap-2 text-sm">
@@ -283,7 +288,26 @@ export default function EnglishDirectory() {
               ))}
             </ul>
           )}
+          {category?.guide?.map((paragraph) => (
+            <p key={paragraph} className="mt-3 max-w-3xl leading-7 text-muted-foreground">{paragraph}</p>
+          ))}
         </section>
+
+        {!category && (
+          <section className="border-b py-6">
+            <h2 className="text-xl font-semibold">{homeCopy.toolsHeading}</h2>
+            <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {homeCopy.tools.map((tool) => (
+                <li key={tool.href}>
+                  <Link href={tool.href} className="block h-full rounded-lg border bg-card p-4 hover:border-primary">
+                    <span className="block font-semibold">{tool.title}</span>
+                    <span className="mt-1 block text-sm text-muted-foreground">{tool.description}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {!category && (
           <section className="grid gap-6 border-b py-7 md:grid-cols-2">
