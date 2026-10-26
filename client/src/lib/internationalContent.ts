@@ -14,7 +14,7 @@ export interface InternationalCategory {
 export const englishHome = {
   title: "Arabic Fonts — Free Download, 850+ Arabic Calligraphy Fonts | xfontat",
   description:
-    "Download 850+ free Arabic fonts: Thuluth, Diwani, Kufi, Naskh, Ruqaa and Nastaliq calligraphy. Preview your own text, then try our Arabic keyboard and name tools.",
+    "Download 850+ free Arabic fonts: Thuluth, Diwani, Kufi, Naskh, Ruqaa and Nastaliq. Preview your own text and try our Arabic keyboard and name tools.",
   heading: "Free Arabic fonts to download and preview",
   intro:
     "xfontat is a free library of more than 850 Arabic fonts, sorted by calligraphy style. Type your own text to preview it in every font, open a font to see its characters, format and licence, then download it. Free tools help you type in Arabic, write your name in Arabic calligraphy and preview a tattoo.",
@@ -329,7 +329,7 @@ export const englishCategories: InternationalCategory[] = [
 export const frenchHome = {
   title: "Polices arabes gratuites — plus de 850 polices à télécharger | xfontat",
   description:
-    "Téléchargez plus de 850 polices arabes gratuites : thuluth, diwani, coufique, naskh, ruqaa et nastaliq. Prévisualisez votre texte et essayez notre clavier arabe.",
+    "Plus de 850 polices arabes gratuites : thuluth, diwani, coufique, naskh, ruqaa et nastaliq. Prévisualisez votre texte et essayez notre clavier arabe.",
   heading: "Polices arabes gratuites à télécharger et prévisualiser",
   intro:
     "xfontat est une bibliothèque gratuite de plus de 850 polices arabes, classées par style de calligraphie. Tapez votre texte pour le prévisualiser dans chaque police, ouvrez une police pour voir ses caractères, son format et sa licence, puis téléchargez-la. Des outils gratuits permettent aussi d'écrire en arabe, d'écrire son prénom en calligraphie et de prévisualiser un tatouage.",

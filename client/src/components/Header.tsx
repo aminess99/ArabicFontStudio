@@ -84,7 +84,7 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
             </Sheet>
 
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity shrink-0" data-testid="link-home">
-              <img src="/logo.png" alt="xfontat - إكس فونتات" className="h-8 md:h-10 w-auto" />
+              <img src="/logo-header.webp" width={267} height={80} alt="xfontat - إكس فونتات" className="h-8 md:h-10 w-auto" />
             </Link>
 
             <nav className="hidden md:flex items-center gap-4 text-sm">

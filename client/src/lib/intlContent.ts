@@ -13,6 +13,12 @@ function fit(long: string, short: string): string {
   return long.length <= MAX_DESCRIPTION ? long : short;
 }
 
+// The first candidate that fits in search results, ignoring the " | xfontat"
+// suffix that the page head drops from long titles.
+function pickTitle(candidates: string[]): string {
+  return candidates.find((title) => title.replace(/ \| xfontat$/, "").length <= 65) ?? candidates[candidates.length - 1];
+}
+
 function firstSentence(text: string): string {
   return text.match(/^[^.!?]*[.!?]/)?.[0] ?? text;
 }
@@ -103,7 +109,7 @@ export function phraseContent(phrase: ArabicPhrase, locale: Locale): DetailConte
   const religious = phrase.kind === "religious";
   if (locale === "fr") {
     return {
-      title: `${label} en arabe (${phrase.arabic}) — sens et calligraphie | xfontat`,
+      title: pickTitle([`${label} en arabe (${phrase.arabic}) — sens et calligraphie | xfontat`, `${label} en arabe (${phrase.arabic}) — sens`, `${label} en arabe (${phrase.arabic})`]),
       description: fit(`${label} en arabe : ${phrase.arabic}. ${firstSentence(copy.meaning)} Prononciation et calligraphie à télécharger.`, `${label} en arabe : ${phrase.arabic}. ${firstSentence(copy.meaning)}`),
       heading: `${label} en arabe`,
       intro: `« ${label} » s'écrit ${phrase.arabic} en arabe et se prononce ${phrase.say}. ${copy.meaning}`,
@@ -119,7 +125,7 @@ export function phraseContent(phrase: ArabicPhrase, locale: Locale): DetailConte
     };
   }
   return {
-    title: `${label} in Arabic (${phrase.arabic}) — Meaning & Calligraphy | xfontat`,
+    title: pickTitle([`${label} in Arabic (${phrase.arabic}) — Meaning & Calligraphy | xfontat`, `${label} in Arabic (${phrase.arabic}) — Meaning`, `${label} in Arabic (${phrase.arabic})`]),
     description: fit(`${label} in Arabic: ${phrase.arabic}. ${firstSentence(copy.meaning)} Pronunciation and calligraphy to download.`, `${label} in Arabic: ${phrase.arabic}. ${firstSentence(copy.meaning)}`),
     heading: `${label} in Arabic`,
     intro: `"${label}" is written ${phrase.arabic} in Arabic and pronounced ${phrase.say}. ${copy.meaning}`,

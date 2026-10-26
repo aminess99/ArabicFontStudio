@@ -149,12 +149,15 @@ export function getLocalizedFontPageContent(
     style,
     useCases: category?.uses || [],
     faqs: category?.faqs || [],
-    title: locale === "fr"
-      ? `Télécharger la police arabe ${font.name}${font.duplicateOf ? ` (${categoryName})` : ""} | xfontat`
-      : `Download ${font.name} Arabic Font${font.duplicateOf ? ` (${categoryName})` : ""} | xfontat`,
-    description: locale === "fr"
-      ? `Prévisualisez ${font.name}, une police arabe de la catégorie ${categoryName}. Vérifiez le format ${format}, la licence et la source avant de télécharger le fichier.`
-      : `Preview ${font.name}, an Arabic font in the ${categoryName} category. Check the ${format} format, license and source before downloading the file.`,
+    title: localizedFontTitle(locale, font.name, font.duplicateOf ? ` (${categoryName})` : ""),
+    description: fitDescription(
+      locale === "fr"
+        ? `Prévisualisez ${font.name}, une police arabe de la catégorie ${categoryName}. Vérifiez le format ${format}, la licence et la source avant de télécharger le fichier.`
+        : `Preview ${font.name}, an Arabic font in the ${categoryName} category. Check the ${format} format, license and source before downloading the file.`,
+      locale === "fr"
+        ? `Police arabe ${font.name} (${categoryName}, ${format}) : aperçu, licence et téléchargement gratuit.`
+        : `${font.name} Arabic font (${categoryName}, ${format}): preview, licence and free download.`,
+    ),
   };
 }
 
@@ -232,3 +235,17 @@ export const fontCharacterMap = [
   ["ئ", "ء", "ؤ", "ر", "لا", "ى", "ة", "و", "ز", "ظ"],
   ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
 ];
+
+const MAX_TITLE = 65;
+const MAX_DESCRIPTION = 160;
+
+// Shortens long font names' titles so they fit in search results.
+export function localizedFontTitle(locale: "en" | "fr", name: string, qualifier = ""): string {
+  const full = locale === "fr" ? `Télécharger la police arabe ${name}${qualifier}` : `Download ${name} Arabic Font${qualifier}`;
+  if (full.length <= MAX_TITLE) return `${full} | xfontat`;
+  return locale === "fr" ? `Police arabe ${name}${qualifier}` : `${name} Arabic Font${qualifier}`;
+}
+
+function fitDescription(long: string, short: string): string {
+  return long.length <= MAX_DESCRIPTION ? long : short;
+}

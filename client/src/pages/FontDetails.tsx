@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
+import { arabicFontDescription, getFontProfile } from "@/lib/fontProfiles";
 import { categoryDescriptions, categoryUseCases } from "@/lib/arabicCategoryContent";
 import { Header } from "@/components/Header";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
@@ -235,7 +236,8 @@ export default function FontDetails() {
 
   // Duplicate copies share the primary's name, so qualify them by category.
   const seoTitle = `تحميل خط ${font.nameArabic}${font.duplicateOf ? ` (${font.category})` : ""} مجاناً | xfontat`;
-  const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat}. خط عربي من فئة ${font.category} مناسب لـ${useCases.slice(0, 3).join(" و")}. معاينة مباشرة وتحميل فوري من مكتبة xfontat.`;
+  const profile = font.duplicateOf ? undefined : getFontProfile(font.slug);
+  const seoDescription = arabicFontDescription(font);
 
   const fontPageSchema = {
     "@context": "https://schema.org",
@@ -387,6 +389,15 @@ export default function FontDetails() {
                   <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
                 </Button>
               </div>
+
+              {profile && (
+                <section className="mb-8">
+                  <h2 className="text-xl font-bold mb-3">عن خط {font.nameArabic}</h2>
+                  {profile.ar.map((paragraph) => (
+                    <p key={paragraph} className="text-muted-foreground leading-loose mb-2">{paragraph}</p>
+                  ))}
+                </section>
+              )}
 
               <div className="border rounded-lg p-6 mb-8">
                 <h2 className="text-xl font-bold mb-4">معلومات خط {font.nameArabic}</h2>

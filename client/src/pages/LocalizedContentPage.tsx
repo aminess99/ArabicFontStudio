@@ -14,7 +14,8 @@ import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { detectFontFamily, groupFontsByFamily } from "@/lib/fontFamily";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
 import { IntlFooter, IntlHeader } from "@/components/IntlShell";
-import { blogPostPath, originalBlogSlug } from "@/lib/blogSlugs";
+import { blogPostPath, blogSeo, originalBlogSlug } from "@/lib/blogSlugs";
+import { getFontProfile, profileDescription } from "@/lib/fontProfiles";
 import {
   fontCharacterMap,
   getLocalizedFontWeightLabel,
@@ -255,6 +256,7 @@ export default function LocalizedContentPage() {
   const homeCopy = currentLabel ? frenchHome : englishHome;
   const fontLabels = localizedFontDetailCopy[locale];
   const localizedFont = font ? getLocalizedFontPageContent(font, locale) : undefined;
+  const fontProfile = font && !font.duplicateOf ? getFontProfile(font.slug) : undefined;
   const fontFamily = font ? detectFontFamily(font.name) : "";
   const familyVariants = font
     ? sameCategoryFonts.filter((item) => item.id !== font.id && detectFontFamily(item.name) === fontFamily)
@@ -319,7 +321,7 @@ export default function LocalizedContentPage() {
   let description = staticPage?.description || "";
   if (font && localizedFont) {
     title = localizedFont.title;
-    description = localizedFont.description;
+    description = (locale === "en" && fontProfile && profileDescription(font!.slug, "en")) || localizedFont.description;
   } else if (translatedCollection) {
     title = `${translatedCollection.title} | xfontat`;
     description = translatedCollection.description;
@@ -334,8 +336,9 @@ export default function LocalizedContentPage() {
       ? "Guides pratiques pour choisir et utiliser des polices arabes dans vos projets."
       : "Practical guides to choosing and using Arabic fonts in your projects.";
   } else if (blogPost && localizedBlogPost) {
-    title = `${localizedBlogPost.title} | xfontat`;
-    description = localizedBlogPost.excerpt;
+    const seo = blogSeo(locale, blogPost.slug, localizedBlogPost.title, localizedBlogPost.excerpt);
+    title = `${seo.title} | xfontat`;
+    description = seo.description;
   }
 
   const schema = font && localizedFont
@@ -535,6 +538,9 @@ export default function LocalizedContentPage() {
 
               <section className="mt-6 rounded-lg border bg-muted/20 p-5" aria-labelledby="font-about-heading">
                 <h2 id="font-about-heading" className="text-xl font-semibold">{fontLabels.aboutHeading}</h2>
+                {locale === "en" && fontProfile?.en.map((paragraph) => (
+                  <p key={paragraph} className="mt-3 max-w-3xl leading-7">{paragraph}</p>
+                ))}
                 <p className="mt-3 max-w-3xl leading-7">{localizedFont?.summary}</p>
                 <p className="mt-3 max-w-3xl leading-7">{localizedFont?.categoryDescription}</p>
                 <p className="mt-3 text-sm text-muted-foreground">
