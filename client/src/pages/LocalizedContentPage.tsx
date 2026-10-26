@@ -13,10 +13,8 @@ import { generateFontFamily, loadFont } from "@/lib/fontLoader";
 import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { detectFontFamily, groupFontsByFamily } from "@/lib/fontFamily";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
-import { LocalizedMobileMenu } from "@/components/LocalizedMobileMenu";
-import { intlNav } from "@/lib/intlTools";
+import { IntlFooter, IntlHeader } from "@/components/IntlShell";
 import { blogPostPath, originalBlogSlug } from "@/lib/blogSlugs";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   fontCharacterMap,
   getLocalizedFontWeightLabel,
@@ -44,7 +42,7 @@ const categoryArticleKeywords: Record<string, string[]> = {
 
 function LocalizedHeader({
   locale,
-  path,
+  languages,
   searchQuery,
   onSearchChange,
   previewText,
@@ -54,7 +52,7 @@ function LocalizedHeader({
   onSearchSubmit,
 }: {
   locale: "en" | "fr";
-  path: string;
+  languages: { ar: string; en: string; fr: string };
   searchQuery: string;
   onSearchChange: (value: string) => void;
   previewText: string;
@@ -63,45 +61,10 @@ function LocalizedHeader({
   onPreviewSizeChange: (value: number) => void;
   onSearchSubmit: () => void;
 }) {
-  const arabicPath = path;
-  const categories = locale === "fr" ? frenchCategories : englishCategories;
-  const designCategory = categories.find((item) => item.arabicCategory === "تصميم");
   const homeCopy = locale === "fr" ? frenchHome : englishHome;
   const [showPreviewTools, setShowPreviewTools] = useState(false);
-  const menuLinks = [
-    { href: `/${locale}`, label: homeCopy.home },
-    ...intlNav[locale].filter((item) => item.id !== "fonts" && item.id !== "blog").map(({ href, label }) => ({ href, label })),
-    ...categories.map((category) => ({ href: `/${locale}/fonts/${category.slug}`, label: category.name })),
-    { href: `/${locale}/blog`, label: homeCopy.blog },
-  ];
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-      <div className="container mx-auto px-3 py-3 md:px-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1">
-            <LocalizedMobileMenu locale={locale} links={menuLinks} />
-            <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
-              <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
-            </Link>
-          </div>
-          <nav className="hidden flex-wrap items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
-            <Link href={`/${locale}`}>{homeCopy.home}</Link>
-            {categories.slice(0, 3).map((category) => (
-              <Link key={category.slug} href={`/${locale}/fonts/${category.slug}`}>{category.name}</Link>
-            ))}
-            <Link href={`/${locale}/fonts/${designCategory?.slug || "tasmeem"}`}>{homeCopy.designFonts}</Link>
-            {intlNav[locale].filter((item) => item.id === "keyboard" || item.id === "names" || item.id === "generator").map((item) => (
-              <Link key={item.href} href={item.href}>{item.label}</Link>
-            ))}
-            <Link href={`/${locale}/blog`}>{homeCopy.blog}</Link>
-          </nav>
-          <div className="flex items-center gap-2 text-sm">
-            <Link href={routeLanguagePath(path, "en")} hrefLang="en" className="rounded-md border px-2 py-2">EN</Link>
-            <Link href={routeLanguagePath(path, "fr")} hrefLang="fr" className="rounded-md border px-2 py-2">FR</Link>
-            <Link href={arabicPath} hrefLang="ar" className="rounded-md border px-2 py-2">العربية</Link>
-            <ThemeToggle label={locale === "fr" ? "Changer le thème" : "Toggle theme"} />
-          </div>
-        </div>
+    <IntlHeader locale={locale} languages={languages}>
         <form
           className="mt-3 grid grid-cols-[1fr_auto] gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_240px_auto]"
           onSubmit={(event) => {
@@ -158,23 +121,7 @@ function LocalizedHeader({
             {locale === "fr" ? "Rechercher" : "Search"}
           </button>
         </form>
-      </div>
-    </header>
-  );
-}
-
-function LocalizedFooter({ locale }: { locale: "en" | "fr" }) {
-  const label = locale === "fr";
-  return (
-    <footer className="mt-12 border-t">
-      <div className="container mx-auto flex flex-wrap gap-x-5 gap-y-3 px-4 py-6 text-sm text-muted-foreground">
-        <Link href={`/${locale}/about`}>{label ? "À propos" : "About"}</Link>
-        <Link href={`/${locale}/contact`}>{label ? "Contact" : "Contact"}</Link>
-        <Link href={`/${locale}/privacy`}>{label ? "Confidentialité" : "Privacy"}</Link>
-        <Link href={`/${locale}/terms`}>{label ? "Conditions" : "Terms"}</Link>
-        <span>© {new Date().getFullYear()} xfontat</span>
-      </div>
-    </footer>
+    </IntlHeader>
   );
 }
 
@@ -357,9 +304,14 @@ export default function LocalizedContentPage() {
           },
         ]
     : [];
+  const languagePaths = {
+    ar: arabicPath,
+    en: blogSlug ? blogPostPath("en", blogSlug) : routeLanguagePath(rawPath, "en"),
+    fr: blogSlug ? blogPostPath("fr", blogSlug) : routeLanguagePath(rawPath, "fr"),
+  };
   const alternates = [
-    { lang: "en", href: `https://xfontat.com${blogSlug ? blogPostPath("en", blogSlug) : routeLanguagePath(rawPath, "en")}` },
-    { lang: "fr", href: `https://xfontat.com${blogSlug ? blogPostPath("fr", blogSlug) : routeLanguagePath(rawPath, "fr")}` },
+    { lang: "en", href: `https://xfontat.com${languagePaths.en}` },
+    { lang: "fr", href: `https://xfontat.com${languagePaths.fr}` },
     { lang: "ar", href: `https://xfontat.com${arabicPath}` },
   ];
 
@@ -534,7 +486,7 @@ export default function LocalizedContentPage() {
       />
       <LocalizedHeader
         locale={locale}
-        path={arabicPath}
+        languages={languagePaths}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         previewText={previewText}
@@ -1032,7 +984,7 @@ export default function LocalizedContentPage() {
           <section><h1 className="text-3xl font-bold">{currentLabel ? "Page introuvable" : "Page not found"}</h1><Link className="mt-4 inline-block underline" href={`/${locale}`}>{currentLabel ? "Retour à l’accueil" : "Return home"}</Link></section>
         ) : null}
       </main>
-      <LocalizedFooter locale={locale} />
+      <IntlFooter locale={locale} />
       {fontSlug && font && (
         // Keeps the download reachable on phones, where the sidebar button sits far down the page.
         <>
