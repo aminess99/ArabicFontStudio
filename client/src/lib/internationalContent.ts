@@ -20,11 +20,11 @@ export const englishHome = {
     "xfontat is a free library of more than 850 Arabic fonts, sorted by calligraphy style. Type your own text to preview it in every font, open a font to see its characters, format and licence, then download it. Free tools help you type in Arabic, write your name in Arabic calligraphy and preview a tattoo.",
   toolsHeading: "Free Arabic writing tools",
   tools: [
-    { href: "/en/arabic-keyboard", title: "Arabic keyboard", description: "Type in Arabic on any device, with vowel marks and phonetic typing." },
-    { href: "/en/names-in-arabic", title: "Names in Arabic", description: "How 200 popular names are written in Arabic, with meanings and calligraphy." },
-    { href: "/en/arabic-font-generator", title: "Arabic font generator", description: "Turn a name or text into Arabic calligraphy and download a PNG." },
-    { href: "/en/arabic-tattoo-fonts", title: "Arabic tattoo fonts", description: "Preview a tattoo in calligraphy fonts and avoid common mistakes." },
-    { href: "/en/arabic-phrases", title: "Arabic phrases", description: "Allah, Bismillah, Habibi and more, with meaning and calligraphy." },
+    { href: "/en/arabic-keyboard", icon: "keyboard" as const, title: "Arabic keyboard", description: "Type in Arabic on any device, with vowel marks and phonetic typing." },
+    { href: "/en/names-in-arabic", icon: "names" as const, title: "Names in Arabic", description: "How 200 popular names are written in Arabic, with meanings and calligraphy." },
+    { href: "/en/arabic-font-generator", icon: "generator" as const, title: "Arabic font generator", description: "Turn a name or text into Arabic calligraphy and download a PNG." },
+    { href: "/en/arabic-tattoo-fonts", icon: "tattoo" as const, title: "Arabic tattoo fonts", description: "Preview a tattoo in calligraphy fonts and avoid common mistakes." },
+    { href: "/en/arabic-phrases", icon: "phrases" as const, title: "Arabic phrases", description: "Allah, Bismillah, Habibi and more, with meaning and calligraphy." },
   ],
   aboutHeading: "Explore Arabic typography",
   about:
@@ -335,11 +335,11 @@ export const frenchHome = {
     "xfontat est une bibliothèque gratuite de plus de 850 polices arabes, classées par style de calligraphie. Tapez votre texte pour le prévisualiser dans chaque police, ouvrez une police pour voir ses caractères, son format et sa licence, puis téléchargez-la. Des outils gratuits permettent aussi d'écrire en arabe, d'écrire son prénom en calligraphie et de prévisualiser un tatouage.",
   toolsHeading: "Outils gratuits d'écriture arabe",
   tools: [
-    { href: "/fr/clavier-arabe", title: "Clavier arabe", description: "Écrivez en arabe sur n'importe quel appareil, avec voyelles et saisie phonétique." },
-    { href: "/fr/prenoms-en-arabe", title: "Prénoms en arabe", description: "Comment 200 prénoms s'écrivent en arabe, avec leur sens et en calligraphie." },
-    { href: "/fr/generateur-police-arabe", title: "Générateur de police arabe", description: "Transformez un prénom ou un texte en calligraphie arabe et téléchargez un PNG." },
-    { href: "/fr/police-arabe-tatouage", title: "Polices pour tatouage", description: "Prévisualisez un tatouage en calligraphie et évitez les erreurs fréquentes." },
-    { href: "/fr/expressions-arabes", title: "Expressions arabes", description: "Allah, Bismillah, Habibi et d'autres, avec leur sens et en calligraphie." },
+    { href: "/fr/clavier-arabe", icon: "keyboard" as const, title: "Clavier arabe", description: "Écrivez en arabe sur n'importe quel appareil, avec voyelles et saisie phonétique." },
+    { href: "/fr/prenoms-en-arabe", icon: "names" as const, title: "Prénoms en arabe", description: "Comment 200 prénoms s'écrivent en arabe, avec leur sens et en calligraphie." },
+    { href: "/fr/generateur-police-arabe", icon: "generator" as const, title: "Générateur de police arabe", description: "Transformez un prénom ou un texte en calligraphie arabe et téléchargez un PNG." },
+    { href: "/fr/police-arabe-tatouage", icon: "tattoo" as const, title: "Polices pour tatouage", description: "Prévisualisez un tatouage en calligraphie et évitez les erreurs fréquentes." },
+    { href: "/fr/expressions-arabes", icon: "phrases" as const, title: "Expressions arabes", description: "Allah, Bismillah, Habibi et d'autres, avec leur sens et en calligraphie." },
   ],
   aboutHeading: "Explorer la typographie arabe",
   about:
