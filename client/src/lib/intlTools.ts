@@ -56,7 +56,7 @@ export const keyboardCopy: Record<IntlLocale, Copy> = {
     locale: "en",
     path: toolPaths.keyboard.en!,
     title: "Arabic Keyboard Online — Type in Arabic Without Installing | xfontat",
-    description: "Free online Arabic keyboard. Type Arabic letters with your mouse or your normal keyboard, add vowel marks, then copy, search, translate or turn the text into calligraphy.",
+    description: "Free online Arabic keyboard: type Arabic with your mouse or keyboard, add vowel marks, then copy, search, translate or turn the text into calligraphy.",
     heading: "Arabic Keyboard Online",
     intro: "Type in Arabic on any computer or phone, even without an Arabic keyboard. Click the letters on screen, or type on your usual keyboard and each key turns into the Arabic letter in the same position on a standard Arabic layout. Switch to phonetic mode to type by sound instead (b for ب, s for س).",
     sections: [
@@ -77,7 +77,7 @@ export const keyboardCopy: Record<IntlLocale, Copy> = {
     locale: "fr",
     path: toolPaths.keyboard.fr!,
     title: "Clavier arabe en ligne — écrire en arabe sans installation | xfontat",
-    description: "Clavier arabe en ligne gratuit : tapez les lettres arabes à la souris ou avec votre clavier, ajoutez les voyelles, puis copiez, cherchez, traduisez ou transformez le texte en calligraphie.",
+    description: "Clavier arabe en ligne gratuit : écrivez en arabe à la souris ou au clavier, ajoutez les voyelles, puis copiez, traduisez ou créez une calligraphie.",
     heading: "Clavier arabe en ligne",
     intro: "Écrivez en arabe sur n'importe quel ordinateur ou téléphone, même sans clavier arabe. Cliquez sur les lettres à l'écran, ou tapez sur votre clavier habituel : chaque touche devient la lettre arabe placée au même endroit sur un clavier arabe standard. Le mode phonétique permet aussi d'écrire au son (b pour ب, s pour س).",
     sections: [
@@ -101,7 +101,7 @@ export const generatorCopy: Record<"en" | "fr", Copy> = {
     locale: "en",
     path: toolPaths.generator.en!,
     title: "Arabic Font Generator — Arabic Calligraphy Text to PNG | xfontat",
-    description: "Type a name or any text, pick from hundreds of Arabic calligraphy fonts (Thuluth, Diwani, Kufi, Naskh, Nastaliq) and download it as a transparent PNG. Free, no sign-up.",
+    description: "Type a name or text, pick an Arabic calligraphy font (Thuluth, Diwani, Kufi, Naskh, Nastaliq) and download a transparent PNG. Free, no sign-up.",
     heading: "Arabic Font Generator",
     intro: "Write any Arabic text, or an English name we can spell in Arabic, then choose a calligraphy style, colour and size, and download the result as a PNG image. The generator uses the real font files from our library of over 850 Arabic fonts.",
     sections: [
@@ -121,7 +121,7 @@ export const generatorCopy: Record<"en" | "fr", Copy> = {
     locale: "fr",
     path: toolPaths.generator.fr!,
     title: "Générateur de police arabe — calligraphie arabe en PNG | xfontat",
-    description: "Tapez un prénom ou un texte, choisissez parmi des centaines de polices de calligraphie arabe (thuluth, diwani, coufique, naskh) et téléchargez une image PNG transparente. Gratuit.",
+    description: "Tapez un prénom ou un texte, choisissez une calligraphie arabe (thuluth, diwani, coufique, naskh) et téléchargez un PNG transparent. Gratuit.",
     heading: "Générateur de police arabe",
     intro: "Écrivez un texte arabe, ou un prénom français que nous savons écrire en arabe, choisissez un style de calligraphie, une couleur et une taille, puis téléchargez une image PNG. Le générateur utilise les vrais fichiers de notre bibliothèque de plus de 850 polices arabes.",
     sections: [
@@ -164,7 +164,7 @@ export const tattooCopy: Record<"en" | "fr", Copy> = {
     locale: "fr",
     path: toolPaths.tattoo.fr!,
     title: "Police arabe pour tatouage — prévisualisez votre tatouage | xfontat",
-    description: "Prévisualisez votre tatouage en arabe en calligraphie thuluth, diwani, coufique et nastaliq, évitez les erreurs fréquentes et téléchargez une image PNG prête pour le pochoir.",
+    description: "Prévisualisez votre tatouage arabe en thuluth, diwani, coufique ou nastaliq, évitez les erreurs fréquentes et téléchargez un PNG pour le pochoir.",
     heading: "Polices arabes pour tatouage",
     intro: "Tapez un mot, un prénom ou une phrase en arabe et voyez-le dans 10 polices calligraphiques choisies pour le tatouage. Toutes sont publiées sous licence SIL Open Font License. Avant de prendre rendez-vous, lisez la section sur les erreurs : les tatouages en arabe sont souvent ratés.",
     sections: [
@@ -224,7 +224,7 @@ export const phrasesHubCopy: Record<"en" | "fr", Copy> = {
     locale: "en",
     path: toolPaths.phrases.en!,
     title: "Arabic Words and Phrases in Calligraphy — Meaning | xfontat",
-    description: "Allah, Bismillah, Alhamdulillah, Inshallah, Habibi and more: the Arabic spelling, meaning and pronunciation of popular words and phrases, in downloadable calligraphy.",
+    description: "Allah, Bismillah, Inshallah, Habibi and more: Arabic spelling, meaning and pronunciation of popular words and phrases, in downloadable calligraphy.",
     heading: "Arabic Words and Phrases",
     intro: "The Arabic words and phrases people look up most, from greetings and expressions of faith to single words that are popular in tattoos and wall art. Each page gives the Arabic text, its meaning, how to say it and the phrase in several calligraphy styles.",
     sections: [
@@ -239,7 +239,7 @@ export const phrasesHubCopy: Record<"en" | "fr", Copy> = {
     locale: "fr",
     path: toolPaths.phrases.fr!,
     title: "Mots et expressions arabes en calligraphie — sens | xfontat",
-    description: "Allah, Bismillah, Al-hamdoulillah, Inchallah, Habibi et d'autres : orthographe arabe, sens et prononciation des expressions les plus recherchées, en calligraphie téléchargeable.",
+    description: "Allah, Bismillah, Inchallah, Habibi et d'autres : orthographe arabe, sens et prononciation des expressions populaires, en calligraphie à télécharger.",
     heading: "Mots et expressions arabes",
     intro: "Les mots et expressions arabes les plus recherchés, des salutations aux formules de foi, ainsi que des mots courts appréciés pour les tatouages et la décoration. Chaque page donne le texte arabe, son sens, sa prononciation et l'expression en plusieurs styles de calligraphie.",
     sections: [

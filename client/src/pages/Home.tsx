@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { readBootData } from "@/lib/bootData";
 import { Link } from "wouter";
 import { ToolTiles, type ToolTile } from "@/components/ToolTiles";
 import { Header } from "@/components/Header";
@@ -69,6 +70,8 @@ export default function Home() {
   const totalItems = pagedData?.total ?? 0;
   const totalPages = Math.ceil(totalItems / FONTS_PER_PAGE);
   const { data: summary } = useQuery<HomeStats & { latest: Font[] }>({ queryKey: ["/api/home-summary"] });
+  // The server embeds the counts so the intro does not change length after load.
+  const bootStats = useMemo(() => readBootData<HomeStats>("homeStats"), []);
 
   const groupedFonts = useMemo(() => groupFontsByFamily(fonts), [fonts]);
 
@@ -151,7 +154,7 @@ export default function Home() {
 
       <section className="container mx-auto px-3 md:px-4 pt-6 pb-2">
         <h1 className="text-2xl md:text-3xl font-bold mb-2">{homeHeading}</h1>
-        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{homeIntro(summary)}</p>
+        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{homeIntro(summary ?? bootStats)}</p>
         {!searchQuery && (
           <ToolTiles tools={TOOL_CARDS} />
         )}

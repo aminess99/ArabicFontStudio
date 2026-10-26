@@ -32,7 +32,8 @@ import {
 import { arabicNames, getArabicName, namePath, relatedNames, NAME_PATHS } from "../client/src/lib/arabicNames";
 import { arabicPhrases, getArabicPhrase, phrasePath, PHRASE_PATHS } from "../client/src/lib/arabicPhrases";
 import { spellArabic } from "../client/src/lib/arabicLetters";
-import { blogPostPath, localizedBlogSlug, originalBlogSlug } from "../client/src/lib/blogSlugs";
+import { arabicFontDescription, getFontProfile, profileDescription } from "../client/src/lib/fontProfiles";
+import { blogPostPath, blogSeo, localizedBlogSlug, originalBlogSlug } from "../client/src/lib/blogSlugs";
 import { nameContent, phraseContent, phraseLabel, type DetailContent } from "../client/src/lib/intlContent";
 import { CARDS_HUB, OCCASIONS, getOccasion, occasionPath } from "../client/src/lib/greetingCards";
 import * as home from "../client/src/lib/homeContent";
@@ -57,6 +58,9 @@ type SeoPage = {
   canonicalPath?: string;
   // schema.org nodes for this page, emitted as one @graph in <head>.
   jsonLd?: object[];
+  // Data the client reads on first render (see client/src/lib/bootData.ts),
+  // so it does not redraw the page once an API request returns.
+  bootData?: Record<string, unknown>;
 };
 
 function breadcrumbNode(items: Array<[string, string]>): object {
@@ -262,6 +266,7 @@ function resolveArabicHome(fonts: Font[]): SeoPage {
     heading: home.homeHeading,
     imagePath: "/og-image.png",
     bodyHtml,
+    bootData: { homeStats: stats },
     alternates: pageAlternates("/"),
     jsonLd: [
       {
@@ -401,16 +406,15 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
   const category = categoryLabel(locale, categorySlug || font.category);
   // Duplicate copies share the primary's name, so qualify them by category.
   const qualifier = font.duplicateOf ? ` (${category})` : "";
+  // English and French use the same title and description as the React page.
+  const localizedMeta = locale === "ar" ? null : getLocalizedFontPageContent(font, locale);
   const title = locale === "ar"
     ? `تحميل خط ${font.nameArabic}${qualifier} مجاناً | xfontat`
-    : locale === "fr"
-      ? `Télécharger la police arabe ${font.name}${qualifier} | xfontat`
-      : `Download ${font.name} Arabic Font${qualifier} | xfontat`;
+    : localizedMeta!.title;
+  const profile = font.duplicateOf ? undefined : getFontProfile(font.slug);
   const description = locale === "ar"
-    ? `حمّل خط ${font.nameArabic} بصيغة ${font.fileFormat}. راجع التصنيف والمصمم والترخيص والمصدر قبل استخدام ملف الخط.`
-    : locale === "fr"
-      ? `Téléchargez le fichier de police arabe ${font.name} au format ${font.fileFormat}. Consultez sa catégorie, son créateur, sa licence et sa source avant utilisation.`
-      : `Download the ${font.name} Arabic font file in ${font.fileFormat} format. Review its category, designer, license, and source before use.`;
+    ? arabicFontDescription(font)
+    : (locale === "en" && !font.duplicateOf && profileDescription(font.slug, "en")) || localizedMeta!.description;
   const heading = locale === "ar"
     ? `تحميل خط ${font.nameArabic}`
     : locale === "fr"
@@ -473,7 +477,9 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
   const previewFile = path.join(process.cwd(), "client/public/font-previews", `${previewSlug}.webp`);
   const imagePath = fs.existsSync(previewFile) ? `/font-previews/${previewSlug}.webp` : "/og-image.png";
   const pagePath = getFontPath(locale, font);
+  const profileText = profile && locale !== "fr" ? profile[locale] : undefined;
   const bodyHtml = [
+    profileText ? `<section><h2>${escapeHtml(locale === "ar" ? `عن خط ${font.nameArabic}` : `About ${font.name}`)}</h2>${profileText.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</section>` : "",
     `<p>${escapeHtml(summary)}</p>`,
     `<dl>${details.map(([label, value]) => `<dt>${escapeHtml(label!)}</dt><dd>${escapeHtml(value!)}</dd>`).join("")}</dl>`,
     useCases.length ? `<section><h2>${escapeHtml(t("استخدامات الخط", "Suggested uses", "Usages suggérés"))}</h2><ul>${useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>` : "",
@@ -734,8 +740,8 @@ function resolveBlogArticle(locale: Locale, requestedSlug: string, posts: BlogPo
   return {
     locale,
     path: blogPostPath(locale, slug),
-    title: `${translation.title} | xfontat`,
-    description: translation.excerpt || translation.title,
+    title: `${blogSeo(locale, slug, translation.title, "").title} | xfontat`,
+    description: blogSeo(locale, slug, translation.title, translation.excerpt || translation.title).description,
     heading: translation.title,
     bodyHtml: `${renderMarkdownLite(translation.content)}<p><a href="${escapeHtml(pathForLocale(locale, "/blog"))}">${escapeHtml(locale === "fr" ? "Tous les articles" : "All articles")}</a></p>`,
     alternates: blogAlternates(slug),
@@ -1154,6 +1160,10 @@ async function renderPage(req: Request, res: Response, page: SeoPage, status = 2
     // data-schema="page" lets SEOHead replace it once React renders.
     const graph = JSON.stringify({ "@context": "https://schema.org", "@graph": page.jsonLd }).replace(/</g, "\\u003c");
     html = html.replace("</head>", `<script type="application/ld+json" data-schema="page">${graph}</script></head>`);
+  }
+  if (page.bootData) {
+    const data = JSON.stringify(page.bootData).replace(/</g, "\\u003c");
+    html = html.replace("</head>", `<script id="boot-data" type="application/json">${data}</script></head>`);
   }
   html = injectRootFallback(html, page);
   const transformed = await transformSeoHtml(req.originalUrl, html);

@@ -35,7 +35,7 @@ export function IntlHeader({
           <div className="flex items-center gap-1">
             <LocalizedMobileMenu locale={locale} links={menuLinks} />
             <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
-              <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
+              <img src="/logo-header.webp" width={267} height={80} alt="xfontat" className="h-8 w-auto md:h-10" />
             </Link>
           </div>
           <nav className="hidden items-center gap-4 text-sm lg:flex" aria-label={locale === "fr" ? "Navigation principale" : "Main navigation"}>

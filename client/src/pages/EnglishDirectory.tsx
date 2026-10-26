@@ -278,7 +278,16 @@ export default function EnglishDirectory() {
 
         <section aria-live="polite">
           {isLoading ? (
-            <p className="py-10 text-center text-muted-foreground">{homeCopy.loading}</p>
+            // Holds roughly the height of the list so the sections below do not jump.
+            <div className="min-h-[2400px]" aria-busy="true">
+              <p className="py-10 text-center text-muted-foreground">{homeCopy.loading}</p>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="animate-pulse border-b py-6">
+                  <div className="mb-3 h-4 w-32 rounded bg-muted" />
+                  <div className="h-12 w-3/4 rounded bg-muted" />
+                </div>
+              ))}
+            </div>
           ) : isError ? (
             <div className="py-10 text-center">
               <p className="text-muted-foreground">{homeCopy.error}</p>
