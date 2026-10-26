@@ -13,6 +13,7 @@ import { generateFontFamily, loadFont } from "@/lib/fontLoader";
 import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { detectFontFamily, groupFontsByFamily } from "@/lib/fontFamily";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
+import { LocalizedMobileMenu } from "@/components/LocalizedMobileMenu";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   fontCharacterMap,
@@ -64,13 +65,22 @@ function LocalizedHeader({
   const categories = locale === "fr" ? frenchCategories : englishCategories;
   const designCategory = categories.find((item) => item.arabicCategory === "تصميم");
   const homeCopy = locale === "fr" ? frenchHome : englishHome;
+  const [showPreviewTools, setShowPreviewTools] = useState(false);
+  const menuLinks = [
+    { href: `/${locale}`, label: homeCopy.home },
+    ...categories.map((category) => ({ href: `/${locale}/fonts/${category.slug}`, label: category.name })),
+    { href: `/${locale}/blog`, label: homeCopy.blog },
+  ];
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto px-3 py-3 md:px-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
-            <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
-          </Link>
+          <div className="flex items-center gap-1">
+            <LocalizedMobileMenu locale={locale} links={menuLinks} />
+            <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
+              <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
+            </Link>
+          </div>
           <nav className="hidden flex-wrap items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
             <Link href={`/${locale}`}>{homeCopy.home}</Link>
             {categories.slice(0, 5).map((category) => (
@@ -87,13 +97,13 @@ function LocalizedHeader({
           </div>
         </div>
         <form
-          className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_240px_auto]"
+          className="mt-3 grid grid-cols-[1fr_auto] gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_240px_auto]"
           onSubmit={(event) => {
             event.preventDefault();
             onSearchSubmit();
           }}
         >
-          <label className="grid gap-1 text-xs font-medium">
+          <label className="order-1 grid gap-1 text-xs font-medium sm:order-none">
             {homeCopy.searchLabel}
             <input
               type="search"
@@ -103,7 +113,16 @@ function LocalizedHeader({
               className="h-10 rounded-md border bg-background px-3 text-base font-normal"
             />
           </label>
-          <label className="grid gap-1 text-xs font-medium">
+          {/* Preview controls fold away on phones so content starts near the top. */}
+          <button
+            type="button"
+            onClick={() => setShowPreviewTools((value) => !value)}
+            aria-expanded={showPreviewTools}
+            className="order-3 col-span-2 text-start text-xs text-muted-foreground underline underline-offset-4 sm:hidden"
+          >
+            {locale === "fr" ? "Options de prévisualisation" : "Preview options"}
+          </button>
+          <label className={`order-4 col-span-2 ${showPreviewTools ? "grid" : "hidden"} gap-1 text-xs font-medium sm:order-none sm:col-span-1 sm:grid`}>
             {homeCopy.previewLabel}
             <input
               value={previewText}
@@ -113,7 +132,7 @@ function LocalizedHeader({
               className="h-10 rounded-md border bg-background px-3 text-base font-normal"
             />
           </label>
-          <label className="grid gap-1 text-xs font-medium">
+          <label className={`order-5 col-span-2 ${showPreviewTools ? "grid" : "hidden"} gap-1 text-xs font-medium sm:order-none sm:col-span-1 sm:grid`}>
             <span className="flex items-center justify-between gap-3">
               <span>{homeCopy.previewSizeLabel}</span>
               <span className="text-xs text-muted-foreground">{previewSize}px</span>
@@ -129,7 +148,7 @@ function LocalizedHeader({
               className="h-10 w-full accent-primary"
             />
           </label>
-          <button type="submit" className="h-10 self-end rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+          <button type="submit" className="order-2 h-10 self-end rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:order-none">
             {locale === "fr" ? "Rechercher" : "Search"}
           </button>
         </form>
@@ -1007,6 +1026,23 @@ export default function LocalizedContentPage() {
         ) : null}
       </main>
       <LocalizedFooter locale={locale} />
+      {fontSlug && font && (
+        // Keeps the download reachable on phones, where the sidebar button sits far down the page.
+        <>
+          <div className="h-20 md:hidden" aria-hidden="true" />
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur md:hidden" data-testid="bar-localized-download">
+            <div className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{font.name}</p>
+                <p className="text-xs text-muted-foreground">{font.fileFormat}</p>
+              </div>
+              <a className="inline-flex h-11 shrink-0 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground" href={font.fileUrl} download={font.fileName}>
+                {localizedFontDetailCopy[locale].download}
+              </a>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

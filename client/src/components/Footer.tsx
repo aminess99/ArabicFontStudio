@@ -61,6 +61,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/tahnia" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-tahnia">
+                  بطاقات تهنئة باسمك
+                </Link>
+              </li>
+              <li>
                 <Link href="/zakhrafa" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-zakhrafa">
                   زخرفة الأسماء
                 </Link>

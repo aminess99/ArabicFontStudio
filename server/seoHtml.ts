@@ -19,6 +19,7 @@ import { generateLegacyFontSlug } from "../client/src/lib/slugify";
 import { categoryContent, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
 import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDetails";
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
+import { CARDS_HUB, OCCASIONS, getOccasion, occasionPath } from "../client/src/lib/greetingCards";
 import { getGeneratedPosts } from "./blogGenerator";
 import { storage } from "./storage";
 import { transformSeoHtml } from "./vite";
@@ -686,6 +687,54 @@ function resolveToolPage(tool: ToolPageCopy): SeoPage {
   };
 }
 
+// Greeting card pages exist only in Arabic.
+function resolveCardsPage(pagePath: string): SeoPage | null {
+  const occasionLinks = (current?: string) => `<ul>${OCCASIONS.filter((item) => item.slug !== current).map((item) => `<li><a href="${occasionPath(item.slug)}">بطاقات تهنئة ${escapeHtml(item.name)}</a></li>`).join("")}</ul>`;
+  if (pagePath === CARDS_HUB.path) {
+    const url = `${SITE_ORIGIN}${CARDS_HUB.path}`;
+    return {
+      locale: "ar",
+      path: CARDS_HUB.path,
+      title: CARDS_HUB.title,
+      description: CARDS_HUB.description,
+      heading: CARDS_HUB.heading,
+      bodyHtml: `<p>${escapeHtml(CARDS_HUB.intro)}</p><section><h2>المناسبات</h2>${occasionLinks()}</section>${faqHtml("أسئلة شائعة", CARDS_HUB.faqs)}`,
+      alternates: { ar: url, "x-default": url },
+      jsonLd: [
+        breadcrumbNode([["الرئيسية", "/"], [CARDS_HUB.heading, CARDS_HUB.path]]),
+        { "@type": "CollectionPage", name: CARDS_HUB.heading, description: CARDS_HUB.description, url, inLanguage: "ar" },
+        faqNode(CARDS_HUB.faqs),
+      ],
+    };
+  }
+  const match = new RegExp(`^${CARDS_HUB.path}/([^/]+)$`).exec(pagePath);
+  const occasion = match ? getOccasion(decodeURIComponent(match[1])) : undefined;
+  if (!occasion) return null;
+  const path = occasionPath(occasion.slug);
+  const url = `${SITE_ORIGIN}${path}`;
+  const templates = occasion.templates.map((template) => template.label).join("، ");
+  return {
+    locale: "ar",
+    path,
+    title: occasion.title,
+    description: occasion.description,
+    heading: occasion.heading,
+    bodyHtml: [
+      `<p>${escapeHtml(occasion.intro)}</p>`,
+      `<p>${escapeHtml(`القوالب المتاحة: ${templates}. المقاسات: مربع 1080×1080 وستوري 1080×1920. الخطوط منشورة بترخيص SIL Open Font License.`)}</p>`,
+      `<section><h2>عبارات تهنئة ${escapeHtml(occasion.name)}</h2><ul>${occasion.greetings.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`,
+      faqHtml("أسئلة شائعة", occasion.faqs),
+      `<section><h2>بطاقات لمناسبات أخرى</h2>${occasionLinks(occasion.slug)}</section>`,
+    ].join(""),
+    alternates: { ar: url, "x-default": url },
+    jsonLd: [
+      breadcrumbNode([["الرئيسية", "/"], [CARDS_HUB.heading, CARDS_HUB.path], [occasion.heading, path]]),
+      { "@type": "WebApplication", name: occasion.heading, description: occasion.description, url, applicationCategory: "DesignApplication", operatingSystem: "Web", inLanguage: "ar", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+      faqNode(occasion.faqs),
+    ],
+  };
+}
+
 function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): SeoPage | null {
   if (pagePath === "/design-fonts") {
     const title = locale === "fr" ? "Polices arabes pour le design | xfontat" : locale === "en" ? "Arabic Design Fonts | xfontat" : "خطوط عربية للتصميم | xfontat";
@@ -700,6 +749,9 @@ function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): Se
       bodyHtml: `<p>${escapeHtml(description)}</p>${fontLinkList(designFonts, locale)}`,
       alternates: pageAlternates(pagePath),
     };
+  }
+  if (pagePath === CARDS_HUB.path || pagePath.startsWith(`${CARDS_HUB.path}/`)) {
+    return locale === "ar" ? resolveCardsPage(pagePath) : null;
   }
   const tool = [zakhrafaPage, textToImagePage].find((item) => item.path === pagePath);
   // The tool pages exist only in Arabic.
@@ -971,6 +1023,9 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   for (const tool of [zakhrafaPage, textToImagePage]) {
     add(tool.path, sourceLastmod("client/src/lib/toolPages.ts"));
   }
+  const cardsLastmod = sourceLastmod("client/src/lib/greetingCards.ts");
+  add(CARDS_HUB.path, cardsLastmod);
+  for (const occasion of OCCASIONS) add(occasionPath(occasion.slug), cardsLastmod);
   const thumbnailLastmod = sourceLastmod("client/src/pages/YouTubeThumbnailStudio.tsx");
   add("/youtube-thumbnail-maker", thumbnailLastmod);
   add("/en/youtube-thumbnail-maker", thumbnailLastmod);
@@ -1019,6 +1074,8 @@ async function renderLlmsTxt(res: Response): Promise<void> {
     "## Free tools",
     ...tools,
     `- [منشئ صور يوتيوب المصغرة](${SITE_ORIGIN}/youtube-thumbnail-maker): AI YouTube thumbnail maker with Arabic titles.`,
+    `- [${CARDS_HUB.heading}](${SITE_ORIGIN}${CARDS_HUB.path}): ${CARDS_HUB.description}`,
+    ...OCCASIONS.map((occasion) => `  - [${occasion.heading}](${SITE_ORIGIN}${occasionPath(occasion.slug)})`),
     "",
     "## Guides",
     ...guides,

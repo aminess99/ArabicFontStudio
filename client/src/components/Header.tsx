@@ -22,6 +22,7 @@ const NAV_LINKS = [
   { href: "/", label: "الرئيسية", testId: "home" },
   { href: "/design-fonts", label: "خطوط التصميم", testId: "design" },
   { href: "/arabic-text-to-image", label: "اكتب اسمك بالخط", testId: "text-to-image" },
+  { href: "/tahnia", label: "بطاقات تهنئة", testId: "tahnia" },
   { href: "/zakhrafa", label: "زخرفة", testId: "zakhrafa" },
   { href: "/blog", label: "المدونة", testId: "blog" },
 ];
