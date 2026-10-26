@@ -17,6 +17,11 @@ import type { Font } from "@shared/schema";
 
 const PAGE_SIZE = 15;
 
+const SHORT_CATEGORY_NAMES: Record<"en" | "fr", Record<string, string>> = {
+  en: { tasmeem: "Display", graffiti: "Freehand", photoshop: "Photoshop" },
+  fr: { tasmeem: "Décoratives", graffiti: "Libres", photoshop: "Photoshop" },
+};
+
 export default function EnglishDirectory() {
   const pathname = typeof window === "undefined" ? "/en" : window.location.pathname;
   const locale = pathname === "/fr" || pathname.startsWith("/fr/") ? "fr" : "en";
@@ -231,23 +236,30 @@ export default function EnglishDirectory() {
       </IntlHeader>
 
       <main className="container mx-auto px-4 py-6 md:py-10">
-        <nav className="mb-5 flex flex-wrap gap-2" aria-label={homeCopy.allCategories}>
+        {/* One scrollable row on phones, as on the Arabic home, so fonts start near the top. */}
+        <nav className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0" aria-label={homeCopy.allCategories}>
+          <Link
+            href={`/${locale}`}
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-sm hover:bg-muted ${!category ? "border-primary bg-primary text-primary-foreground" : ""}`}
+          >
+            {isFrench ? "Toutes" : "All"}
+          </Link>
           {categories.map((item) => (
             <Link
               key={item.slug}
               href={`/${locale}/fonts/${item.slug}`}
-              className={`rounded-full border px-3 py-1.5 text-sm hover:bg-muted ${
-                item.slug === category?.slug ? "border-primary bg-muted" : ""
+              className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm hover:bg-muted ${
+                item.slug === category?.slug ? "border-primary bg-primary text-primary-foreground" : ""
               }`}
             >
-              {item.name}
+              {SHORT_CATEGORY_NAMES[locale][item.slug] ?? item.name}
             </Link>
           ))}
         </nav>
 
-        <section className="border-b pb-6">
-          <h1 className="text-3xl font-bold md:text-4xl">{heading}</h1>
-          <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">{intro}</p>
+        <section className="pb-4">
+          <h1 className="text-2xl font-bold md:text-4xl">{heading}</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground md:mt-3 md:text-base md:leading-7">{intro}</p>
           {category && (
             <ul className="mt-4 flex flex-wrap gap-2" aria-label="Common uses">
               {category.uses.map((use) => (
@@ -255,37 +267,22 @@ export default function EnglishDirectory() {
               ))}
             </ul>
           )}
-          {category?.guide?.map((paragraph) => (
-            <p key={paragraph} className="mt-3 max-w-3xl leading-7 text-muted-foreground">{paragraph}</p>
-          ))}
         </section>
 
         {!category && (
-          <section className="border-b py-6">
-            <h2 className="text-xl font-semibold">{homeCopy.toolsHeading}</h2>
-            <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <section className="border-b pb-4">
+            <h2 className="sr-only md:not-sr-only md:mb-3 md:text-xl md:font-semibold">{homeCopy.toolsHeading}</h2>
+            {/* Compact chips on phones; full cards from md up. */}
+            <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-5 md:gap-3 md:overflow-visible md:px-0">
               {homeCopy.tools.map((tool) => (
-                <li key={tool.href}>
-                  <Link href={tool.href} className="block h-full rounded-lg border bg-card p-4 hover:border-primary">
-                    <span className="block font-semibold">{tool.title}</span>
-                    <span className="mt-1 block text-sm text-muted-foreground">{tool.description}</span>
+                <li key={tool.href} className="shrink-0 md:shrink">
+                  <Link href={tool.href} className="block h-full whitespace-nowrap rounded-full border bg-card px-3 py-1.5 text-sm hover:border-primary md:whitespace-normal md:rounded-lg md:p-4">
+                    <span className="block font-medium md:font-semibold">{tool.title}</span>
+                    <span className="mt-1 hidden text-sm text-muted-foreground md:block">{tool.description}</span>
                   </Link>
                 </li>
               ))}
             </ul>
-          </section>
-        )}
-
-        {!category && (
-          <section className="grid gap-6 border-b py-7 md:grid-cols-2">
-            <div>
-              <h2 className="text-xl font-semibold">{homeCopy.aboutHeading}</h2>
-              <p className="mt-2 leading-7 text-muted-foreground">{homeCopy.about}</p>
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">{homeCopy.licenseHeading}</h2>
-              <p className="mt-2 leading-7 text-muted-foreground">{homeCopy.license}</p>
-            </div>
           </section>
         )}
 
@@ -343,6 +340,28 @@ export default function EnglishDirectory() {
             </>
           )}
         </section>
+
+        {category?.guide && (
+          <section className="mt-10 border-t pt-8">
+            <h2 className="text-2xl font-bold">{isFrench ? `À propos du style ${category.name}` : `About ${category.name} fonts`}</h2>
+            {category.guide.map((paragraph) => (
+              <p key={paragraph} className="mt-3 max-w-3xl leading-7 text-muted-foreground">{paragraph}</p>
+            ))}
+          </section>
+        )}
+
+        {!category && (
+          <section className="mt-10 grid gap-6 border-t pt-8 md:grid-cols-2">
+            <div>
+              <h2 className="text-xl font-semibold">{homeCopy.aboutHeading}</h2>
+              <p className="mt-2 leading-7 text-muted-foreground">{homeCopy.about}</p>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">{homeCopy.licenseHeading}</h2>
+              <p className="mt-2 leading-7 text-muted-foreground">{homeCopy.license}</p>
+            </div>
+          </section>
+        )}
 
         {!category && (
           <>
