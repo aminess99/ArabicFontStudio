@@ -16,6 +16,8 @@ import { collections } from "../client/src/lib/collectionsData";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "../client/src/lib/blogTranslations";
 import { generateLegacyFontSlug } from "../client/src/lib/slugify";
+import { categoryContent, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
+import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDetails";
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
 import { getGeneratedPosts } from "./blogGenerator";
 import { storage } from "./storage";
@@ -35,7 +37,37 @@ type SeoPage = {
   alternates?: Partial<Record<Locale | "x-default", string>>;
   // Defaults to path; set when another page holds the same content.
   canonicalPath?: string;
+  // schema.org nodes for this page, emitted as one @graph in <head>.
+  jsonLd?: object[];
 };
+
+function breadcrumbNode(items: Array<[string, string]>): object {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, itemPath], index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name,
+      item: `${SITE_ORIGIN}${itemPath}`,
+    })),
+  };
+}
+
+function faqNode(faqs: Array<{ question: string; answer: string }>): object {
+  return {
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
+}
+
+function faqHtml(heading: string, faqs: Array<{ question: string; answer: string }>): string {
+  if (faqs.length === 0) return "";
+  return `<section><h2>${escapeHtml(heading)}</h2>${faqs.map((faq) => `<h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p>`).join("")}</section>`;
+}
 
 const arabicStaticCopy: Record<"about" | "contact" | "privacy" | "terms", {
   title: string;
@@ -212,7 +244,7 @@ function resolveHome(locale: Locale, fonts: Font[]): SeoPage {
 function resolveCategory(locale: Locale, slug: string, fonts: Font[]): SeoPage | null {
   const category = englishCategories.find((item) => item.slug === slug);
   if (!category) return null;
-  const categoryFonts = fonts.filter((font) => font.category === category.arabicCategory);
+  const categoryFonts = fonts.filter((font) => font.category === category.arabicCategory && !font.duplicateOf);
   const localizedCategory = locale === "fr"
     ? frenchCategories.find((item) => item.slug === slug)
     : category;
@@ -226,14 +258,33 @@ function resolveCategory(locale: Locale, slug: string, fonts: Font[]): SeoPage |
   const intro = locale === "ar"
     ? `تضم هذه الصفحة ${categoryFonts.length} ملفاً مصنفاً ضمن ${category.arabicCategory}. تختلف أشكال الحروف والتوافق والتراخيص بحسب الملف، لذلك راجع التفاصيل قبل الاستخدام.`
     : localizedCategory?.intro || description;
+  const guide = locale === "ar" ? categoryContent[category.arabicCategory] : undefined;
+  const guideHtml = guide
+    ? `<p>${escapeHtml(guide.intro)}</p><section><h2>نبذة عن ${escapeHtml(category.arabicCategory)}</h2><p>${escapeHtml(guide.history)}</p></section><section><h2>نصائح الاستخدام</h2><p>${escapeHtml(guide.usageTips)}</p></section>`
+    : "";
+  const faqs = locale === "ar"
+    ? (guide ? [{ question: `أسئلة عن خط ${category.arabicCategory}`, answer: guide.faq }] : [])
+    : (locale === "fr" ? frenchCategories.find((item) => item.slug === slug)?.faqs : category.faqs) || [];
+  const home = locale === "fr" ? "Accueil" : locale === "en" ? "Home" : "الرئيسية";
   return {
     locale,
     path: pathForLocale(locale, `/fonts/${slug}`),
     title,
     description,
     heading,
-    bodyHtml: `<p>${escapeHtml(intro)}</p><p><a href="${escapeHtml(pathForLocale(locale, "/"))}">${escapeHtml(locale === "fr" ? "Accueil" : locale === "en" ? "Home" : "الرئيسية")}</a></p><section><h2>${escapeHtml(locale === "fr" ? "Fichiers de police de cette catégorie" : locale === "en" ? "Font files in this category" : "ملفات الخطوط في هذا التصنيف")}</h2>${fontLinkList(categoryFonts, locale)}</section>`,
+    bodyHtml: `<p>${escapeHtml(intro)}</p>${guideHtml}<p><a href="${escapeHtml(pathForLocale(locale, "/"))}">${escapeHtml(home)}</a></p><section><h2>${escapeHtml(locale === "fr" ? "Fichiers de police de cette catégorie" : locale === "en" ? "Font files in this category" : "ملفات الخطوط في هذا التصنيف")}</h2>${fontLinkList(categoryFonts, locale)}</section>${faqHtml(locale === "fr" ? "Questions fréquentes" : locale === "en" ? "Frequently asked questions" : "أسئلة شائعة", faqs)}`,
     alternates: pageAlternates(`/fonts/${slug}`),
+    jsonLd: [
+      breadcrumbNode([[home, pathForLocale(locale, "/")], [heading, pathForLocale(locale, `/fonts/${slug}`)]]),
+      {
+        "@type": "CollectionPage",
+        name: heading,
+        description,
+        url: `${SITE_ORIGIN}${pathForLocale(locale, `/fonts/${slug}`)}`,
+        numberOfItems: categoryFonts.length,
+      },
+      ...(faqs.length ? [faqNode(faqs)] : []),
+    ],
   };
 }
 
@@ -263,8 +314,9 @@ function resolveCollection(locale: Locale, slug: string, fonts: Font[]): SeoPage
   };
 }
 
-function resolveFont(locale: Locale, font: Font): SeoPage {
-  const category = categoryLabel(locale, englishCategories.find((item) => item.arabicCategory === font.category)?.slug || font.category);
+function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
+  const categorySlug = englishCategories.find((item) => item.arabicCategory === font.category)?.slug;
+  const category = categoryLabel(locale, categorySlug || font.category);
   // Duplicate copies share the primary's name, so qualify them by category.
   const qualifier = font.duplicateOf ? ` (${category})` : "";
   const title = locale === "ar"
@@ -282,34 +334,106 @@ function resolveFont(locale: Locale, font: Font): SeoPage {
     : locale === "fr"
       ? `Télécharger la police arabe ${font.name}`
       : `Download ${font.name} Arabic Font`;
+  const t = (ar: string, en: string, fr: string) => (locale === "ar" ? ar : locale === "fr" ? fr : en);
+  const localized = locale === "ar" ? null : getLocalizedFontPageContent(font, locale);
+  const useCases = locale === "ar" ? categoryUseCases[font.category] || [] : localized!.useCases;
+
+  // Answer-first: the opening sentence says what the font is and what it suits.
+  const summary = locale === "ar"
+    ? `${font.nameArabic} خط عربي من تصنيف ${font.category} بصيغة ${font.fileFormat}${font.designer ? ` من تصميم ${font.designer}` : ""}. ${categoryDescriptions[font.category] || ""}${useCases.length ? ` يناسب ${useCases.join("، ")}.` : ""}`
+    : localized!.summary;
+  const licenseAnswer = font.license
+    ? t(`يُنشر خط ${font.nameArabic} بترخيص ${font.license}. اقرأ نص الترخيص قبل الاستخدام التجاري.`,
+      `${font.name} is published under the ${font.license}. Read the license text before commercial use.`,
+      `${font.name} est publiée sous licence ${font.license}. Lisez la licence avant tout usage commercial.`)
+    : t(`لم يُتحقق من ترخيص خط ${font.nameArabic} بعد. راجع المصمم أو المصدر الأصلي قبل أي استخدام تجاري.`,
+      `The license of ${font.name} has not been verified yet. Check with the designer or original source before commercial use.`,
+      `La licence de ${font.name} n’a pas encore été vérifiée. Renseignez-vous auprès du créateur ou de la source avant tout usage commercial.`);
+  const faqs = [
+    {
+      question: t(`ما هو خط ${font.nameArabic}؟`, `What is ${font.name}?`, `Qu’est-ce que ${font.name} ?`),
+      answer: summary,
+    },
+    {
+      question: t(`هل خط ${font.nameArabic} مجاني للاستخدام التجاري؟`, `Is ${font.name} free for commercial use?`, `${font.name} est-elle gratuite pour un usage commercial ?`),
+      answer: licenseAnswer,
+    },
+    {
+      question: t(`كيف أثبت خط ${font.nameArabic}؟`, `How do I install ${font.name}?`, `Comment installer ${font.name} ?`),
+      answer: t(
+        `حمّل ملف ${font.fileFormat}، ثم على ويندوز انقر عليه بزر الفأرة الأيمن واختر تثبيت، وعلى الماك انقر عليه مرتين واضغط Install في Font Book، ثم أعد فتح البرنامج.`,
+        `Download the ${font.fileFormat} file. On Windows, right-click it and choose Install; on macOS, double-click it and click Install in Font Book. Then restart your design app.`,
+        `Téléchargez le fichier ${font.fileFormat}. Sous Windows, faites un clic droit puis Installer ; sous macOS, double-cliquez puis Installer dans Livre des polices. Relancez ensuite votre logiciel.`,
+      ),
+    },
+    ...(locale === "ar" ? [] : localized!.faqs),
+  ];
   const details = [
-    [locale === "fr" ? "Catégorie" : locale === "en" ? "Category" : "التصنيف", category],
-    [locale === "fr" ? "Format" : locale === "en" ? "Format" : "الصيغة", font.fileFormat],
-    [locale === "fr" ? "Créateur" : locale === "en" ? "Designer" : "المصمم", font.designer],
-    [locale === "fr" ? "Licence" : locale === "en" ? "License" : "الترخيص", font.license],
+    [t("التصنيف", "Category", "Catégorie"), category],
+    [t("الصيغة", "Format", "Format"), font.fileFormat],
+    [t("المصمم", "Designer", "Créateur"), font.designer],
+    [t("الترخيص", "License", "Licence"), font.license || t("غير موثق", "Not verified", "Non vérifiée")],
   ].filter((item) => item[1]);
-  const categorySlug = englishCategories.find((item) => item.arabicCategory === font.category)?.slug;
+  const related = fonts
+    .filter((item) => item.category === font.category && item.id !== font.id && !item.duplicateOf)
+    .slice(0, 8);
+  const primaryPath = getFontPath(locale, font.duplicateOf ? { ...font, slug: font.duplicateOf } : font);
   const sourceLink = font.sourceUrl
-    ? `<p><a href="${escapeHtml(font.sourceUrl)}" rel="nofollow noopener noreferrer">${escapeHtml(locale === "fr" ? "Consulter la source" : locale === "en" ? "View source" : "عرض المصدر")}</a></p>`
+    ? `<p><a href="${escapeHtml(font.sourceUrl)}" rel="nofollow noopener noreferrer">${escapeHtml(t("عرض المصدر", "View source", "Consulter la source"))}</a></p>`
     : "";
-  const detailsHtml = details.map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`).join("");
   const categoryLink = categorySlug
-    ? `<p><a href="${escapeHtml(getCategoryPath(locale, categorySlug))}">${escapeHtml(locale === "fr" ? "Parcourir la catégorie" : locale === "en" ? "Browse this category" : "تصفح هذا التصنيف")}: ${escapeHtml(category)}</a></p>`
+    ? `<p><a href="${escapeHtml(getCategoryPath(locale, categorySlug))}">${escapeHtml(t("تصفح هذا التصنيف", "Browse this category", "Parcourir la catégorie"))}: ${escapeHtml(category)}</a></p>`
     : "";
-  const downloadText = locale === "fr" ? "Télécharger le fichier" : locale === "en" ? "Download file" : "تحميل الملف";
+  const toolLink = locale === "ar"
+    ? `<p><a href="/arabic-text-to-image?font=${encodeURIComponent(font.duplicateOf || font.slug)}">اكتب اسمك بخط ${escapeHtml(font.nameArabic)} وحمّله صورة</a></p>`
+    : "";
   const previewSlug = generateLegacyFontSlug(font.name, font.fileName, font.category);
   const previewFile = path.join(process.cwd(), "client/public/font-previews", `${previewSlug}.webp`);
   const imagePath = fs.existsSync(previewFile) ? `/font-previews/${previewSlug}.webp` : "/logo.png";
+  const pagePath = getFontPath(locale, font);
+  const bodyHtml = [
+    `<p>${escapeHtml(summary)}</p>`,
+    `<dl>${details.map(([label, value]) => `<dt>${escapeHtml(label!)}</dt><dd>${escapeHtml(value!)}</dd>`).join("")}</dl>`,
+    useCases.length ? `<section><h2>${escapeHtml(t("استخدامات الخط", "Suggested uses", "Usages suggérés"))}</h2><ul>${useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>` : "",
+    `<p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${escapeHtml(t("تحميل الملف", "Download file", "Télécharger le fichier"))}</a></p>`,
+    toolLink,
+    categoryLink,
+    sourceLink,
+    faqHtml(t("أسئلة شائعة", "Frequently asked questions", "Questions fréquentes"), faqs),
+    related.length ? `<section><h2>${escapeHtml(t("خطوط مشابهة", "Similar fonts", "Polices similaires"))}</h2>${fontLinkList(related, locale)}</section>` : "",
+  ].join("");
   return {
     locale,
-    path: getFontPath(locale, font),
+    path: pagePath,
     title,
     description,
     heading,
     imagePath,
-    bodyHtml: `<p>${escapeHtml(description)}</p><dl>${detailsHtml}</dl>${categoryLink}${sourceLink}<p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${escapeHtml(downloadText)}</a></p>`,
+    bodyHtml,
     alternates: pageAlternates(`/font/${font.duplicateOf || font.slug}`),
-    canonicalPath: font.duplicateOf ? pathForLocale(locale, `/font/${font.duplicateOf}`) : undefined,
+    canonicalPath: font.duplicateOf ? primaryPath : undefined,
+    jsonLd: [
+      breadcrumbNode([
+        [t("الرئيسية", "Home", "Accueil"), pathForLocale(locale, "/")],
+        ...(categorySlug ? [[category, getCategoryPath(locale, categorySlug)] as [string, string]] : []),
+        [locale === "ar" ? font.nameArabic : font.name, primaryPath],
+      ]),
+      {
+        "@type": "CreativeWork",
+        name: locale === "ar" ? font.nameArabic : font.name,
+        alternateName: font.name,
+        description: summary,
+        url: `${SITE_ORIGIN}${primaryPath}`,
+        image: `${SITE_ORIGIN}${imagePath}`,
+        encodingFormat: font.fileFormat,
+        genre: category,
+        inLanguage: "ar",
+        isAccessibleForFree: true,
+        ...(font.designer ? { creator: { "@type": "Person", name: font.designer } } : {}),
+        ...(font.license ? { license: font.license } : {}),
+      },
+      faqNode(faqs),
+    ],
   };
 }
 
@@ -370,6 +494,8 @@ type BlogPost = {
   content?: string;
   dateISO?: string;
   dateModified?: string;
+  author?: string;
+  keywords?: string[];
 };
 
 function getAllBlogPosts(): BlogPost[] {
@@ -452,6 +578,30 @@ function resolveBlogIndex(locale: Locale, posts: BlogPost[]): SeoPage {
   };
 }
 
+function articleJsonLd(post: BlogPost, locale: Locale, headline: string, description: string, articlePath: string): object[] {
+  const blogPath = pathForLocale(locale, "/blog");
+  return [
+    breadcrumbNode([
+      [locale === "fr" ? "Accueil" : locale === "en" ? "Home" : "الرئيسية", pathForLocale(locale, "/")],
+      [locale === "fr" ? "Blog" : locale === "en" ? "Blog" : "المدونة", blogPath],
+      [headline, articlePath],
+    ]),
+    {
+      "@type": "Article",
+      headline,
+      description,
+      url: `${SITE_ORIGIN}${articlePath}`,
+      mainEntityOfPage: `${SITE_ORIGIN}${articlePath}`,
+      inLanguage: locale,
+      ...(post.dateISO ? { datePublished: post.dateISO } : {}),
+      ...(post.dateModified || post.dateISO ? { dateModified: post.dateModified || post.dateISO } : {}),
+      author: { "@type": post.author && post.author !== "فريق xfontat" ? "Person" : "Organization", name: post.author || "xfontat" },
+      publisher: { "@type": "Organization", name: "xfontat", logo: { "@type": "ImageObject", url: `${SITE_ORIGIN}/logo.png` } },
+      ...(post.keywords?.length ? { keywords: post.keywords.join(", ") } : {}),
+    },
+  ];
+}
+
 function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): SeoPage | null {
   const post = posts.find((item) => item.slug === slug);
   if (!post) return null;
@@ -466,6 +616,7 @@ function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): Se
       heading: title,
       bodyHtml: `${renderMarkdownLite(post.content || description)}<p><a href="/blog">جميع المقالات</a></p>`,
       alternates: pageAlternates(`/blog/${slug}`),
+      jsonLd: articleJsonLd(post, "ar", title, description, `/blog/${slug}`),
     };
   }
   const translation = translatedBlogPost(slug, locale);
@@ -493,6 +644,7 @@ function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): Se
     heading: translation.title,
     bodyHtml: `${renderMarkdownLite(translation.content)}<p><a href="${escapeHtml(pathForLocale(locale, "/blog"))}">${escapeHtml(locale === "fr" ? "Tous les articles" : "All articles")}</a></p>`,
     alternates: pageAlternates(`/blog/${slug}`),
+    jsonLd: articleJsonLd(post, locale, translation.title, translation.excerpt || translation.title, pathForLocale(locale, `/blog/${slug}`)),
   };
 }
 
@@ -515,8 +667,22 @@ function resolveToolPage(tool: ToolPageCopy): SeoPage {
     description: tool.description,
     heading: tool.heading,
     bodyHtml: `<p>${escapeHtml(tool.intro)}</p>${sections}<section><h2>أسئلة شائعة</h2>${faqs}</section><ul>${related}<li><a href="/">مكتبة الخطوط العربية</a></li></ul>`
-      + `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", ...toolFaqSchema(tool) }).replace(/</g, "\\u003c")}</script>`,
+      ,
     alternates: { ar: url, "x-default": url },
+    jsonLd: [
+      breadcrumbNode([["الرئيسية", "/"], [tool.heading, tool.path]]),
+      {
+        "@type": "WebApplication",
+        name: tool.heading,
+        url,
+        description: tool.description,
+        applicationCategory: "DesignApplication",
+        operatingSystem: "Web",
+        inLanguage: "ar",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+      toolFaqSchema(tool),
+    ],
   };
 }
 
@@ -572,7 +738,7 @@ async function resolvePage(pathname: string): Promise<SeoPage | null> {
         location: getFontPath(locale, font),
       });
     }
-    return resolveFont(locale, font);
+    return resolveFont(locale, font, fonts);
   }
 
   const categoryMatch = /^\/fonts\/([^/]+)$/.exec(pagePath);
@@ -669,6 +835,11 @@ async function renderPage(req: Request, res: Response, page: SeoPage, status = 2
   html = replaceMeta(html, "name", "twitter:url", canonical);
   html = replaceMeta(html, "name", "twitter:image", image);
   html = injectAlternates(html, page.alternates);
+  if (page.jsonLd?.length) {
+    // data-schema="page" lets SEOHead replace it once React renders.
+    const graph = JSON.stringify({ "@context": "https://schema.org", "@graph": page.jsonLd }).replace(/</g, "\\u003c");
+    html = html.replace("</head>", `<script type="application/ld+json" data-schema="page">${graph}</script></head>`);
+  }
   html = injectRootFallback(html, page);
   const transformed = await transformSeoHtml(req.originalUrl, html);
   res.setHeader("X-Robots-Tag", page.noindex || status === 404 ? "noindex, follow" : "index, follow");
@@ -826,7 +997,52 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   res.type("application/xml").send(xml);
 }
 
+// Plain-text site guide for AI assistants (llmstxt.org).
+async function renderLlmsTxt(res: Response): Promise<void> {
+  const fonts = (await storage.getAllFonts()).filter((font) => !font.duplicateOf);
+  const categories = englishCategories
+    .map((category) => ({ category, count: fonts.filter((font) => font.category === category.arabicCategory).length }))
+    .filter(({ count }) => count > 0)
+    .map(({ category, count }) => `- [${category.name} (${category.arabicCategory})](${SITE_ORIGIN}/fonts/${category.slug}): ${count} fonts. ${categoryDescriptions[category.arabicCategory] || ""}`);
+  const guides = staticBlogPosts.map((post) => `- [${post.title}](${SITE_ORIGIN}/blog/${post.slug}): ${post.excerpt}`);
+  const tools = [zakhrafaPage, textToImagePage].map((tool) => `- [${tool.heading}](${SITE_ORIGIN}${tool.path}): ${tool.description}`);
+  const body = [
+    "# xfontat",
+    "",
+    `> xfontat (إكس فونتات) is a free library of ${fonts.length} Arabic font files for browsing, live text preview and download, organised by calligraphic style. The interface is in Arabic, with English and French versions at /en and /fr.`,
+    "",
+    "Each font page lists the file format, category, designer and license when known. Many files have no verified license, so the site tells users to check the original source before commercial use.",
+    "",
+    "## Font categories",
+    ...categories,
+    "",
+    "## Free tools",
+    ...tools,
+    `- [منشئ صور يوتيوب المصغرة](${SITE_ORIGIN}/youtube-thumbnail-maker): AI YouTube thumbnail maker with Arabic titles.`,
+    "",
+    "## Guides",
+    ...guides,
+    "",
+    "## Optional",
+    `- [English directory](${SITE_ORIGIN}/en)`,
+    `- [Version française](${SITE_ORIGIN}/fr)`,
+    `- [Sitemap](${SITE_ORIGIN}/sitemap.xml)`,
+    `- [About](${SITE_ORIGIN}/about)`,
+    "",
+  ].join("\n");
+  res.type("text/plain; charset=utf-8").send(body);
+}
+
 export function registerSeoHtmlRoute(app: Express): void {
+  app.get("/llms.txt", async (_req: Request, res: Response) => {
+    try {
+      await renderLlmsTxt(res);
+    } catch (error) {
+      console.error("llms.txt generation failed:", error);
+      res.status(500).type("text").send("Unable to generate llms.txt.");
+    }
+  });
+
   app.get("/sitemap.xml", async (_req: Request, res: Response) => {
     try {
       await renderDynamicSitemap(res);
