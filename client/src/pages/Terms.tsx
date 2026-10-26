@@ -18,14 +18,7 @@ export default function Terms() {
         path="/terms"
         schema={schema}
       />
-      <Header 
-        searchQuery=""
-        onSearchChange={() => {}}
-        previewText="بسم الله الرحمن الرحيم"
-        onPreviewTextChange={() => {}}
-        fontSize={48}
-        onFontSizeChange={() => {}}
-      />
+      <Header />
 
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">

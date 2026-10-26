@@ -54,14 +54,7 @@ export default function Zakhrafa() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead title={page.title} description={page.description} path={page.path} schema={schema} localized={false} />
-      <Header
-        searchQuery=""
-        onSearchChange={() => {}}
-        previewText=""
-        onPreviewTextChange={() => {}}
-        fontSize={48}
-        onFontSizeChange={() => {}}
-      />
+      <Header />
 
       <main className="flex-1 container mx-auto px-4 py-10">
         <div className="max-w-4xl mx-auto">
