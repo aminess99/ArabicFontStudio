@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Header } from "@/components/Header";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Clock, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -92,43 +92,7 @@ export default function Blog() {
         schema={blogListSchema}
       />
       <div className="flex flex-col min-h-screen bg-background">
-        <header className="sticky top-0 z-50 w-full border-b bg-background">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between gap-4">
-              <Link
-                href="/"
-                className="flex items-center hover:opacity-80 transition-opacity shrink-0"
-                data-testid="link-home"
-              >
-                <img src="/logo.png" alt="xfontat" className="h-8 md:h-10 w-auto" />
-              </Link>
-              <nav className="hidden md:flex items-center gap-4 text-sm flex-1">
-                <Link
-                  href="/"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  data-testid="link-nav-home"
-                >
-                  الرئيسية
-                </Link>
-                <Link
-                  href="/design-fonts"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  data-testid="link-nav-design"
-                >
-                  خطوط التصميم
-                </Link>
-                <Link
-                  href="/blog"
-                  className="text-foreground font-medium"
-                  data-testid="link-nav-blog"
-                >
-                  المدونة
-                </Link>
-              </nav>
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
+        <Header />
 
         <Breadcrumb items={breadcrumbItems} />
 
@@ -145,26 +109,35 @@ export default function Blog() {
 
             <div className="space-y-4 md:space-y-6">
               {allPosts.map((post) => (
-                <Link key={post.slug} href={`/blog/${post.slug}`}>
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="block">
                   <Card
-                    className="p-4 md:p-6 hover-elevate cursor-pointer transition-all"
+                    className="group p-4 md:p-6 hover-elevate cursor-pointer transition-all hover:border-primary"
                     data-testid={`card-blog-post-${post.slug}`}
                   >
-                    <div className="space-y-3">
-                      <h2 className="text-lg md:text-xl font-bold text-foreground">
-                        {post.title}
-                      </h2>
-                      <p className="text-sm md:text-base text-muted-foreground">
-                        {post.excerpt}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground pt-3 border-t">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                          <span>{post.date}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 md:w-4 md:h-4" />
-                          <span>{post.readTime} دقائق</span>
+                    <div className="flex gap-4">
+                      {/* First letter of the title as a typographic mark. */}
+                      <div aria-hidden="true" className="hidden sm:grid h-16 w-16 shrink-0 place-items-center rounded-lg bg-primary/10 text-3xl font-bold text-primary">
+                        {post.title.trim().charAt(0)}
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-3">
+                        {post.keywords?.[0] && (
+                          <span className="inline-block rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground">{post.keywords[0]}</span>
+                        )}
+                        <h2 className="text-lg md:text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                          {post.title}
+                        </h2>
+                        <p className="text-sm md:text-base text-muted-foreground">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground pt-3 border-t">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 md:w-4 md:h-4" />
+                            <span>{post.date}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3 md:w-4 md:h-4" />
+                            <span>{post.readTime} دقائق</span>
+                          </div>
                         </div>
                       </div>
                     </div>

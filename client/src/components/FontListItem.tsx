@@ -76,14 +76,17 @@ export function FontListItem({
       });
   }, [isVisible, fontFamily, fileUrl]);
 
+  const fontPath = `/font/${getCanonicalFontSlug({ slug, name, fileName, category })}`;
+
   return (
     <div ref={containerRef} className="border-b py-4 md:py-6" data-testid={`font-item-${name}`}>
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 md:mb-3 flex-wrap">
-            <h3 className="text-xs md:text-sm text-muted-foreground truncate">
-              {nameArabic}
+            <h3 className="text-sm md:text-base font-semibold truncate">
+              <Link href={fontPath} className="hover:text-primary transition-colors">{nameArabic}</Link>
             </h3>
+            <Badge variant="outline" className="text-xs shrink-0 font-normal text-muted-foreground">{category}</Badge>
             {variantCount > 1 && (
               <Badge variant="secondary" className="text-xs gap-1 shrink-0">
                 <Layers className="w-3 h-3" />
@@ -92,8 +95,10 @@ export function FontListItem({
             )}
           </div>
           
-          <div 
-            className="leading-relaxed break-words"
+          <Link
+            href={fontPath}
+            aria-label={`معاينة خط ${nameArabic}`}
+            className="block leading-relaxed break-words hover:opacity-80 transition-opacity"
             style={{ 
               fontFamily: fontLoaded ? fontFamily : 'inherit',
               fontSize: window.innerWidth < 768 ? `${Math.min(fontSize, 36)}px` : `${fontSize}px`,
@@ -102,17 +107,15 @@ export function FontListItem({
             data-testid={`text-preview-${name}`}
           >
             {previewText}
-          </div>
-          <h2 className="text-xs text-muted-foreground mt-2" aria-label={`تحميل وتنزيل خط ${nameArabic} مجاناً`}>
-            تحميل وتنزيل خط {nameArabic} مجاناً
-          </h2>
+          </Link>
+          {designer && <p className="text-xs text-muted-foreground mt-2">تصميم: {designer}</p>}
         </div>
 
         <div className="flex items-center gap-2 md:gap-3 shrink-0 w-full md:w-auto">
           <Button
             variant="ghost"
             size="icon"
-            className={isFavorite ? "text-red-500" : ""}
+            className={`h-11 w-11 ${isFavorite ? "text-red-500" : ""}`}
             onClick={onToggleFavorite}
             aria-label={isFavorite ? `إزالة خط ${nameArabic} من المفضلة` : `إضافة خط ${nameArabic} إلى المفضلة`}
             aria-pressed={isFavorite}
@@ -121,13 +124,14 @@ export function FontListItem({
             <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
           </Button>
           
-          <Button asChild className="flex-1 md:flex-none">
+          {/* Outline so a page of rows is not a wall of orange buttons. */}
+          <Button asChild variant="outline" className="h-11 flex-1 md:flex-none hover:bg-primary hover:text-primary-foreground hover:border-primary">
             <Link
-              href={`/font/${getCanonicalFontSlug({ slug, name, fileName, category })}`}
+              href={fontPath}
               data-testid={`button-download-${name}`}
             >
               <Download className="ml-2 h-4 w-4" />
-              تحميل الخط مجاناً
+              تحميل الخط
             </Link>
           </Button>
         </div>

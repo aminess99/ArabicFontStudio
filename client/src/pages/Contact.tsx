@@ -20,14 +20,7 @@ export default function Contact() {
         path="/contact"
         schema={schema}
       />
-      <Header 
-        searchQuery=""
-        onSearchChange={() => {}}
-        previewText="بسم الله الرحمن الرحيم"
-        onPreviewTextChange={() => {}}
-        fontSize={48}
-        onFontSizeChange={() => {}}
-      />
+      <Header />
 
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">

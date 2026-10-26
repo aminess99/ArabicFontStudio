@@ -14,7 +14,7 @@ export function CategoryFilter({ categories, selectedCategory, onCategoryChange 
           <Button
             variant={selectedCategory === "الكل" ? "default" : "outline"}
             size="sm"
-            className="text-xs md:text-sm whitespace-nowrap shrink-0"
+            className="h-10 md:h-9 px-4 text-sm whitespace-nowrap shrink-0"
             onClick={() => onCategoryChange("الكل")}
             data-testid="button-category-all"
           >
@@ -25,7 +25,7 @@ export function CategoryFilter({ categories, selectedCategory, onCategoryChange 
               key={category}
               variant={selectedCategory === category ? "default" : "outline"}
               size="sm"
-              className="text-xs md:text-sm whitespace-nowrap shrink-0"
+              className="h-10 md:h-9 px-4 text-sm whitespace-nowrap shrink-0"
               onClick={() => onCategoryChange(category)}
               data-testid={`button-category-${category}`}
             >

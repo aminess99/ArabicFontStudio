@@ -9,6 +9,7 @@ export function ThemeToggle({ label = "تبديل الوضع" }: { label?: strin
     <Button
       variant="ghost"
       size="icon"
+      className="h-10 w-10 shrink-0"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       data-testid="button-theme-toggle"
     >

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { ImageDown, Sparkles, Youtube } from "lucide-react";
 import { Header } from "@/components/Header";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { FontListItem } from "@/components/FontListItem";
@@ -25,8 +26,15 @@ interface PagedFontResponse {
 
 const KNOWN_CATEGORIES = ["ثلث", "ديواني", "رقعة", "كوفي", "نسخ", "تصميم", "خطوط الحرة", "فوتوشوب", "نستعليق"];
 
+const TOOL_CARDS = [
+  { id: "text-to-image", href: "/arabic-text-to-image", icon: ImageDown, title: "اكتب اسمك بالخط العربي", text: "اختر خطاً من المكتبة وحمّل النص صورة PNG." },
+  { id: "zakhrafa", href: "/zakhrafa", icon: Sparkles, title: "زخرفة الأسماء", text: "أشكال مزخرفة جاهزة للنسخ في الألعاب ووسائل التواصل." },
+  { id: "thumbnail", href: "/youtube-thumbnail-maker", icon: Youtube, title: "صانع صور يوتيوب المصغرة", text: "صورة مصغرة بعنوان عربي بمقاس 1280×720." },
+];
+
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  // ?q= comes from the header search on other pages.
+  const [searchQuery, setSearchQuery] = useState(() => new URLSearchParams(window.location.search).get("q") ?? "");
   const [selectedCategory, setSelectedCategory] = useState("الكل");
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [fontSize, setFontSize] = useState(48);
@@ -131,6 +139,26 @@ export default function Home() {
         <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
           مرحباً بك في xfontat. تصفّح خطوطاً عربية من تصنيفات متعددة، واطّلع على الصيغ والترخيص في صفحة كل خط قبل تنزيله أو استخدامه في مشروعك.
         </p>
+        {!searchQuery && (
+          <ul className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+            {TOOL_CARDS.map((tool) => (
+              <li key={tool.href}>
+                {/* Compact tiles on phones so the font list stays near the top. */}
+                <Link
+                  href={tool.href}
+                  className="group flex h-full flex-col items-center gap-2 rounded-lg border bg-card p-3 text-center transition-colors hover:border-primary sm:flex-row sm:items-start sm:gap-3 sm:p-4 sm:text-start"
+                  data-testid={`card-tool-${tool.id}`}
+                >
+                  <tool.icon className="h-5 w-5 shrink-0 text-primary sm:mt-0.5" aria-hidden="true" />
+                  <span>
+                    <span className="block text-xs font-semibold leading-snug group-hover:text-primary transition-colors sm:text-base">{tool.title}</span>
+                    <span className="mt-1 hidden text-sm text-muted-foreground leading-relaxed sm:block">{tool.text}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">

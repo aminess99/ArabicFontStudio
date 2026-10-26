@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Download, Heart, Monitor, Apple, Layers } from "lucide-react";
@@ -9,7 +9,7 @@ import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { categoryDescriptions, categoryUseCases } from "@/lib/arabicCategoryContent";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Header } from "@/components/Header";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
 import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { getCategorySlug } from "@/lib/categorySlug";
@@ -108,6 +108,9 @@ export default function FontDetails() {
   const [fontLoaded, setFontLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
+  // The mobile download bar appears once the main download button scrolls away.
+  const downloadButtonRef = useRef<HTMLButtonElement>(null);
+  const [downloadButtonVisible, setDownloadButtonVisible] = useState(true);
 
   const { data: font, isLoading } = useQuery<Font | null>({
     queryKey: [`/api/fonts/by-slug/${slug}`],
@@ -181,6 +184,14 @@ export default function FontDetails() {
       description: `يتم الآن تحميل خط ${font.nameArabic}`,
     });
   };
+
+  useEffect(() => {
+    const button = downloadButtonRef.current;
+    if (!button) return;
+    const observer = new IntersectionObserver(([entry]) => setDownloadButtonVisible(entry.isIntersecting));
+    observer.observe(button);
+    return () => observer.disconnect();
+  }, [font?.id]);
 
   if (isLoading) {
     return (
@@ -286,7 +297,7 @@ export default function FontDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0">
       <SEOHead
         title={seoTitle}
         description={seoDescription}
@@ -295,21 +306,7 @@ export default function FontDetails() {
         schema={fontPageSchema}
       />
 
-      <header className="sticky top-0 z-50 w-full border-b bg-background">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity shrink-0" data-testid="link-home">
-              <img src="/logo.png" alt="xfontat" className="h-8 md:h-10 w-auto" />
-            </Link>
-            <nav className="hidden md:flex items-center gap-4 text-sm flex-1">
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-home">الرئيسية</Link>
-              <Link href="/design-fonts" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-design">خطوط التصميم</Link>
-              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-blog">المدونة</Link>
-            </nav>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1">
         <div className="container mx-auto px-4 py-6">
@@ -366,6 +363,7 @@ export default function FontDetails() {
 
               <div className="flex flex-wrap gap-3 mb-8">
                 <Button
+                  ref={downloadButtonRef}
                   size="lg"
                   className="flex-1 md:flex-none max-w-full h-auto min-h-11 py-2 whitespace-normal text-base"
                   onClick={handleDownload}
@@ -545,7 +543,7 @@ export default function FontDetails() {
                       height={760}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-auto rounded-md border bg-white"
+                      className="w-full h-auto rounded-md border bg-white dark:invert dark:hue-rotate-180"
                     />
                     <p className="text-xs text-muted-foreground text-center mt-3">
                       صورة تجريبية توضح شكل الحروف بهذا الخط
@@ -680,6 +678,21 @@ export default function FontDetails() {
       </main>
 
       <Footer />
+
+      {!downloadButtonVisible && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur p-3 md:hidden" data-testid="bar-mobile-download">
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">{font.nameArabic}</p>
+              <p className="text-xs text-muted-foreground">{font.fileFormat} · {font.category}</p>
+            </div>
+            <Button onClick={handleDownload} className="h-11 shrink-0" data-testid="button-mobile-download">
+              <Download className="ml-2 h-4 w-4" />
+              تحميل
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
