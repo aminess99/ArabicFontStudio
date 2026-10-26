@@ -10,6 +10,8 @@ interface SEOHeadProps {
   alternates?: { lang: string; href: string }[];
   // Defaults to path; set when another page holds the same content.
   canonicalPath?: string;
+  // False for pages that exist only in Arabic, so no en/fr hreflang is emitted.
+  localized?: boolean;
 }
 
 const MAX_TITLE_LENGTH = 65;
@@ -45,11 +47,14 @@ export function SEOHead({
   direction = "rtl",
   alternates = [],
   canonicalPath,
+  localized = true,
 }: SEOHeadProps) {
   const baseUrl = "https://xfontat.com";
   const fullUrl = `${baseUrl}${canonicalPath || path}`;
   title = fitTitle(title);
-  const resolvedAlternates = buildAlternates(path, alternates);
+  const resolvedAlternates = localized
+    ? buildAlternates(path, alternates)
+    : [{ lang: "ar", href: fullUrl }, { lang: "x-default", href: fullUrl }];
   const alternateLinksKey = JSON.stringify(resolvedAlternates);
 
   useEffect(() => {

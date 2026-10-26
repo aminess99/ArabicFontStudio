@@ -299,6 +299,8 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/design-fonts$/,
   /^\/blog$/,
   /^\/youtube-thumbnail-maker$/,
+  /^\/zakhrafa$/,
+  /^\/arabic-text-to-image$/,
   /^\/about$/,
   /^\/contact$/,
   /^\/privacy$/,

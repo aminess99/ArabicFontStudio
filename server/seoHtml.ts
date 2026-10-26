@@ -16,6 +16,7 @@ import { collections } from "../client/src/lib/collectionsData";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "../client/src/lib/blogTranslations";
 import { generateLegacyFontSlug } from "../client/src/lib/slugify";
+import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
 import { getGeneratedPosts } from "./blogGenerator";
 import { storage } from "./storage";
 import { transformSeoHtml } from "./vite";
@@ -495,6 +496,30 @@ function resolveBlogArticle(locale: Locale, slug: string, posts: BlogPost[]): Se
   };
 }
 
+function resolveToolPage(tool: ToolPageCopy): SeoPage {
+  const url = `${SITE_ORIGIN}${tool.path}`;
+  const sections = tool.sections
+    .map((section) => `<section><h2>${escapeHtml(section.heading)}</h2><p>${escapeHtml(section.body)}</p></section>`)
+    .join("");
+  const faqs = tool.faqs
+    .map((faq) => `<h3>${escapeHtml(faq.question)}</h3><p>${escapeHtml(faq.answer)}</p>`)
+    .join("");
+  const related = [zakhrafaPage, textToImagePage]
+    .filter((item) => item !== tool)
+    .map((item) => `<li><a href="${escapeHtml(item.path)}">${escapeHtml(item.heading)}</a></li>`)
+    .join("");
+  return {
+    locale: "ar",
+    path: tool.path,
+    title: tool.title,
+    description: tool.description,
+    heading: tool.heading,
+    bodyHtml: `<p>${escapeHtml(tool.intro)}</p>${sections}<section><h2>أسئلة شائعة</h2>${faqs}</section><ul>${related}<li><a href="/">مكتبة الخطوط العربية</a></li></ul>`
+      + `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", ...toolFaqSchema(tool) }).replace(/</g, "\\u003c")}</script>`,
+    alternates: { ar: url, "x-default": url },
+  };
+}
+
 function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): SeoPage | null {
   if (pagePath === "/design-fonts") {
     const title = locale === "fr" ? "Polices arabes pour le design | xfontat" : locale === "en" ? "Arabic Design Fonts | xfontat" : "خطوط عربية للتصميم | xfontat";
@@ -510,6 +535,9 @@ function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): Se
       alternates: pageAlternates(pagePath),
     };
   }
+  const tool = [zakhrafaPage, textToImagePage].find((item) => item.path === pagePath);
+  // The tool pages exist only in Arabic.
+  if (tool) return locale === "ar" ? resolveToolPage(tool) : null;
   if (pagePath === "/youtube-thumbnail-maker") {
     const title = locale === "fr" ? "Créateur de miniatures YouTube | xfontat" : locale === "en" ? "YouTube Thumbnail Maker | xfontat" : "منشئ صور يوتيوب المصغرة | xfontat";
     const description = locale === "fr" ? "Créez des miniatures YouTube et prévisualisez des titres en arabe." : locale === "en" ? "Create YouTube thumbnails and preview Arabic titles in the intended layout." : "أنشئ صوراً مصغرة لليوتيوب وعاين العناوين العربية ضمن التصميم.";
@@ -768,6 +796,14 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
       add(`/fr/blog/${post.slug}`, lastmod);
     }
   }
+
+  for (const tool of [zakhrafaPage, textToImagePage]) {
+    add(tool.path, sourceLastmod("client/src/lib/toolPages.ts"));
+  }
+  const thumbnailLastmod = sourceLastmod("client/src/pages/YouTubeThumbnailStudio.tsx");
+  add("/youtube-thumbnail-maker", thumbnailLastmod);
+  add("/en/youtube-thumbnail-maker", thumbnailLastmod);
+  add("/fr/youtube-thumbnail-maker", thumbnailLastmod);
 
   const staticPagePaths = [
     { path: "/about", source: "client/src/pages/About.tsx" },
