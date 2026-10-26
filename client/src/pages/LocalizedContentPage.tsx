@@ -500,6 +500,7 @@ export default function LocalizedContentPage() {
         title={title}
         description={description}
         path={canonicalPath}
+        canonicalPath={font?.duplicateOf ? `/${locale}/font/${font.duplicateOf}` : undefined}
         schema={schema}
         lang={locale}
         direction="ltr"

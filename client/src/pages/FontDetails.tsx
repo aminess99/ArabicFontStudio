@@ -243,7 +243,8 @@ export default function FontDetails() {
     { label: font.nameArabic, href: `/font/${fontSlug}` }
   ];
 
-  const seoTitle = `تحميل خط ${font.nameArabic} مجاناً - ${font.name} | xfontat`;
+  // Duplicate copies share the primary's name, so qualify them by category.
+  const seoTitle = `تحميل خط ${font.nameArabic}${font.duplicateOf ? ` (${font.category})` : ""} مجاناً | xfontat`;
   const seoDescription = `حمّل خط ${font.nameArabic} (${font.name}) مجاناً بصيغة ${font.fileFormat}. خط عربي من فئة ${font.category} مناسب لـ${useCases.slice(0, 3).join(" و")}. معاينة مباشرة وتحميل فوري من مكتبة xfontat.`;
 
   const fontPageSchema = {
@@ -308,6 +309,7 @@ export default function FontDetails() {
         title={seoTitle}
         description={seoDescription}
         path={`/font/${fontSlug}`}
+        canonicalPath={font.duplicateOf ? `/font/${font.duplicateOf}` : undefined}
         schema={fontPageSchema}
       />
 

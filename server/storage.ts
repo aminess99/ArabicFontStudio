@@ -189,6 +189,7 @@ class DatabaseStorage implements IStorage {
         copyright: insertFont.copyright ?? null,
         featured: insertFont.featured ?? false,
         addedAt: insertFont.addedAt ?? new Date(),
+        duplicateOf: insertFont.duplicateOf ?? null,
       };
     });
 
@@ -212,6 +213,7 @@ class DatabaseStorage implements IStorage {
           fileFormat: sql`excluded.file_format`,
           featured: sql`excluded.featured`,
           addedAt: sql`excluded.added_at`,
+          duplicateOf: sql`excluded.duplicate_of`,
         },
       }).returning();
       savedFonts.push(...saved);

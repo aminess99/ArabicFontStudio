@@ -32,6 +32,8 @@ type SeoPage = {
   imagePath?: string;
   noindex?: boolean;
   alternates?: Partial<Record<Locale | "x-default", string>>;
+  // Defaults to path; set when another page holds the same content.
+  canonicalPath?: string;
 };
 
 const arabicStaticCopy: Record<"about" | "contact" | "privacy" | "terms", {
@@ -113,6 +115,13 @@ function categoryLabel(locale: Locale, slug: string): string {
     return frenchCategories.find((item) => item.slug === slug)?.name || category.name;
   }
   return category.arabicCategory;
+}
+
+const MAX_TITLE_LENGTH = 65;
+
+// Search results truncate long titles; drop the brand suffix first.
+export function fitTitle(title: string): string {
+  return title.length > MAX_TITLE_LENGTH ? title.replace(/\s*\|\s*xfontat$/, "") : title;
 }
 
 function getFontPath(locale: Locale, font: Font): string {
@@ -255,11 +264,13 @@ function resolveCollection(locale: Locale, slug: string, fonts: Font[]): SeoPage
 
 function resolveFont(locale: Locale, font: Font): SeoPage {
   const category = categoryLabel(locale, englishCategories.find((item) => item.arabicCategory === font.category)?.slug || font.category);
+  // Duplicate copies share the primary's name, so qualify them by category.
+  const qualifier = font.duplicateOf ? ` (${category})` : "";
   const title = locale === "ar"
-    ? `${font.nameArabic} - تحميل الخط العربي | xfontat`
+    ? `تحميل خط ${font.nameArabic}${qualifier} مجاناً | xfontat`
     : locale === "fr"
-      ? `Télécharger la police arabe ${font.name} | xfontat`
-      : `Download ${font.name} Arabic Font | xfontat`;
+      ? `Télécharger la police arabe ${font.name}${qualifier} | xfontat`
+      : `Download ${font.name} Arabic Font${qualifier} | xfontat`;
   const description = locale === "ar"
     ? `حمّل خط ${font.nameArabic} بصيغة ${font.fileFormat}. راجع التصنيف والمصمم والترخيص والمصدر قبل استخدام ملف الخط.`
     : locale === "fr"
@@ -296,7 +307,8 @@ function resolveFont(locale: Locale, font: Font): SeoPage {
     heading,
     imagePath,
     bodyHtml: `<p>${escapeHtml(description)}</p><dl>${detailsHtml}</dl>${categoryLink}${sourceLink}<p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${escapeHtml(downloadText)}</a></p>`,
-    alternates: pageAlternates(`/font/${font.slug}`),
+    alternates: pageAlternates(`/font/${font.duplicateOf || font.slug}`),
+    canonicalPath: font.duplicateOf ? pathForLocale(locale, `/font/${font.duplicateOf}`) : undefined,
   };
 }
 
@@ -604,11 +616,12 @@ async function loadIndexTemplate(): Promise<string> {
 }
 
 async function renderPage(req: Request, res: Response, page: SeoPage, status = 200) {
-  const canonical = `${SITE_ORIGIN}${page.path}`;
+  const canonical = `${SITE_ORIGIN}${page.canonicalPath || page.path}`;
   const image = `${SITE_ORIGIN}${page.imagePath || "/logo.png"}`;
   const localeTag = page.locale === "ar" ? "ar_AR" : page.locale === "fr" ? "fr_FR" : "en_US";
   let html = await loadIndexTemplate();
 
+  page = { ...page, title: fitTitle(page.title) };
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(page.title)}</title>`);
   html = injectHtmlAttributes(html, page.locale);
   html = setLink(html, "canonical", canonical);
@@ -732,6 +745,7 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   }
 
   for (const font of fonts) {
+    if (font.duplicateOf) continue;
     const cleanPath = `/font/${font.slug}`;
     const lastmod = dateToIso(font.addedAt);
     add(cleanPath, lastmod);
