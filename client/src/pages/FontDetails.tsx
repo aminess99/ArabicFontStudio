@@ -316,7 +316,7 @@ export default function FontDetails() {
           <Breadcrumb items={breadcrumbItems} />
 
           <div className="grid lg:grid-cols-3 gap-8 mt-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 min-w-0">
               <h1 className="text-2xl md:text-3xl font-bold mb-2" data-testid="text-font-name">
                 تحميل خط {font.nameArabic} مجاناً
               </h1>
@@ -364,10 +364,10 @@ export default function FontDetails() {
                 </div>
               </div>
 
-              <div className="flex gap-3 mb-8">
+              <div className="flex flex-wrap gap-3 mb-8">
                 <Button
                   size="lg"
-                  className="flex-1 md:flex-none text-base"
+                  className="flex-1 md:flex-none max-w-full h-auto min-h-11 py-2 whitespace-normal text-base"
                   onClick={handleDownload}
                   data-testid="button-download-font"
                 >
