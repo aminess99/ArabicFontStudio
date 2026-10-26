@@ -7,24 +7,27 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
-import Home from "@/pages/Home";
-import DesignFonts from "@/pages/DesignFonts";
-import CategoryFonts from "@/pages/CategoryFonts";
-import FontDetails from "@/pages/FontDetails";
-import Blog from "@/pages/Blog";
-import BlogPost from "@/pages/BlogPost";
-import About from "@/pages/About";
-import Contact from "@/pages/Contact";
-import Privacy from "@/pages/Privacy";
-import Terms from "@/pages/Terms";
-import NotFound from "@/pages/not-found";
-import FontCollection from "@/pages/FontCollection";
-import EnglishDirectory from "@/pages/EnglishDirectory";
+// Each page is its own chunk so visitors only download the page they open.
+const Home = lazy(() => import("@/pages/Home"));
+const DesignFonts = lazy(() => import("@/pages/DesignFonts"));
+const CategoryFonts = lazy(() => import("@/pages/CategoryFonts"));
+const FontDetails = lazy(() => import("@/pages/FontDetails"));
+const Blog = lazy(() => import("@/pages/Blog"));
+const BlogPost = lazy(() => import("@/pages/BlogPost"));
+const About = lazy(() => import("@/pages/About"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const FontCollection = lazy(() => import("@/pages/FontCollection"));
+const EnglishDirectory = lazy(() => import("@/pages/EnglishDirectory"));
 const LocalizedContentPage = lazy(() => import("@/pages/LocalizedContentPage"));
-import {
-  PurpleLogoPreview,
-  YouTubeThumbnailPreview,
-} from "@/pages/AIStudioPreview";
+const PurpleLogoPreview = lazy(() =>
+  import("@/pages/AIStudioPreview").then((m) => ({ default: m.PurpleLogoPreview })),
+);
+const YouTubeThumbnailPreview = lazy(() =>
+  import("@/pages/AIStudioPreview").then((m) => ({ default: m.YouTubeThumbnailPreview })),
+);
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -42,19 +45,19 @@ function Router() {
   if (import.meta.env.DEV) {
     if (previewPath === "/__preview/youtube-thumbnail-maker") {
       return (
-        <>
+        <Suspense fallback={null}>
           <ScrollToTop />
           <YouTubeThumbnailPreview />
-        </>
+        </Suspense>
       );
     }
 
     if (previewPath === "/__preview/logo-maker") {
       return (
-        <>
+        <Suspense fallback={null}>
           <ScrollToTop />
           <PurpleLogoPreview />
-        </>
+        </Suspense>
       );
     }
   }

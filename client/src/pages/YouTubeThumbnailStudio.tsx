@@ -884,12 +884,12 @@ export default function YouTubeThumbnailStudio() {
             <p className="mb-3 text-[10px] uppercase tracking-[.2em] text-[#65f2c0]">
               {t("YouTube Thumbnail Maker بالعربي")}
             </p>
-            <h2
+            <h1
               id="youtube-thumbnail-seo-title"
               className="max-w-3xl text-2xl font-semibold leading-[1.4] tracking-tight sm:text-3xl"
             >
               {t("منشئ الصور المصغرة لليوتيوب بالذكاء الاصطناعي")}
-            </h2>
+            </h1>
             <p className="mt-4 max-w-3xl text-sm leading-8 text-[#9aaca3]">
               {t("أنشئ صورة مصغّرة احترافية لليوتيوب من فكرة بسيطة. يساعدك xfontat على تحويل عنوان الفيديو إلى تصميم Thumbnail واضح وجذاب بمقاس 1280×720، مع دعم العناوين العربية، الألوان المتباينة، وترتيب بصري يجعل موضوع الفيديو مفهوماً من النظرة الأولى.")}
             </p>
