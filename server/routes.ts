@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { blogPostPath } from "../client/src/lib/blogSlugs";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFontSchema } from "@shared/schema";
@@ -247,6 +248,11 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/zakhrafa$/,
   /^\/arabic-text-to-image$/,
   /^\/tahnia(?:\/[^/]+)?$/,
+  /^\/keyboard$/,
+  /^\/en\/(?:arabic-keyboard|arabic-font-generator|arabic-tattoo-fonts)$/,
+  /^\/fr\/(?:clavier-arabe|generateur-police-arabe|police-arabe-tatouage)$/,
+  /^\/en\/(?:names-in-arabic|arabic-phrases)(?:\/[^/]+)?$/,
+  /^\/fr\/(?:prenoms-en-arabe|expressions-arabes)(?:\/[^/]+)?$/,
   /^\/about$/,
   /^\/contact$/,
   /^\/privacy$/,
@@ -1236,7 +1242,7 @@ ${faqHtml}
           const translation = fullBlogTranslations[post.slug]?.[locale] || localizedBlogPosts[locale][post.slug];
           if (!translation) return "";
           const excerpt = translation.excerpt;
-          return `<li><a href="/${locale}/blog/${post.slug}">${escapeHtml(translation.title)}</a><p>${escapeHtml(excerpt)}</p></li>`;
+          return `<li><a href="${blogPostPath(locale, post.slug)}">${escapeHtml(translation.title)}</a><p>${escapeHtml(excerpt)}</p></li>`;
         })
         .filter(Boolean)
         .join("");
@@ -1480,7 +1486,7 @@ ${articlesSection}
         : "Practical guides to choosing and using Arabic fonts.";
       const posts = staticBlogPosts.map((post) => {
         const translation = fullBlogTranslations[post.slug]?.[locale] || localizedBlogPosts[locale][post.slug];
-        return translation ? `<li><a href="/${locale}/blog/${post.slug}">${translation.title}</a> — ${translation.excerpt}</li>` : "";
+        return translation ? `<li><a href="${blogPostPath(locale, post.slug)}">${translation.title}</a> — ${translation.excerpt}</li>` : "";
       }).join("");
       return res.send(botHTML(title, description, canonical, title, `<ul>${posts}</ul>`, { "@type": "Blog", "name": title, "inLanguage": locale }, undefined, {
         lang: locale,

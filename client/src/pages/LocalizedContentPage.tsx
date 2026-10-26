@@ -14,6 +14,8 @@ import { generateLegacyFontSlug, getCanonicalFontSlug } from "@/lib/slugify";
 import { detectFontFamily, groupFontsByFamily } from "@/lib/fontFamily";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
 import { LocalizedMobileMenu } from "@/components/LocalizedMobileMenu";
+import { intlNav } from "@/lib/intlTools";
+import { blogPostPath, originalBlogSlug } from "@/lib/blogSlugs";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   fontCharacterMap,
@@ -68,6 +70,7 @@ function LocalizedHeader({
   const [showPreviewTools, setShowPreviewTools] = useState(false);
   const menuLinks = [
     { href: `/${locale}`, label: homeCopy.home },
+    ...intlNav[locale].filter((item) => item.id !== "fonts" && item.id !== "blog").map(({ href, label }) => ({ href, label })),
     ...categories.map((category) => ({ href: `/${locale}/fonts/${category.slug}`, label: category.name })),
     { href: `/${locale}/blog`, label: homeCopy.blog },
   ];
@@ -83,10 +86,13 @@ function LocalizedHeader({
           </div>
           <nav className="hidden flex-wrap items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
             <Link href={`/${locale}`}>{homeCopy.home}</Link>
-            {categories.slice(0, 5).map((category) => (
+            {categories.slice(0, 3).map((category) => (
               <Link key={category.slug} href={`/${locale}/fonts/${category.slug}`}>{category.name}</Link>
             ))}
             <Link href={`/${locale}/fonts/${designCategory?.slug || "tasmeem"}`}>{homeCopy.designFonts}</Link>
+            {intlNav[locale].filter((item) => item.id === "keyboard" || item.id === "names" || item.id === "generator").map((item) => (
+              <Link key={item.href} href={item.href}>{item.label}</Link>
+            ))}
             <Link href={`/${locale}/blog`}>{homeCopy.blog}</Link>
           </nav>
           <div className="flex items-center gap-2 text-sm">
@@ -233,7 +239,8 @@ export default function LocalizedContentPage() {
   const rawPath = pathname.replace(/^\/(en|fr)(?=\/|$)/, "") || "/";
   const fontSlug = rawPath.match(/^\/font\/([^/]+)$/)?.[1];
   const collectionSlug = rawPath.match(/^\/collection\/([^/]+)$/)?.[1];
-  const blogSlug = rawPath.match(/^\/blog\/([^/]+)$/)?.[1];
+  const requestedBlogSlug = rawPath.match(/^\/blog\/([^/]+)$/)?.[1];
+  const blogSlug = requestedBlogSlug ? originalBlogSlug(locale, requestedBlogSlug) : undefined;
   const isBlogIndex = rawPath === "/blog";
   const blogPost = blogSlug ? blogPosts.find((post) => post.slug === blogSlug) : undefined;
   const summaryBlogPost = blogSlug ? localizedBlogPosts[locale][blogSlug] : undefined;
@@ -296,7 +303,7 @@ export default function LocalizedContentPage() {
   }, [font]);
 
   const canonicalPath = routeLanguagePath(rawPath, locale);
-  const arabicPath = rawPath;
+  const arabicPath = blogSlug ? `/blog/${blogSlug}` : rawPath;
   const currentLabel = locale === "fr";
   const homeCopy = currentLabel ? frenchHome : englishHome;
   const fontLabels = localizedFontDetailCopy[locale];
@@ -351,8 +358,8 @@ export default function LocalizedContentPage() {
         ]
     : [];
   const alternates = [
-    { lang: "en", href: `https://xfontat.com${routeLanguagePath(rawPath, "en")}` },
-    { lang: "fr", href: `https://xfontat.com${routeLanguagePath(rawPath, "fr")}` },
+    { lang: "en", href: `https://xfontat.com${blogSlug ? blogPostPath("en", blogSlug) : routeLanguagePath(rawPath, "en")}` },
+    { lang: "fr", href: `https://xfontat.com${blogSlug ? blogPostPath("fr", blogSlug) : routeLanguagePath(rawPath, "fr")}` },
     { lang: "ar", href: `https://xfontat.com${arabicPath}` },
   ];
 
@@ -456,7 +463,7 @@ export default function LocalizedContentPage() {
               "@type": "ListItem",
               position: index + 1,
               name: item.title,
-              url: `https://xfontat.com/${locale}/blog/${item.slug}`,
+              url: `https://xfontat.com${blogPostPath(locale, item.slug)}`,
             })),
           }] : []),
         ],
@@ -527,7 +534,7 @@ export default function LocalizedContentPage() {
       />
       <LocalizedHeader
         locale={locale}
-        path={rawPath}
+        path={arabicPath}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         previewText={previewText}
@@ -786,7 +793,7 @@ export default function LocalizedContentPage() {
                     {relatedArticles.map((article) => (
                       <article key={article.slug} className="rounded-md border p-4">
                         <h3 className="font-medium">
-                          <Link className="hover:underline" href={`/${locale}/blog/${article.slug}`}>{article.title}</Link>
+                          <Link className="hover:underline" href={blogPostPath(locale, article.slug)}>{article.title}</Link>
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">{article.excerpt}</p>
                       </article>
@@ -941,7 +948,7 @@ export default function LocalizedContentPage() {
                 return (
                   <article key={post.slug} className="rounded-lg border p-5">
                     <h2 className="text-xl font-semibold">
-                      <Link className="hover:underline" href={`/${locale}/blog/${post.slug}`}>{translation.title}</Link>
+                      <Link className="hover:underline" href={blogPostPath(locale, post.slug)}>{translation.title}</Link>
                     </h2>
                     <p className="mt-2 leading-7 text-muted-foreground">{translation.excerpt}</p>
                     <p className="mt-3 text-xs text-muted-foreground">

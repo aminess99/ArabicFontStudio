@@ -2,6 +2,7 @@ import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
+import { blogPostPath } from "@/lib/blogSlugs";
 import { Header } from "@/components/Header";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
@@ -116,6 +117,10 @@ export default function BlogPost() {
         description={post.excerpt}
         path={`/blog/${post.slug}`}
         schema={articleSchema}
+        alternates={[
+          { lang: "en", href: `https://xfontat.com${blogPostPath("en", post.slug)}` },
+          { lang: "fr", href: `https://xfontat.com${blogPostPath("fr", post.slug)}` },
+        ]}
       />
       <div className="flex flex-col min-h-screen bg-background">
         <Header />

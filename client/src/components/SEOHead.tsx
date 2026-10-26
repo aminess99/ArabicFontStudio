@@ -12,6 +12,8 @@ interface SEOHeadProps {
   canonicalPath?: string;
   // False for pages that exist only in Arabic, so no en/fr hreflang is emitted.
   localized?: boolean;
+  // The full hreflang set, for pages whose translations use different paths.
+  exactAlternates?: { lang: string; href: string }[];
 }
 
 const MAX_TITLE_LENGTH = 65;
@@ -48,11 +50,14 @@ export function SEOHead({
   alternates = [],
   canonicalPath,
   localized = true,
+  exactAlternates,
 }: SEOHeadProps) {
   const baseUrl = "https://xfontat.com";
   const fullUrl = `${baseUrl}${canonicalPath || path}`;
   title = fitTitle(title);
-  const resolvedAlternates = localized
+  const resolvedAlternates = exactAlternates
+    ? exactAlternates
+    : localized
     ? buildAlternates(path, alternates)
     : [{ lang: "ar", href: fullUrl }, { lang: "x-default", href: fullUrl }];
   const alternateLinksKey = JSON.stringify(resolvedAlternates);

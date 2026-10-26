@@ -7,15 +7,25 @@ export interface InternationalCategory {
   intro: string;
   uses: string[];
   faqs: { question: string; answer: string }[];
+  heading?: string;
+  guide?: string[];
 }
 
 export const englishHome = {
-  title: "Arabic Fonts — Browse and Preview | xfontat",
+  title: "Arabic Fonts — Free Download, 850+ Arabic Calligraphy Fonts | xfontat",
   description:
-    "Browse Arabic font styles, preview Arabic text, and check the format and license information listed for each file.",
-  heading: "Arabic fonts to browse and preview",
+    "Download 850+ free Arabic fonts: Thuluth, Diwani, Kufi, Naskh, Ruqaa and Nastaliq calligraphy. Preview your own text, then try our Arabic keyboard and name tools.",
+  heading: "Free Arabic fonts to download and preview",
   intro:
-    "Explore Arabic font files by style, preview your own text, and check each file’s format and license information before using it.",
+    "xfontat is a free library of more than 850 Arabic fonts, sorted by calligraphy style. Type your own text to preview it in every font, open a font to see its characters, format and licence, then download it. Free tools help you type in Arabic, write your name in Arabic calligraphy and preview a tattoo.",
+  toolsHeading: "Free Arabic writing tools",
+  tools: [
+    { href: "/en/arabic-keyboard", title: "Arabic keyboard", description: "Type in Arabic on any device, with vowel marks and phonetic typing." },
+    { href: "/en/names-in-arabic", title: "Names in Arabic", description: "How 200 popular names are written in Arabic, with meanings and calligraphy." },
+    { href: "/en/arabic-font-generator", title: "Arabic font generator", description: "Turn a name or text into Arabic calligraphy and download a PNG." },
+    { href: "/en/arabic-tattoo-fonts", title: "Arabic tattoo fonts", description: "Preview a tattoo in calligraphy fonts and avoid common mistakes." },
+    { href: "/en/arabic-phrases", title: "Arabic phrases", description: "Allah, Bismillah, Habibi and more, with meaning and calligraphy." },
+  ],
   aboutHeading: "Explore Arabic typography",
   about:
     "Arabic typefaces vary in letterforms, character coverage, and file format. Preview the text you plan to use, check the file details, and confirm its license before including it in a project.",
@@ -102,9 +112,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "thuluth",
     arabicCategory: "ثلث",
     name: "Thuluth",
-    title: "Thuluth Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files classified as Thuluth, preview sample text, and check the format and license details for each file.",
+    heading: "Thuluth Arabic fonts",
+    guide: ["Thuluth (\"one third\") is one of the six classical styles of Arabic calligraphy. Its tall vertical strokes, deep curves and overlapping letters make it the script of mosque inscriptions, book titles and formal headings.", "Digital Thuluth fonts simplify the hand-written style so it can be typed. Use them for large headings, logos with a traditional feel, certificates and wall art; avoid them for long paragraphs, where Naskh reads more easily."],
+    title: "Thuluth Font Free Download — Arabic Thuluth Calligraphy Fonts | xfontat",
+    description: "Download free Thuluth Arabic fonts. Preview your text in Thuluth calligraphy, compare styles and check each font's format and licence before use.",
     intro:
       "This collection groups files under the Thuluth category. Letterforms and decorative details vary, so preview the exact text and size needed for your design.",
     uses: ["Headings", "Invitations", "Decorative compositions"],
@@ -125,9 +136,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "diwani",
     arabicCategory: "ديواني",
     name: "Diwani",
-    title: "Diwani Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files classified as Diwani, preview their letterforms, and review file details before use.",
+    heading: "Diwani Arabic fonts",
+    guide: ["Diwani was developed in the Ottoman chancery for official decrees. Letters lean, curve and sit on top of one another, so the writing looks like a single flowing ornament.", "Diwani fonts suit wedding invitations, names, greeting cards and decorative logos. Keep the text short and check that names and dates stay readable at the final size."],
+    title: "Diwani Font Free Download — Arabic Diwani Calligraphy Fonts | xfontat",
+    description: "Download free Diwani Arabic fonts. Preview names and short phrases in flowing Diwani calligraphy and check each font's format and licence.",
     intro:
       "The Diwani category includes files with different flowing and decorative forms. Compare each file with your actual text and available layout space.",
     uses: ["Invitations", "Certificates", "Decorative headings"],
@@ -148,9 +160,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "ruqaa",
     arabicCategory: "رقعة",
     name: "Ruqah",
-    title: "Ruqah Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files classified as Ruqah and compare how sample text looks at your intended display size.",
+    heading: "Ruqaa Arabic fonts",
+    guide: ["Ruqaa (also written Riqa or Ruqah) is the most common style of everyday Arabic handwriting. It is quick to write, with short strokes, few flourishes and dots often joined into small dashes.", "Ruqaa fonts give designs a handwritten, informal feel. They work well for posters, social media graphics, food packaging and short headlines."],
+    title: "Ruqaa Font Free Download — Arabic Riqa Handwriting Fonts | xfontat",
+    description: "Download free Ruqaa (Riqa) Arabic fonts, the style of everyday Arabic handwriting. Preview your text and check each font's format and licence.",
     intro:
       "Ruqah files in this directory can differ in letter shape and spacing. Preview the exact words and check the file details before choosing one.",
     uses: ["Short headings", "Social graphics", "Labels"],
@@ -171,9 +184,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "kufi",
     arabicCategory: "كوفي",
     name: "Kufi",
-    title: "Kufi Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files classified as Kufi, including varied geometric forms, and preview them with your own text.",
+    heading: "Kufi Arabic fonts",
+    guide: ["Kufic is the oldest Arabic calligraphic style, used in early Quran manuscripts and architecture. It is built from straight lines and angles, and its square variant can be laid out on a grid like a pattern.", "Modern Kufi fonts include many clean, geometric typefaces that work like a sans-serif. They are a popular choice for logos, apps, websites and signage because they stay clear at small sizes."],
+    title: "Kufi Font Free Download — Arabic Kufic & Geometric Fonts | xfontat",
+    description: "Download free Kufi Arabic fonts, from classic Kufic to modern geometric sans-serif styles. Preview your text and check each font's licence.",
     intro:
       "The Kufi category brings together different Arabic font files, including geometric styles. Compare letter shapes and spacing against the needs of your project.",
     uses: ["Logos", "Headings", "Geometric compositions"],
@@ -194,9 +208,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "naskh",
     arabicCategory: "نسخ",
     name: "Naskh",
-    title: "Naskh Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files classified as Naskh and test letter clarity and diacritics with your own text.",
+    heading: "Naskh Arabic fonts",
+    guide: ["Naskh is the classical script used for copying books and the Quran, and the model for most Arabic printing. Its letters are rounded, balanced and easy to read in long passages.", "Choose a Naskh font for body text, books, reports, subtitles and websites. Check that it supports the diacritics (tashkeel) you need if your text is vocalised."],
+    title: "Naskh Font Free Download — Arabic Naskh Text Fonts | xfontat",
+    description: "Download free Naskh Arabic fonts for books, documents and websites. Preview paragraphs in Naskh and check each font's character set and licence.",
     intro:
       "Files classified as Naskh can differ in proportions, character coverage, and diacritic support. Preview representative content before choosing a file.",
     uses: ["Books", "Articles", "Long-form text"],
@@ -217,9 +232,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "tasmeem",
     arabicCategory: "تصميم",
     name: "Arabic Design Fonts",
-    title: "Arabic Design Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files in the design category, preview sample text, and check each file’s format and license.",
+    heading: "Arabic display and decorative fonts",
+    guide: ["Display fonts are designed to be seen at large sizes: bold headlines, posters, packaging and video titles. Many mix traditional letterforms with modern shapes, outlines and textures.", "Because display fonts trade readability for personality, use them for a few words at a time and pair them with a simple Naskh or Kufi font for the rest of the text."],
+    title: "Arabic Display Fonts Free Download — Decorative Fonts | xfontat",
+    description: "Download free decorative Arabic display fonts for logos, posters, thumbnails and social media. Preview your text and check each font's licence.",
     intro:
       "This is a practical library category containing varied Arabic font files. Check each file’s character coverage, format, and license for your project.",
     uses: ["Posters", "Social graphics", "Presentations"],
@@ -240,9 +256,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "graffiti",
     arabicCategory: "خطوط الحرة",
     name: "Freehand Arabic Fonts",
-    title: "Freehand Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse Arabic font files classified as freehand or graffiti styles and preview them before use.",
+    heading: "Freehand and handwritten Arabic fonts",
+    guide: ["Freehand fonts imitate brush strokes, markers and street lettering rather than a classical calligraphy style. Each design has its own rhythm, so results vary a lot from one font to another.", "They suit album covers, street-style posters, T-shirts and social media posts. Test the exact words you plan to use, since some freehand fonts cover only basic Arabic letters."],
+    title: "Freehand Arabic Fonts Free Download — Handwritten Styles | xfontat",
+    description: "Download free freehand and handwritten Arabic fonts with brush, marker and graffiti styles. Preview your text and check each font's licence.",
     intro:
       "Files in this category use varied expressive forms. Preview actual words and check that the characters you need are present.",
     uses: ["Short titles", "Posters", "Expressive graphics"],
@@ -263,9 +280,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "photoshop",
     arabicCategory: "فوتوشوب",
     name: "Arabic Fonts for Design Software",
-    title: "Arabic Fonts in the Photoshop Category | xfontat",
-    description:
-      "Browse Arabic font files listed in the Photoshop category and check format, Arabic support, and license before use.",
+    heading: "Arabic fonts for Photoshop and design apps",
+    guide: ["These fonts are popular with designers working in Photoshop, Illustrator, InDesign, Canva and video editors. To display Arabic correctly, the app must support right-to-left text and Arabic shaping.", "In Photoshop, enable the Middle Eastern text engine (Preferences > Type) so letters join correctly. If letters appear separated or reversed, the app or setting does not support Arabic, not the font."],
+    title: "Arabic Fonts for Photoshop Free Download | xfontat",
+    description: "Download free Arabic fonts that work in Photoshop, Illustrator, Canva and other design apps. Preview your text and check each font's licence.",
     intro:
       "This is a library category, not a compatibility guarantee. Check the file format and test Arabic shaping and text direction in your software version.",
     uses: ["Image editing", "Posters", "Design layouts"],
@@ -286,9 +304,10 @@ export const englishCategories: InternationalCategory[] = [
     slug: "nastaliq",
     arabicCategory: "نستعليق",
     name: "Nastaliq",
-    title: "Nastaliq Arabic Fonts to Preview | xfontat",
-    description:
-      "Browse font files classified as Nastaliq and test the language characters and shaping required by your text.",
+    heading: "Nastaliq fonts",
+    guide: ["Nastaliq developed in Persia in the 14th and 15th centuries and is still the main calligraphic style for Persian and Urdu. Words slope down from right to left, giving it a light, hanging rhythm.", "Nastaliq fonts are ideal for poetry, book covers and elegant titles. Many also include the extra letters used in Persian and Urdu, such as پ, چ, گ and ے."],
+    title: "Nastaliq Font Free Download — Persian & Urdu Calligraphy | xfontat",
+    description: "Download free Nastaliq fonts for Persian, Urdu and Arabic calligraphy. Preview your text in Nastaliq and check each font's character set and licence.",
     intro:
       "Nastaliq files can differ in character coverage and shaping behavior. Preview the exact language and text you intend to use.",
     uses: ["Headings", "Short compositions", "Multilingual layouts"],
@@ -308,12 +327,20 @@ export const englishCategories: InternationalCategory[] = [
 ];
 
 export const frenchHome = {
-  title: "Polices arabes — Parcourir et prévisualiser | xfontat",
+  title: "Polices arabes gratuites — plus de 850 polices à télécharger | xfontat",
   description:
-    "Parcourez des styles de polices arabes, prévisualisez du texte et vérifiez le format et la licence indiqués pour chaque fichier.",
-  heading: "Polices arabes à parcourir et à prévisualiser",
+    "Téléchargez plus de 850 polices arabes gratuites : thuluth, diwani, coufique, naskh, ruqaa et nastaliq. Prévisualisez votre texte et essayez notre clavier arabe.",
+  heading: "Polices arabes gratuites à télécharger et prévisualiser",
   intro:
-    "Explorez les fichiers de polices arabes par style, prévisualisez votre texte et vérifiez le format et la licence de chaque fichier avant de l’utiliser.",
+    "xfontat est une bibliothèque gratuite de plus de 850 polices arabes, classées par style de calligraphie. Tapez votre texte pour le prévisualiser dans chaque police, ouvrez une police pour voir ses caractères, son format et sa licence, puis téléchargez-la. Des outils gratuits permettent aussi d'écrire en arabe, d'écrire son prénom en calligraphie et de prévisualiser un tatouage.",
+  toolsHeading: "Outils gratuits d'écriture arabe",
+  tools: [
+    { href: "/fr/clavier-arabe", title: "Clavier arabe", description: "Écrivez en arabe sur n'importe quel appareil, avec voyelles et saisie phonétique." },
+    { href: "/fr/prenoms-en-arabe", title: "Prénoms en arabe", description: "Comment 200 prénoms s'écrivent en arabe, avec leur sens et en calligraphie." },
+    { href: "/fr/generateur-police-arabe", title: "Générateur de police arabe", description: "Transformez un prénom ou un texte en calligraphie arabe et téléchargez un PNG." },
+    { href: "/fr/police-arabe-tatouage", title: "Polices pour tatouage", description: "Prévisualisez un tatouage en calligraphie et évitez les erreurs fréquentes." },
+    { href: "/fr/expressions-arabes", title: "Expressions arabes", description: "Allah, Bismillah, Habibi et d'autres, avec leur sens et en calligraphie." },
+  ],
   aboutHeading: "Explorer la typographie arabe",
   about:
     "Les polices arabes diffèrent par la forme des lettres, la couverture des caractères et le format. Prévisualisez le texte prévu, consultez les détails du fichier et vérifiez sa licence avant de l’utiliser dans un projet.",
@@ -402,9 +429,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "thuluth",
     arabicCategory: "ثلث",
     name: "Thuluth",
-    title: "Polices arabes Thuluth à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes classés dans la catégorie Thuluth, prévisualisez du texte et vérifiez le format et la licence de chaque fichier.",
+    heading: "Polices arabes Thuluth",
+    guide: ["Le thuluth (« un tiers ») est l'un des six styles classiques de la calligraphie arabe. Ses hampes verticales, ses courbes profondes et ses lettres superposées en font l'écriture des inscriptions de mosquées et des titres d'ouvrages.", "Les polices thuluth simplifient le style manuscrit pour qu'il puisse être tapé. Utilisez-les pour les grands titres, les logos traditionnels, les diplômes et les tableaux, mais pas pour les longs paragraphes."],
+    title: "Police Thuluth gratuite — calligraphie arabe Thuluth | xfontat",
+    description: "Téléchargez des polices arabes Thuluth gratuites. Prévisualisez votre texte en calligraphie Thuluth et vérifiez le format et la licence de chaque police.",
     intro:
       "Cette collection regroupe des fichiers classés dans la catégorie Thuluth. Les formes et les ornements varient : prévisualisez le texte et la taille prévus pour votre création.",
     uses: ["Titres", "Invitations", "Compositions décoratives"],
@@ -425,9 +453,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "diwani",
     arabicCategory: "ديواني",
     name: "Diwani",
-    title: "Polices arabes Diwani à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes classés Diwani, prévisualisez leurs formes et consultez les détails avant utilisation.",
+    heading: "Polices arabes Diwani",
+    guide: ["Le diwani est né à la chancellerie ottomane pour les décrets officiels. Les lettres s'inclinent, s'arrondissent et se superposent, si bien que l'écriture forme un seul ornement fluide.", "Les polices diwani conviennent aux faire-part de mariage, aux prénoms, aux cartes de vœux et aux logos décoratifs. Gardez un texte court et vérifiez la lisibilité des noms et des dates."],
+    title: "Police Diwani gratuite — calligraphie arabe Diwani | xfontat",
+    description: "Téléchargez des polices arabes Diwani gratuites. Prévisualisez prénoms et phrases courtes en calligraphie Diwani et vérifiez la licence.",
     intro:
       "La catégorie Diwani rassemble des fichiers aux formes fluides et décoratives variées. Comparez chaque fichier avec votre texte et l’espace disponible.",
     uses: ["Invitations", "Certificats", "Titres décoratifs"],
@@ -448,9 +477,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "ruqaa",
     arabicCategory: "رقعة",
     name: "Ruqah",
-    title: "Polices arabes Ruqah à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes classés Ruqah et comparez leur rendu à la taille prévue pour votre création.",
+    heading: "Polices arabes Ruqaa",
+    guide: ["Le ruqaa (ou riqa) est le style le plus répandu de l'écriture arabe manuscrite au quotidien. Rapide à tracer, il a des traits courts, peu d'ornements et des points souvent liés en petits tirets.", "Les polices ruqaa donnent un aspect manuscrit et décontracté. Elles conviennent aux affiches, aux visuels pour les réseaux sociaux, aux emballages alimentaires et aux titres courts."],
+    title: "Police Ruqaa gratuite — écriture arabe manuscrite Riqa | xfontat",
+    description: "Téléchargez des polices arabes Ruqaa (Riqa) gratuites, le style de l'écriture arabe manuscrite courante. Prévisualisez votre texte et vérifiez la licence.",
     intro:
       "Les fichiers de la catégorie Ruqah peuvent différer par la forme et l’espacement des lettres. Prévisualisez les mots concernés et consultez les détails de chaque fichier.",
     uses: ["Titres courts", "Visuels pour réseaux sociaux", "Étiquettes"],
@@ -471,9 +501,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "kufi",
     arabicCategory: "كوفي",
     name: "Kufi",
-    title: "Polices arabes Kufi à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes classés Kufi, dont différents styles géométriques, et prévisualisez votre propre texte.",
+    heading: "Polices arabes coufiques (Kufi)",
+    guide: ["Le coufique est le plus ancien style de calligraphie arabe, utilisé dans les premiers manuscrits du Coran et en architecture. Il est fait de lignes droites et d'angles ; sa variante carrée se compose sur une grille.", "Les polices coufiques modernes comprennent de nombreux caractères géométriques et épurés, proches d'un sans-serif. Elles sont prisées pour les logos, les applications, les sites web et la signalétique."],
+    title: "Police Kufi gratuite — polices arabes coufiques et géométriques | xfontat",
+    description: "Téléchargez des polices arabes coufiques gratuites, du coufique classique aux styles géométriques modernes. Prévisualisez votre texte et vérifiez la licence.",
     intro:
       "La catégorie Kufi rassemble différents fichiers de polices arabes, notamment des styles géométriques. Comparez les formes et l’espacement selon les besoins du projet.",
     uses: ["Logos", "Titres", "Compositions géométriques"],
@@ -494,9 +525,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "naskh",
     arabicCategory: "نسخ",
     name: "Naskh",
-    title: "Polices arabes Naskh à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes classés Naskh et testez la lisibilité et les signes diacritiques avec votre texte.",
+    heading: "Polices arabes Naskh",
+    guide: ["Le naskh est l'écriture classique de la copie des livres et du Coran, et le modèle de la plupart des textes imprimés en arabe. Ses lettres arrondies et équilibrées se lisent facilement dans les longs passages.", "Choisissez une police naskh pour le texte courant, les livres, les rapports, les sous-titres et les sites web. Vérifiez qu'elle gère les voyelles (tachkil) si votre texte est vocalisé."],
+    title: "Police Naskh gratuite — polices arabes de texte | xfontat",
+    description: "Téléchargez des polices arabes Naskh gratuites pour les livres, documents et sites web. Prévisualisez des paragraphes et vérifiez la licence de chaque police.",
     intro:
       "Les fichiers classés Naskh peuvent différer par leurs proportions, la couverture des caractères et la prise en charge des signes diacritiques. Testez un contenu représentatif.",
     uses: ["Livres", "Articles", "Textes longs"],
@@ -517,9 +549,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "tasmeem",
     arabicCategory: "تصميم",
     name: "Polices arabes de design",
-    title: "Polices arabes de design à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes de la catégorie design, prévisualisez du texte et consultez le format et la licence.",
+    heading: "Polices arabes décoratives",
+    guide: ["Les polices décoratives sont faites pour les grands formats : titres, affiches, emballages et vidéos. Beaucoup mêlent formes traditionnelles et formes modernes, contours ou textures.", "Comme elles privilégient la personnalité à la lisibilité, utilisez-les pour quelques mots et associez-les à une police naskh ou coufique simple pour le reste du texte."],
+    title: "Polices arabes décoratives gratuites — titres et logos | xfontat",
+    description: "Téléchargez des polices arabes décoratives gratuites pour logos, affiches, miniatures et réseaux sociaux. Prévisualisez votre texte et vérifiez la licence.",
     intro:
       "Cette catégorie pratique rassemble différents fichiers de polices arabes. Vérifiez la couverture des caractères, le format et la licence de chaque fichier.",
     uses: ["Affiches", "Visuels pour réseaux sociaux", "Présentations"],
@@ -540,9 +573,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "graffiti",
     arabicCategory: "خطوط الحرة",
     name: "Polices arabes manuscrites",
-    title: "Polices arabes manuscrites à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers arabes classés manuscrits ou graffiti et prévisualisez-les avant utilisation.",
+    heading: "Polices arabes manuscrites et libres",
+    guide: ["Les polices libres imitent le pinceau, le marqueur ou le lettrage urbain plutôt qu'un style calligraphique classique. Chaque dessin a son propre rythme.", "Elles conviennent aux pochettes d'album, aux affiches urbaines, aux t-shirts et aux publications sur les réseaux sociaux. Testez les mots exacts, car certaines ne couvrent que les lettres arabes de base."],
+    title: "Polices arabes manuscrites gratuites — styles libres | xfontat",
+    description: "Téléchargez des polices arabes manuscrites gratuites, styles pinceau, marqueur et graffiti. Prévisualisez votre texte et vérifiez la licence de chaque police.",
     intro:
       "Les fichiers de cette catégorie présentent des formes expressives variées. Testez les mots réels et vérifiez la présence des caractères nécessaires.",
     uses: ["Titres courts", "Affiches", "Visuels expressifs"],
@@ -563,9 +597,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "photoshop",
     arabicCategory: "فوتوشوب",
     name: "Polices arabes pour logiciels de design",
-    title: "Fichiers arabes de la catégorie Photoshop | xfontat",
-    description:
-      "Parcourez les fichiers arabes de la catégorie Photoshop et vérifiez le format, la prise en charge de l’arabe et la licence.",
+    heading: "Polices arabes pour Photoshop et logiciels de design",
+    guide: ["Ces polices sont appréciées des graphistes sous Photoshop, Illustrator, InDesign, Canva et les logiciels de montage. Pour afficher l'arabe correctement, le logiciel doit gérer l'écriture de droite à gauche.", "Dans Photoshop, activez le moteur de texte pour le Moyen-Orient (Préférences > Texte) afin que les lettres se lient. Des lettres séparées ou inversées viennent du logiciel, pas de la police."],
+    title: "Polices arabes pour Photoshop gratuites | xfontat",
+    description: "Téléchargez des polices arabes gratuites pour Photoshop, Illustrator, Canva et autres logiciels de design. Prévisualisez votre texte et vérifiez la licence.",
     intro:
       "Cette catégorie de bibliothèque ne garantit pas la compatibilité. Vérifiez le format et testez le façonnage arabe et le sens du texte dans votre version du logiciel.",
     uses: ["Retouche d’image", "Affiches", "Mises en page"],
@@ -586,9 +621,10 @@ export const frenchCategories: InternationalCategory[] = [
     slug: "nastaliq",
     arabicCategory: "نستعليق",
     name: "Nastaliq",
-    title: "Polices arabes Nastaliq à prévisualiser | xfontat",
-    description:
-      "Parcourez les fichiers classés Nastaliq et testez les caractères et le façonnage nécessaires à votre texte.",
+    heading: "Polices Nastaliq",
+    guide: ["Le nastaliq est né en Perse aux XIVe et XVe siècles et reste le principal style calligraphique du persan et de l'ourdou. Les mots descendent de droite à gauche, ce qui lui donne un rythme léger et suspendu.", "Les polices nastaliq sont idéales pour la poésie, les couvertures de livres et les titres élégants. Beaucoup incluent les lettres propres au persan et à l'ourdou, comme پ, چ, گ et ے."],
+    title: "Police Nastaliq gratuite — calligraphie persane et ourdou | xfontat",
+    description: "Téléchargez des polices Nastaliq gratuites pour la calligraphie persane, ourdoue et arabe. Prévisualisez votre texte et vérifiez la licence.",
     intro:
       "Les fichiers Nastaliq peuvent différer par la couverture des caractères et leur comportement de façonnage. Prévisualisez le texte exact et la langue visés.",
     uses: ["Titres", "Compositions courtes", "Mises en page multilingues"],
