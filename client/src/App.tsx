@@ -24,6 +24,7 @@ const EnglishDirectory = lazy(() => import("@/pages/EnglishDirectory"));
 const LocalizedContentPage = lazy(() => import("@/pages/LocalizedContentPage"));
 const Zakhrafa = lazy(() => import("@/pages/Zakhrafa"));
 const ArabicTextToImage = lazy(() => import("@/pages/ArabicTextToImage"));
+const GreetingCards = lazy(() => import("@/pages/GreetingCards"));
 const PurpleLogoPreview = lazy(() =>
   import("@/pages/AIStudioPreview").then((m) => ({ default: m.PurpleLogoPreview })),
 );
@@ -97,6 +98,8 @@ function Router() {
         <Route path="/youtube-thumbnail-maker" component={YouTubeThumbnailPreview} />
         <Route path="/zakhrafa" component={Zakhrafa} />
         <Route path="/arabic-text-to-image" component={ArabicTextToImage} />
+        <Route path="/tahnia" component={GreetingCards} />
+        <Route path="/tahnia/:slug" component={GreetingCards} />
         <Route path="/design-fonts" component={DesignFonts} />
         <Route path="/font/:slug" component={FontDetails} />
         <Route path="/fonts/:category" component={CategoryFonts} />

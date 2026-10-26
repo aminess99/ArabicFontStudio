@@ -3,6 +3,7 @@ import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { SEOHead } from "@/components/SEOHead";
 import { LocalizedFontRow } from "@/components/LocalizedFontRow";
+import { LocalizedMobileMenu } from "@/components/LocalizedMobileMenu";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getCanonicalFontSlug } from "@/lib/slugify";
 import { localizedCollections } from "@/lib/localizedPagesContent";
@@ -34,6 +35,7 @@ export default function EnglishDirectory() {
   ));
   const [previewText, setPreviewText] = useState("بسم الله الرحمن الرحيم");
   const [previewSize, setPreviewSize] = useState(48);
+  const [showPreviewTools, setShowPreviewTools] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
 
@@ -172,9 +174,19 @@ export default function EnglishDirectory() {
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-3 py-3 md:px-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
-              <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
-            </Link>
+            <div className="flex items-center gap-1">
+              <LocalizedMobileMenu
+                locale={locale}
+                links={[
+                  { href: `/${locale}`, label: homeCopy.home },
+                  ...categories.map((item) => ({ href: `/${locale}/fonts/${item.slug}`, label: item.name })),
+                  { href: `/${locale}/blog`, label: homeCopy.blog },
+                ]}
+              />
+              <Link href={`/${locale}`} className="flex shrink-0 items-center hover:opacity-80" aria-label={`xfontat ${locale} home`}>
+                <img src="/logo.png" alt="xfontat" className="h-8 w-auto md:h-10" />
+              </Link>
+            </div>
             <nav className="hidden items-center gap-3 text-sm lg:flex" aria-label={homeCopy.mainNavigation}>
               <Link href={`/${locale}`} className="hover:underline">{homeCopy.home}</Link>
               {categories.slice(0, 5).map((item) => (
@@ -193,7 +205,8 @@ export default function EnglishDirectory() {
             </div>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_240px]">
-            <label className="grid gap-1 text-xs font-medium">
+            {/* Preview controls fold away on phones so the font list starts near the top. */}
+            <label className="order-1 grid gap-1 text-xs font-medium sm:order-none">
               {homeCopy.searchLabel}
               <input
                 type="search"
@@ -204,7 +217,15 @@ export default function EnglishDirectory() {
                 data-testid="english-font-search"
               />
             </label>
-            <label className="grid gap-1 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setShowPreviewTools((value) => !value)}
+              aria-expanded={showPreviewTools}
+              className="order-2 text-start text-xs text-muted-foreground underline underline-offset-4 sm:hidden"
+            >
+              {isFrench ? "Options de prévisualisation" : "Preview options"}
+            </button>
+            <label className={`order-3 ${showPreviewTools ? "grid" : "hidden"} gap-1 text-xs font-medium sm:order-none sm:grid`}>
               {homeCopy.previewLabel}
               <input
                 type="text"
@@ -216,7 +237,7 @@ export default function EnglishDirectory() {
                 data-testid="english-font-preview"
               />
             </label>
-            <label className="grid gap-1 text-xs font-medium">
+            <label className={`order-4 ${showPreviewTools ? "grid" : "hidden"} gap-1 text-xs font-medium sm:order-none sm:grid`}>
               <span className="flex items-center justify-between gap-3">
                 <span>{homeCopy.previewSizeLabel}</span>
                 <span className="text-xs text-muted-foreground">{previewSize}px</span>

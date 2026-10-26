@@ -246,6 +246,7 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/youtube-thumbnail-maker$/,
   /^\/zakhrafa$/,
   /^\/arabic-text-to-image$/,
+  /^\/tahnia(?:\/[^/]+)?$/,
   /^\/about$/,
   /^\/contact$/,
   /^\/privacy$/,
