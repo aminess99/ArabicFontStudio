@@ -37,6 +37,8 @@ function buildAlternates(path: string, supplied: { lang: string; href: string }[
     ["x-default", `${baseUrl}${pagePath}`],
   ]);
   for (const alternate of supplied) defaults.set(alternate.lang, alternate.href);
+  // x-default follows the Arabic version, which may have a different slug.
+  defaults.set("x-default", defaults.get("ar")!);
   return Array.from(defaults, ([lang, href]) => ({ lang, href }));
 }
 

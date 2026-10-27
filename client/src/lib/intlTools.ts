@@ -3,6 +3,7 @@
 // hreflang links come from `toolPaths` rather than the /en and /fr prefixes.
 
 import type { ToolPageCopy } from "./toolPages";
+import { blogPostPath } from "./blogSlugs";
 
 export type IntlLocale = "ar" | "en" | "fr";
 export type IntlToolId = "keyboard" | "generator" | "tattoo" | "names" | "phrases";
@@ -41,6 +42,8 @@ export function localeSwitchPath(locale: "en" | "fr", arabicPath: string): strin
   const path = arabicPath.replace(/\/+$/, "") || "/";
   const tool = findIntlTool(path);
   if (tool) return toolPaths[tool.id][locale] ?? `/${locale}`;
+  const blogPost = path.match(/^\/blog\/([^/]+)$/);
+  if (blogPost) return blogPostPath(locale, decodeURIComponent(blogPost[1]));
   if (path === "/" || ARABIC_ONLY.some((pattern) => pattern.test(path))) return `/${locale}`;
   return `/${locale}${path}`;
 }
