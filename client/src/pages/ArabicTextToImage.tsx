@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { textToImagePage, toolFaqSchema, zakhrafaPage } from "@/lib/toolPages";
-import { findIntlTool, generatorCopy, toolAlternates, toolPaths, type IntlLocale } from "@/lib/intlTools";
+import { findIntlTool, generatorCopy, ruqaaCopy, toolAlternates, toolPaths, type IntlLocale } from "@/lib/intlTools";
 import { findArabicName, namePath } from "@/lib/arabicNames";
 import { englishCategories, frenchCategories } from "@/lib/internationalContent";
 import { SITE_ORIGIN, createBreadcrumbSchema } from "@/lib/schemas";
@@ -90,8 +90,11 @@ function drawText(canvas: HTMLCanvasElement, text: string, family: string, size:
 
 export default function ArabicTextToImage() {
   const [location] = useLocation();
-  const locale = findIntlTool(location)?.locale ?? "ar";
-  const page = locale === "ar" ? textToImagePage : generatorCopy[locale];
+  const route = findIntlTool(location);
+  const locale = route?.locale ?? "ar";
+  // The Ruqaa page is the same tool opened on Ruqaa fonts.
+  const toolId = route?.id === "ruqaa" ? "ruqaa" : "generator";
+  const page = toolId === "ruqaa" ? ruqaaCopy[locale] : locale === "ar" ? textToImagePage : generatorCopy[locale];
   const ui = UI[locale];
   const categoryLabels = useMemo(() => {
     const list = locale === "fr" ? frenchCategories : englishCategories;
@@ -108,7 +111,7 @@ export default function ArabicTextToImage() {
     return (/[A-Za-z]/.test(requested) && findArabicName(requested)?.arabic) || requested.slice(0, 120);
   });
   const latinName = /[A-Za-z]/.test(text) ? findArabicName(text) : undefined;
-  const [category, setCategory] = useState("ثلث");
+  const [category, setCategory] = useState(toolId === "ruqaa" ? "رقعة" : "ثلث");
   const [search, setSearch] = useState("");
   const [fontId, setFontId] = useState<string | null>(null);
   const [size, setSize] = useState(96);
@@ -299,7 +302,7 @@ export default function ArabicTextToImage() {
       schema={schema}
       lang={locale}
       direction={locale === "ar" ? "rtl" : "ltr"}
-      exactAlternates={toolAlternates(toolPaths.generator)}
+      exactAlternates={toolAlternates(toolPaths[toolId])}
     />
   );
 
@@ -308,7 +311,7 @@ export default function ArabicTextToImage() {
       ? [[toolPaths.keyboard.fr!, "Clavier arabe"], [toolPaths.names.fr!, "Prénoms en arabe"], [toolPaths.tattoo.fr!, "Polices pour tatouage"]]
       : [[toolPaths.keyboard.en!, "Arabic keyboard"], [toolPaths.names.en!, "Names in Arabic"], [toolPaths.tattoo.en!, "Arabic tattoo fonts"]];
     return (
-      <IntlShell locale={locale} languages={toolPaths.generator}>
+      <IntlShell locale={locale} languages={toolPaths[toolId]}>
         {head}
         <div className="max-w-5xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{page.heading}</h1>

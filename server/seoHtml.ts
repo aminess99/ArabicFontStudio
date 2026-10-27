@@ -12,7 +12,7 @@ import {
   localizedCollections,
   localizedStaticPages,
 } from "../client/src/lib/localizedPagesContent";
-import { collections } from "../client/src/lib/collectionsData";
+import { collections, collectionFonts } from "../client/src/lib/collectionsData";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "../client/src/lib/blogTranslations";
 import { generateLegacyFontSlug } from "../client/src/lib/slugify";
@@ -25,6 +25,7 @@ import {
   generatorCopy,
   keyboardCopy,
   zakhrafaCopy,
+  ruqaaCopy,
   namesHubCopy,
   phrasesHubCopy,
   tattooCopy,
@@ -40,6 +41,7 @@ import { nameContent, phraseContent, phraseLabel, type DetailContent } from "../
 import { nameContentAr, nameMeaningAr, phraseContentAr, phraseDisplayLatin, phraseTransliteration } from "../client/src/lib/arContent";
 import { phraseTextAr } from "../client/src/lib/arabicPhrasesAr";
 import { decorate } from "../client/src/lib/zakhrafa";
+import { fontTitleName } from "../client/src/lib/fontArabicNames";
 import { OCCASIONS, getOccasion } from "../client/src/lib/greetingCards";
 import { CARD_PATHS, cardOccasionPath, cardsHubCopy, localizeOccasion, parseCardPath, type CardLocale } from "../client/src/lib/greetingCardsIntl";
 import * as home from "../client/src/lib/homeContent";
@@ -389,7 +391,7 @@ function resolveCollection(locale: Locale, slug: string, fonts: Font[]): SeoPage
   const availableTranslation = locale === "ar" || Boolean(localized);
   const title = localized?.title || collection.title;
   const description = localized?.description || collection.description;
-  const collectionFonts = fonts.filter((font) => collection.categories.includes(font.category));
+  const collectionFontList = collectionFonts(collection, fonts);
   const bodyIntro = locale === "ar" ? collection.longDescription : localized?.description || description;
   const categoryLinks = collection.categories.map((categoryName) => {
     const category = englishCategories.find((item) => item.arabicCategory === categoryName);
@@ -407,7 +409,7 @@ function resolveCollection(locale: Locale, slug: string, fonts: Font[]): SeoPage
       locale === "ar" && collection.callout ? `<p>${escapeHtml(collection.callout.text)} <a href="${escapeHtml(collection.callout.href)}">${escapeHtml(collection.callout.label)}</a></p>` : "",
       locale === "ar" && collection.guide ? `<section><h2>${escapeHtml(collection.guide.heading)}</h2><ol>${collection.guide.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>${collection.guide.note ? `<p>${escapeHtml(collection.guide.note)}</p>` : ""}</section>` : "",
       `<section><h2>${escapeHtml(locale === "fr" ? "Styles associés" : locale === "en" ? "Related styles" : "التصنيفات المرتبطة")}</h2><ul>${categoryLinks}</ul></section>`,
-      `<section><h2>${escapeHtml(locale === "fr" ? "Fichiers de police de la collection" : locale === "en" ? "Font files in this collection" : "ملفات الخطوط في المجموعة")}</h2>${fontLinkList(collectionFonts, locale)}</section>`,
+      `<section><h2>${escapeHtml(locale === "fr" ? "Fichiers de police de la collection" : locale === "en" ? "Font files in this collection" : "ملفات الخطوط في المجموعة")}</h2>${fontLinkList(collectionFontList, locale)}</section>`,
       locale === "ar" ? faqHtml("أسئلة شائعة", collection.faqs) : "",
     ].join(""),
     noindex: !availableTranslation,
@@ -435,7 +437,7 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
   // English and French use the same title and description as the React page.
   const localizedMeta = locale === "ar" ? null : getLocalizedFontPageContent(font, locale);
   const title = locale === "ar"
-    ? `تحميل خط ${font.nameArabic}${qualifier} مجاناً | xfontat`
+    ? `تحميل خط ${fontTitleName(font)}${qualifier} مجاناً | xfontat`
     : localizedMeta!.title;
   const profile = font.duplicateOf ? undefined : getFontProfile(font.slug);
   const description = locale === "ar"
@@ -941,9 +943,10 @@ function homeCrumb(locale: IntlLocale): [string, string] {
   return locale === "ar" ? ["الرئيسية", "/"] : locale === "fr" ? ["Accueil", "/fr"] : ["Home", "/en"];
 }
 
-function resolveIntlToolPage(id: "keyboard" | "generator" | "zakhrafa" | "tattoo", locale: IntlLocale): SeoPage | null {
+function resolveIntlToolPage(id: "keyboard" | "generator" | "ruqaa" | "zakhrafa" | "tattoo", locale: IntlLocale): SeoPage | null {
   const copy = id === "keyboard" ? keyboardCopy[locale]
     : id === "tattoo" ? tattooCopy[locale]
+    : id === "ruqaa" ? ruqaaCopy[locale]
     : locale === "ar" ? null
     : id === "generator" ? generatorCopy[locale] : zakhrafaCopy[locale];
   if (!copy) return null;
@@ -1071,6 +1074,7 @@ function arToolLinks(): Array<[string, string]> {
   return [
     [toolPaths.zakhrafa.ar!, "زخرفة الأسماء"],
     [toolPaths.generator.ar!, "كتابة الاسم بالخط العربي صورة"],
+    [toolPaths.ruqaa.ar!, "تحويل الكتابة إلى خط الرقعة"],
     [toolPaths.tattoo.ar!, "خطوط تاتو عربية"],
     [toolPaths.names.ar!, "أسماء بالإنجليزي"],
     [toolPaths.phrases.ar!, "عبارات بالإنجليزي"],
@@ -1171,7 +1175,7 @@ function resolveArPhrasesPage(slug?: string): SeoPage | null {
 
 function resolveIntlPage(pathname: string): SeoPage | null | undefined {
   const tool = findIntlTool(pathname);
-  if (tool && (tool.id === "keyboard" || tool.id === "tattoo" || ((tool.id === "generator" || tool.id === "zakhrafa") && tool.locale !== "ar"))) {
+  if (tool && (tool.id === "keyboard" || tool.id === "tattoo" || tool.id === "ruqaa" || ((tool.id === "generator" || tool.id === "zakhrafa") && tool.locale !== "ar"))) {
     return resolveIntlToolPage(tool.id, tool.locale);
   }
   const card = parseCardPath(pathname);
@@ -1441,7 +1445,7 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   }
 
   for (const collection of collections) {
-    const localizedFonts = fonts.filter((font) => collection.categories.includes(font.category));
+    const localizedFonts = collectionFonts(collection, fonts);
     if (localizedFonts.length === 0) continue;
     const lastmod = newestDate(localizedFonts.map((font) => font.addedAt))
       || sourceLastmod("client/src/lib/collectionsData.ts", "client/src/lib/localizedPagesContent.ts");

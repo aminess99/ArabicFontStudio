@@ -48,6 +48,11 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       description: "Browse downloadable Arabic font files. Download availability does not determine usage rights; review each file’s license.",
       useCases: ["Personal projects", "Print", "Web and apps"],
     },
+    "khotot-atfal": {
+      title: "Arabic fonts for kids",
+      description: "Playful, rounded Arabic fonts that children read easily, for kids' books, worksheets, stories, birthday cards and children's channels.",
+      useCases: ["Kids' books", "Worksheets", "Birthday cards"],
+    },
     "khotot-inshot": {
       title: "Arabic fonts for InShot",
       description: "Arabic fonts that work in InShot video captions. Download a font file, add it in InShot's text tool, then type your Arabic text.",
@@ -99,6 +104,11 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       title: "Fichiers de polices arabes à télécharger",
       description: "Parcourez des fichiers de polices arabes téléchargeables. La disponibilité au téléchargement ne définit pas les droits d’usage : vérifiez chaque licence.",
       useCases: ["Projets personnels", "Impression", "Web et applications"],
+    },
+    "khotot-atfal": {
+      title: "Polices arabes pour enfants",
+      description: "Des polices arabes ludiques et arrondies, faciles à lire pour les enfants : livres jeunesse, fiches d'exercices, contes et cartes d'anniversaire.",
+      useCases: ["Livres jeunesse", "Fiches d'exercices", "Cartes d'anniversaire"],
     },
     "khotot-inshot": {
       title: "Polices arabes pour InShot",

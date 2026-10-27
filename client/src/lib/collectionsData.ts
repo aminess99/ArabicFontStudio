@@ -12,6 +12,9 @@ export interface CollectionData {
   guide?: { heading: string; steps: string[]; note?: string };
   // A prominent link to a related tool.
   callout?: { text: string; href: string; label: string };
+  // Limits the collection to these font families (font names in lowercase
+  // letters and digits, matched by prefix) within its categories.
+  fontNames?: string[];
 }
 
 export const collections: CollectionData[] = [
@@ -192,7 +195,31 @@ export const collections: CollectionData[] = [
       { question: "هل الخطوط مجانية للاستخدام التجاري؟", answer: "التحميل مجاني، لكن الترخيص يختلف من خط إلى آخر. راجع صفحة الخط قبل نشر محتوى تجاري." },
     ],
   },
+  {
+    slug: "khotot-atfal",
+    titleArabic: "خطوط أطفال — خطوط عربية للأطفال",
+    title: "خطوط أطفال — تحميل خطوط عربية للأطفال مجاناً",
+    description: "خطوط عربية للأطفال مجاناً: خطوط مرحة ودائرية وسهلة القراءة لكتب الأطفال وأوراق العمل والقصص وبطاقات أعياد الميلاد وقنوات الأطفال.",
+    longDescription: "اخترنا لك خطوطاً عربية مرحة بحروف دائرية وسميكة يسهل على الأطفال قراءتها، مثل بلابلو ومرحى وطيور الجنة وسكر وليمونادة. تناسب كتب الأطفال والقصص وأوراق العمل المدرسية وبطاقات أعياد الميلاد وصور قنوات الأطفال على يوتيوب. اكتب نصك في الأعلى لتعاينه بكل خط قبل التحميل.",
+    categories: ["نسخ", "تصميم", "فوتوشوب", "خطوط الحرة", "كوفي"],
+    fontNames: ["blabeloo", "marhey", "marshmallow", "lemonada", "sukar", "toyoraljanah", "lazeez", "caramel", "baloobhaijaan", "yrsponge", "vipcartoon", "tido", "dgforsha", "bkoodak", "spkoodak", "kharabeesh", "fanni", "rosemary"],
+    keywords: ["خطوط أطفال", "خطوط للأطفال", "خط أطفال", "خطوط عربية للأطفال", "خطوط كرتون"],
+    useCases: ["كتب الأطفال", "أوراق العمل", "قصص مصورة", "أعياد الميلاد", "قنوات الأطفال"],
+    faqs: [
+      { question: "ما أفضل خط عربي للأطفال؟", answer: "الخطوط الدائرية ذات الحروف الواضحة مثل بلابلو ومرحى وليمونادة تناسب الأطفال، لأنها مرحة وسهلة القراءة. للنصوص التعليمية الطويلة اختر خطاً بسيطاً واضحاً بحجم كبير." },
+      { question: "هل هذه الخطوط مجانية؟", answer: "التحميل مجاني، لكن الترخيص يختلف من خط لآخر. افتح صفحة الخط وراجع ترخيصه قبل استخدامه في كتاب أو منتج للبيع." },
+      { question: "ما الخط المناسب لأوراق العمل المدرسية؟", answer: "اختر خطاً واضح الحروف وكبّر حجمه إلى 18 نقطة أو أكثر، وتجنب الخطوط المزخرفة في النصوص التي يقرؤها الطفل بنفسه." },
+    ],
+  },
 ];
+
+const familyKey = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+// The fonts that belong to a collection.
+export function collectionFonts<T extends { category: string; name: string }>(collection: CollectionData, fonts: T[]): T[] {
+  return fonts.filter((font) => collection.categories.includes(font.category)
+    && (!collection.fontNames || collection.fontNames.some((prefix) => familyKey(font.name).startsWith(prefix))));
+}
 
 export function getCollectionBySlug(slug: string): CollectionData | undefined {
   return collections.find(c => c.slug === slug);

@@ -79,6 +79,9 @@ function Router() {
         <Route path="/keyboard" component={ArabicKeyboard} />
         <Route path="/en/arabic-keyboard" component={ArabicKeyboard} />
         <Route path="/fr/clavier-arabe" component={ArabicKeyboard} />
+        <Route path="/tahweel-khat-ruqaa" component={ArabicTextToImage} />
+        <Route path="/en/ruqaa-font-generator" component={ArabicTextToImage} />
+        <Route path="/fr/generateur-ecriture-ruqaa" component={ArabicTextToImage} />
         <Route path="/en/arabic-font-generator" component={ArabicTextToImage} />
         <Route path="/fr/generateur-police-arabe" component={ArabicTextToImage} />
         <Route path="/en/arabic-fancy-text" component={Zakhrafa} />

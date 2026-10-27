@@ -1,10 +1,11 @@
 import type { Express } from "express";
 import { blogPostPath } from "../client/src/lib/blogSlugs";
+import { fontTitleName } from "../client/src/lib/fontArabicNames";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { getGeneratedPosts } from "./blogGenerator";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
-import { collections } from "../client/src/lib/collectionsData";
+import { collections, collectionFonts } from "../client/src/lib/collectionsData";
 import { getBlogInternalLinks } from "../client/src/lib/blogInternalLinks";
 import { registerThumbnailRoutes } from "./thumbnailGenerator";
 import { registerSeoHtmlRoute } from "./seoHtml";
@@ -249,6 +250,9 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/tahnia(?:\/[^/]+)?$/,
   /^\/keyboard$/,
   /^\/khotot-tattoo$/,
+  /^\/tahweel-khat-ruqaa$/,
+  /^\/en\/ruqaa-font-generator$/,
+  /^\/fr\/generateur-ecriture-ruqaa$/,
   /^\/(?:asmaa|ibarat)(?:\/[^/]+)?$/,
   /^\/en\/(?:arabic-keyboard|arabic-font-generator|arabic-fancy-text|arabic-tattoo-fonts)$/,
   /^\/fr\/(?:clavier-arabe|generateur-police-arabe|texte-arabe-stylise|police-arabe-tatouage)$/,
@@ -301,7 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     if (!isBot(req.headers['user-agent'] || '')) return next();
     const canonical = `https://xfontat.com/font/${req.params.slug}`;
-    const title = `تحميل خط ${font.nameArabic} مجاناً | xfontat`;
+    const title = `تحميل خط ${fontTitleName(font)} مجاناً | xfontat`;
     const formatInfo = font.fileFormat ? ` الصيغة المعروضة: ${font.fileFormat}.` : " راجع تفاصيل الصفحة لمعرفة الصيغة المتاحة.";
     const desc = `تصفّح خط ${font.nameArabic} (${font.name}) ضمن تصنيف ${font.category}.${formatInfo} راجع الترخيص قبل الاستخدام.`;
     const body = `
@@ -656,7 +660,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `<h3>${f.question}</h3><p>${f.answer}</p>`
     ).join('\n');
     const useCaseList = collection.useCases.map(u => `<li>${u}</li>`).join('\n');
-    const fonts = await storage.getFontsByCategories(collection.categories);
+    const fonts = collectionFonts(collection, await storage.getFontsByCategories(collection.categories));
     const fontLinks = fonts.map(font =>
       `<li><a href="/font/${font.slug}">${font.nameArabic}</a></li>`
     ).join('\n');
@@ -1374,7 +1378,7 @@ ${articlesSection}
         ));
       }
       const categoryNames = (isFrench ? frenchCategories : englishCategories);
-      const fonts = await storage.getFontsByCategories(collection.categories);
+      const fonts = collectionFonts(collection, await storage.getFontsByCategories(collection.categories));
       const fontGroups = groupFontsByFamily(fonts);
       const links = fontGroups.slice(0, 80).map((group) =>
         `<li><a href="/${locale}/font/${group.primary.slug}">${escapeHtml(group.family)} — <span lang="ar" dir="rtl">${escapeHtml(group.primary.nameArabic)}</span></a> <span>${group.variants.length} ${isFrench ? frenchHome.variantCountLabel(group.variants.length) : englishHome.variantCountLabel(group.variants.length)}</span></li>`

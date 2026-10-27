@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm";
 import { type Font, type InsertFont, fontSlugAliases, fontsTable } from "@shared/schema";
 import { generateSlug } from "../client/src/lib/slugify";
+import { familyKeysForArabicQuery, withArabicName } from "../client/src/lib/fontArabicNames";
 import { db } from "./db";
 
 export interface IStorage {
@@ -27,17 +28,23 @@ export interface IStorage {
   deleteFont(id: string): Promise<boolean>;
 }
 
+const named = (fonts: Font[]) => fonts.map(withArabicName);
+
 function buildWhere(category?: string, q?: string) {
   const conditions = [];
   if (category) conditions.push(eq(fontsTable.category, category));
   if (q?.trim()) {
     const escapedQuery = q.trim().replace(/[\\%_]/g, "\\$&");
     const pattern = `%${escapedQuery}%`;
+    // Arabic names of Latin-only families live in fontArabicNames.ts, so an
+    // Arabic query also matches the Latin names of those families.
+    const families = familyKeysForArabicQuery(q).map((key) => sql`regexp_replace(lower(${fontsTable.name}), '[^a-z0-9]', '', 'g') like ${`${key}%`}`);
     conditions.push(or(
       ilike(fontsTable.name, pattern),
       ilike(fontsTable.nameArabic, pattern),
       ilike(fontsTable.designer, pattern),
       ilike(fontsTable.description, pattern),
+      ...families,
     )!);
   }
   return conditions.length ? and(...conditions) : undefined;
@@ -61,26 +68,26 @@ async function uniqueSlug(baseSlug: string, category: string, fileName: string):
 
 class DatabaseStorage implements IStorage {
   async getAllFonts(): Promise<Font[]> {
-    return db.select().from(fontsTable).orderBy(desc(fontsTable.addedAt), fontsTable.name);
+    return named(await db.select().from(fontsTable).orderBy(desc(fontsTable.addedAt), fontsTable.name));
   }
 
   async getFontById(id: string): Promise<Font | undefined> {
     const [font] = await db.select().from(fontsTable).where(eq(fontsTable.id, id)).limit(1);
-    return font;
+    return font && withArabicName(font);
   }
 
   async getFontsByCategory(category: string): Promise<Font[]> {
-    return db.select().from(fontsTable).where(eq(fontsTable.category, category)).orderBy(fontsTable.name);
+    return named(await db.select().from(fontsTable).where(eq(fontsTable.category, category)).orderBy(fontsTable.name));
   }
 
   async getFontsByCategories(categories: string[]): Promise<Font[]> {
     if (categories.length === 0) return [];
-    return db.select().from(fontsTable).where(inArray(fontsTable.category, categories)).orderBy(fontsTable.name);
+    return named(await db.select().from(fontsTable).where(inArray(fontsTable.category, categories)).orderBy(fontsTable.name));
   }
 
   async getFontBySlug(slug: string): Promise<Font | undefined> {
     const [canonical] = await db.select().from(fontsTable).where(eq(fontsTable.slug, slug)).limit(1);
-    if (canonical) return canonical;
+    if (canonical) return withArabicName(canonical);
 
     const [aliased] = await db
       .select({ font: fontsTable })
@@ -88,7 +95,7 @@ class DatabaseStorage implements IStorage {
       .innerJoin(fontsTable, eq(fontSlugAliases.fontId, fontsTable.id))
       .where(eq(fontSlugAliases.oldSlug, slug))
       .limit(1);
-    return aliased?.font;
+    return aliased?.font && withArabicName(aliased.font);
   }
 
   async addSlugAlias(oldSlug: string, fontId: string): Promise<void> {
@@ -113,12 +120,12 @@ class DatabaseStorage implements IStorage {
 
   async getFontsPaginated(page: number, limit: number, category?: string, q?: string): Promise<Font[]> {
     const start = Math.max(0, page - 1) * limit;
-    return db.select()
+    return named(await db.select()
       .from(fontsTable)
       .where(buildWhere(category, q))
       .orderBy(desc(fontsTable.addedAt), fontsTable.name)
       .limit(limit)
-      .offset(start);
+      .offset(start));
   }
 
   async createFont(insertFont: InsertFont): Promise<Font> {

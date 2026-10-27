@@ -19,6 +19,11 @@ const SLUGS: Record<string, { en: string; fr: string }> = {
   "khotot-arabiya-lil-alamat-al-tijariya": { en: "arabic-fonts-for-branding", fr: "polices-arabes-identite-visuelle" },
   "khotot-arabiya-lil-wosham": { en: "arabic-lettering-for-tattoos", fr: "lettrage-arabe-tatouage" },
   "khotot-arabiya-lil-mawaqi-wal-tatbeeqat": { en: "arabic-fonts-for-websites-and-apps", fr: "polices-arabes-sites-et-applications" },
+  "hal-mushkilat-alhoroof-almuqatta-photoshop": { en: "arabic-letters-broken-in-photoshop", fr: "lettres-arabes-separees-photoshop" },
+  "kayfa-tuthabbit-khat-ala-windows-wal-mac": { en: "install-arabic-font-windows-mac", fr: "installer-police-arabe-windows-mac" },
+  "idafat-khat-arabi-ila-canva-wa-word": { en: "add-arabic-font-to-canva-word", fr: "ajouter-police-arabe-canva-word" },
+  "anwa-alkhotot-alarabiya": { en: "types-of-arabic-calligraphy", fr: "types-de-calligraphie-arabe" },
+  "khotot-alarqam-alarabiya": { en: "arabic-numerals-fonts", fr: "chiffres-arabes-polices" },
 };
 
 const ORIGINAL: Record<"en" | "fr", Map<string, string>> = {
