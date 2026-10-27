@@ -180,7 +180,7 @@ function NamesHub({ locale }: { locale: Locale }) {
   }), [copy, locale, ui.home]);
   return (
     <IntlShell locale={locale} languages={toolPaths.names}>
-      <SEOHead title={copy.title} description={copy.description} path={copy.path} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(toolPaths.names)} />
+      <SEOHead title={copy.title} description={copy.description} path={copy.path} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(toolPaths.names, "en")} />
       <div className="mx-auto max-w-5xl">
         <Breadcrumbs items={[[ui.home, `/${locale}`], [copy.heading]]} />
         <h1 className="mb-3 text-3xl font-bold md:text-4xl">{copy.heading}</h1>
@@ -242,10 +242,10 @@ function NameDetail({ locale, slug }: { locale: Locale; slug: string }) {
     ],
   }) : undefined, [content, name, locale, ui.home]);
   if (!name || !content) return <NotFound />;
-  const languages = { en: namePath("en", name.slug), fr: namePath("fr", name.slug) };
+  const languages = { ar: namePath("ar", name.slug), en: namePath("en", name.slug), fr: namePath("fr", name.slug) };
   return (
     <IntlShell locale={locale} languages={languages}>
-      <SEOHead title={content.title} description={content.description} path={namePath(locale, name.slug)} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(languages)} />
+      <SEOHead title={content.title} description={content.description} path={namePath(locale, name.slug)} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(languages, "en")} />
       <div className="mx-auto max-w-5xl">
         <Breadcrumbs items={[[ui.home, `/${locale}`], [namesHubCopy[locale].heading, NAME_PATHS[locale]], [name.latin]]} />
         <DetailView locale={locale} content={content} arabic={name.arabic} word={name.latin} showLetters fileName={`${name.slug}-in-arabic`}>
@@ -281,7 +281,7 @@ function PhrasesHub({ locale }: { locale: Locale }) {
   }), [copy, locale, ui.home]);
   return (
     <IntlShell locale={locale} languages={toolPaths.phrases}>
-      <SEOHead title={copy.title} description={copy.description} path={copy.path} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(toolPaths.phrases)} />
+      <SEOHead title={copy.title} description={copy.description} path={copy.path} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(toolPaths.phrases, "en")} />
       <div className="mx-auto max-w-5xl">
         <Breadcrumbs items={[[ui.home, `/${locale}`], [copy.heading]]} />
         <h1 className="mb-3 text-3xl font-bold md:text-4xl">{copy.heading}</h1>
@@ -327,12 +327,12 @@ function PhraseDetail({ locale, slug }: { locale: Locale; slug: string }) {
     ],
   }) : undefined, [content, phrase, locale, ui.home]);
   if (!phrase || !content) return <NotFound />;
-  const languages = { en: phrasePath("en", phrase.slug), fr: phrasePath("fr", phrase.slug) };
+  const languages = { ar: phrasePath("ar", phrase.slug), en: phrasePath("en", phrase.slug), fr: phrasePath("fr", phrase.slug) };
   const label = phraseLabel(phrase, locale);
   const others = arabicPhrases.filter((item) => item.slug !== phrase.slug).slice(0, 12);
   return (
     <IntlShell locale={locale} languages={languages}>
-      <SEOHead title={content.title} description={content.description} path={phrasePath(locale, phrase.slug)} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(languages)} />
+      <SEOHead title={content.title} description={content.description} path={phrasePath(locale, phrase.slug)} schema={schema} lang={locale} direction="ltr" exactAlternates={toolAlternates(languages, "en")} />
       <div className="mx-auto max-w-5xl">
         <Breadcrumbs items={[[ui.home, `/${locale}`], [phrasesHubCopy[locale].heading, PHRASE_PATHS[locale]], [label]]} />
         <DetailView locale={locale} content={content} arabic={phrase.arabic} word={label} showLetters={!phrase.arabic.includes(" ")} fileName={`${phrase.slug}-in-arabic`}>

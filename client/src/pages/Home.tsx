@@ -47,6 +47,8 @@ const TOOL_CARDS: ToolTile[] = [
   { href: "/tahnia", icon: "cards", title: "بطاقات تهنئة باسمك", text: "رمضان والعيد والزواج والمولود بخطوط عربية جميلة." },
   { href: "/zakhrafa", icon: "zakhrafa", title: "زخرفة الأسماء", text: "أشكال مزخرفة جاهزة للنسخ في الألعاب ووسائل التواصل." },
   { href: "/keyboard", icon: "keyboard", title: "كيبورد عربي اونلاين", text: "اكتب بالعربي من أي جهاز مع التشكيل، ثم انسخ النص." },
+  { href: "/asmaa", icon: "names", title: "أسماء بالإنجليزي", text: "كتابة الأسماء بالإنجليزي مع معناها وزخرفتها." },
+  { href: "/khotot-tattoo", icon: "tattoo", title: "خطوط تاتو عربية", text: "عاين كتابة الوشم بخطوط الثلث والديواني والكوفي." },
 ];
 
 export default function Home() {

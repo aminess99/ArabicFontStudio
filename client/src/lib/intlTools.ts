@@ -12,15 +12,16 @@ export const toolPaths: Record<IntlToolId, Partial<Record<IntlLocale, string>>> 
   keyboard: { ar: "/keyboard", en: "/en/arabic-keyboard", fr: "/fr/clavier-arabe" },
   generator: { ar: "/arabic-text-to-image", en: "/en/arabic-font-generator", fr: "/fr/generateur-police-arabe" },
   zakhrafa: { ar: "/zakhrafa", en: "/en/arabic-fancy-text", fr: "/fr/texte-arabe-stylise" },
-  tattoo: { en: "/en/arabic-tattoo-fonts", fr: "/fr/police-arabe-tatouage" },
-  names: { en: "/en/names-in-arabic", fr: "/fr/prenoms-en-arabe" },
-  phrases: { en: "/en/arabic-phrases", fr: "/fr/expressions-arabes" },
+  tattoo: { ar: "/khotot-tattoo", en: "/en/arabic-tattoo-fonts", fr: "/fr/police-arabe-tatouage" },
+  names: { ar: "/asmaa", en: "/en/names-in-arabic", fr: "/fr/prenoms-en-arabe" },
+  phrases: { ar: "/ibarat", en: "/en/arabic-phrases", fr: "/fr/expressions-arabes" },
 };
 
-// The default language for x-default: Arabic when the page exists in Arabic.
-export function toolAlternates(paths: Partial<Record<IntlLocale, string>>) {
+// The default language for x-default: Arabic when the page exists in Arabic,
+// except for pages written first for English speakers (names, phrases, tattoo).
+export function toolAlternates(paths: Partial<Record<IntlLocale, string>>, xDefault: IntlLocale = "ar") {
   const entries = (Object.entries(paths) as Array<[IntlLocale, string]>).map(([lang, path]) => ({ lang, href: `https://xfontat.com${path}` }));
-  const fallback = paths.ar || paths.en!;
+  const fallback = paths[xDefault] || paths.ar || paths.en!;
   return [...entries, { lang: "x-default", href: `https://xfontat.com${fallback}` }];
 }
 
@@ -57,6 +58,11 @@ export function localeSwitchPath(locale: "en" | "fr", arabicPath: string): strin
   const path = arabicPath.replace(/\/+$/, "") || "/";
   const tool = findIntlTool(path);
   if (tool) return toolPaths[tool.id][locale] ?? `/${locale}`;
+  // Name and phrase pages share their slug across languages.
+  for (const id of ["names", "phrases"] as const) {
+    const base = toolPaths[id].ar!;
+    if (path.startsWith(`${base}/`)) return `${toolPaths[id][locale]}${path.slice(base.length)}`;
+  }
   const card = parseCardPath(path);
   if (card?.locale === "ar") return card.slug ? cardOccasionPath(locale, card.slug) : CARD_PATHS[locale];
   const blogPost = path.match(/^\/blog\/([^/]+)$/);
@@ -214,7 +220,27 @@ export const zakhrafaCopy: Record<"en" | "fr", Copy> = {
   },
 };
 
-export const tattooCopy: Record<"en" | "fr", Copy> = {
+export const tattooCopy: Record<IntlLocale, Copy> = {
+  ar: {
+    locale: "ar",
+    path: toolPaths.tattoo.ar!,
+    title: "خطوط تاتو عربي — عاين وشمك بالخط العربي مجاناً | xfontat",
+    description: "عاين كتابة التاتو بخطوط الثلث والديواني والكوفي والنستعليق، وتجنّب أخطاء الوشم العربي الشائعة، وحمّل التصميم صورة PNG جاهزة للرسام.",
+    heading: "خطوط تاتو عربية",
+    intro: "اكتب الكلمة أو الاسم أو العبارة لتراها بعشرة خطوط عربية مختارة للوشم. كل الخطوط هنا منشورة بترخيص SIL Open Font License، فيمكنك أخذ التصميم إلى رسام الوشم. اقرأ قسم الأخطاء الشائعة قبل الحجز.",
+    sections: [
+      { heading: "أشهر أخطاء التاتو العربي", body: "حروف مكتوبة منفصلة بدل أن تكون متصلة، ونص مقلوب من اليسار إلى اليمين لأن برنامج التصميم لا يدعم العربية، وترجمة آلية تختار كلمة خاطئة، واستنسل مطبوع بالمقلوب كالمرآة. راجع الاستنسل النهائي، لا الرسم فقط، قبل البدء." },
+      { heading: "اختيار نوع الخط", body: "الثلث خط مزخرف يناسب الوشوم الكبيرة على الساعد أو الظهر. والديواني منحنٍ انسيابي يناسب الأضلاع والترقوة. والكوفي هندسي يبقى واضحاً في الأحجام الصغيرة كالإصبع والمعصم. والنستعليق مائل رقيق للكلمات القصيرة والشعر." },
+      { heading: "الحجم ووضوح الكتابة", body: "تفاصيل الخط العربي الدقيقة تتلاشى مع انتشار الحبر بمرور الوقت. اجعل ارتفاع الثلث والديواني 3 سم على الأقل، واختر خطاً بسيطاً للوشوم الصغيرة. الكلمات القصيرة من ثلاثة إلى ستة حروف تعطي أوضح نتيجة." },
+      { heading: "ملاحظة عن العبارات الدينية", body: "يرى كثير من المسلمين أن وشم لفظ الجلالة أو آيات القرآن على الجسد لا يليق. إذا أردت معنى روحياً فكلمات مثل صبر وأمل ونور بدائل شائعة." },
+    ],
+    faqs: [
+      { question: "ما أفضل خط للتاتو العربي؟", answer: "للتصاميم الكبيرة الثلث أو الديواني، وللوشوم الصغيرة كوفي أو نسخ بسيط. جرّب نصك بعدة خطوط من الأعلى قبل أن تقرر." },
+      { question: "كيف أتأكد أن كتابة التاتو صحيحة؟", answer: "تأكد أن الحروف متصلة وأن النص يُقرأ من اليمين إلى اليسار، وراجع الاستنسل النهائي قبل أن يبدأ الرسام." },
+      { question: "هل الخطوط مجانية للتاتو؟", answer: "نعم، الخطوط في هذه الصفحة منشورة بترخيص SIL Open Font License الذي يسمح بالاستخدام الشخصي والتجاري." },
+      { question: "كيف أكتب اسماً أجنبياً بالعربي للتاتو؟", answer: "ابحث عن الاسم في صفحة الأسماء بالإنجليزي لترى كتابته العربية المعتادة، ثم عاينه هنا بخطوط التاتو." },
+    ],
+  },
   en: {
     locale: "en",
     path: toolPaths.tattoo.en!,
@@ -257,7 +283,24 @@ export const tattooCopy: Record<"en" | "fr", Copy> = {
   },
 };
 
-export const namesHubCopy: Record<"en" | "fr", Copy> = {
+export const namesHubCopy: Record<IntlLocale, Copy> = {
+  ar: {
+    locale: "ar",
+    path: toolPaths.names.ar!,
+    title: "أسماء بالإنجليزي — كتابة الأسماء بالإنجليزي ومعانيها | xfontat",
+    description: "كيف يُكتب اسمك بالإنجليزي: أكثر من 200 اسم عربي وأجنبي بحروف إنجليزية مع معنى كل اسم وأصله، وعرضه بالخط العربي ومزخرفاً للنسخ.",
+    heading: "أسماء بالإنجليزي",
+    intro: "ابحث عن الاسم لترى كتابته بالحروف الإنجليزية والكتابات الأخرى الشائعة، ومعناه وأصله، ثم شاهده بخطوط عربية مثل الثلث والديواني وحمّله صورة، أو انسخه مزخرفاً.",
+    sections: [
+      { heading: "لماذا يُكتب الاسم الواحد بأكثر من طريقة؟", body: "تُكتب الأسماء العربية بالإنجليزية حسب النطق، وبعض الأصوات العربية مثل الحاء والعين والقاف لا مقابل لها في الإنجليزية، لذلك تجد محمد مكتوباً Muhammad وMohamed وMohammed. اختر الكتابة المعتمدة في جواز سفرك أو الأكثر شيوعاً في بلدك." },
+      { heading: "الأسماء الأجنبية بالعربي", body: "تجد هنا أيضاً أسماء أجنبية شائعة مثل Emma وDavid مع كتابتها العربية المعتادة ومعناها، وإن كان للاسم مقابل عربي تقليدي، مثل Joseph ويوسف، نذكره." },
+    ],
+    faqs: [
+      { question: "كيف أكتب اسمي بالإنجليزي؟", answer: "ابحث عن اسمك في القائمة لترى الكتابة الأشهر والكتابات الأخرى. إن لم تجده فاكتبه حسب النطق، أو استخدم الكتابة المعتمدة في جواز سفرك." },
+      { question: "هل للاسم كتابة إنجليزية صحيحة واحدة؟", answer: "ليس دائماً؛ فالأسماء العربية تُكتب حسب النطق، لذلك تتعدد الكتابات. نعرض الأكثر استخداماً." },
+      { question: "كيف أزخرف اسمي؟", answer: "افتح صفحة الاسم لتجد أشكالاً مزخرفة جاهزة للنسخ، أو استخدم أداة زخرفة الأسماء." },
+    ],
+  },
   en: {
     locale: "en",
     path: toolPaths.names.en!,
@@ -294,7 +337,22 @@ export const namesHubCopy: Record<"en" | "fr", Copy> = {
   },
 };
 
-export const phrasesHubCopy: Record<"en" | "fr", Copy> = {
+export const phrasesHubCopy: Record<IntlLocale, Copy> = {
+  ar: {
+    locale: "ar",
+    path: toolPaths.phrases.ar!,
+    title: "عبارات بالإنجليزي — الحمد لله وإن شاء الله وغيرها | xfontat",
+    description: "الحمد لله وإن شاء الله وما شاء الله والسلام عليكم وغيرها: كتابتها بالحروف الإنجليزية وترجمتها ومعناها، وعرضها بالخط العربي ومزخرفة.",
+    heading: "عبارات وكلمات عربية بالإنجليزي",
+    intro: "أشهر العبارات والكلمات العربية مع كتابتها بالحروف الإنجليزية وترجمتها إلى الإنجليزية ومتى تُقال، وكل عبارة معروضة بعدة خطوط عربية للتحميل.",
+    sections: [
+      { heading: "الكتابة بالحروف الإنجليزية والترجمة", body: "الكتابة بالحروف الإنجليزية (مثل Alhamdulillah) تنقل نطق العبارة كما هو، أما الترجمة (Praise be to God) فتنقل معناها. في الرسائل مع غير العرب تُستخدم الكتابة غالباً، وفي الشرح تُستخدم الترجمة." },
+    ],
+    faqs: [
+      { question: "هل يمكنني تحميل العبارة بالخط العربي؟", answer: "نعم، في صفحة كل عبارة تجدها بعدة خطوط عربية، ويمكنك تحميل كل خط صورة PNG." },
+      { question: "هل تصلح هذه العبارات للوشم؟", answer: "الكلمات العامة مثل أمل وصبر ونور شائعة في الوشوم، أما لفظ الجلالة والعبارات الدينية فيرى كثير من المسلمين أن وشمها لا يليق." },
+    ],
+  },
   en: {
     locale: "en",
     path: toolPaths.phrases.en!,

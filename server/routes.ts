@@ -248,6 +248,8 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/arabic-text-to-image$/,
   /^\/tahnia(?:\/[^/]+)?$/,
   /^\/keyboard$/,
+  /^\/khotot-tattoo$/,
+  /^\/(?:asmaa|ibarat)(?:\/[^/]+)?$/,
   /^\/en\/(?:arabic-keyboard|arabic-font-generator|arabic-fancy-text|arabic-tattoo-fonts)$/,
   /^\/fr\/(?:clavier-arabe|generateur-police-arabe|texte-arabe-stylise|police-arabe-tatouage)$/,
   /^\/en\/greeting-cards(?:\/[^/]+)?$/,

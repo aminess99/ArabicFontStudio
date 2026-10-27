@@ -37,6 +37,9 @@ import { spellArabic } from "../client/src/lib/arabicLetters";
 import { arabicFontDescription, getFontProfile, profileDescription } from "../client/src/lib/fontProfiles";
 import { blogPostPath, blogSeo, localizedBlogSlug, originalBlogSlug } from "../client/src/lib/blogSlugs";
 import { nameContent, phraseContent, phraseLabel, type DetailContent } from "../client/src/lib/intlContent";
+import { nameContentAr, nameMeaningAr, phraseContentAr, phraseDisplayLatin, phraseTransliteration } from "../client/src/lib/arContent";
+import { phraseTextAr } from "../client/src/lib/arabicPhrasesAr";
+import { decorate } from "../client/src/lib/zakhrafa";
 import { OCCASIONS, getOccasion } from "../client/src/lib/greetingCards";
 import { CARD_PATHS, cardOccasionPath, cardsHubCopy, localizeOccasion, parseCardPath, type CardLocale } from "../client/src/lib/greetingCardsIntl";
 import * as home from "../client/src/lib/homeContent";
@@ -909,10 +912,10 @@ function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): Se
 }
 
 // Tools and guides with their own path in each language (see intlTools.ts).
-function intlAlternates(paths: Partial<Record<IntlLocale, string>>): SeoPage["alternates"] {
+function intlAlternates(paths: Partial<Record<IntlLocale, string>>, xDefault: IntlLocale = "ar"): SeoPage["alternates"] {
   const alternates: SeoPage["alternates"] = {};
   for (const [lang, toolPath] of Object.entries(paths) as Array<[IntlLocale, string]>) alternates[lang] = `${SITE_ORIGIN}${toolPath}`;
-  alternates["x-default"] = `${SITE_ORIGIN}${paths.ar || paths.en}`;
+  alternates["x-default"] = `${SITE_ORIGIN}${paths[xDefault] || paths.ar || paths.en}`;
   return alternates;
 }
 
@@ -940,16 +943,19 @@ function homeCrumb(locale: IntlLocale): [string, string] {
 
 function resolveIntlToolPage(id: "keyboard" | "generator" | "zakhrafa" | "tattoo", locale: IntlLocale): SeoPage | null {
   const copy = id === "keyboard" ? keyboardCopy[locale]
+    : id === "tattoo" ? tattooCopy[locale]
     : locale === "ar" ? null
-    : id === "generator" ? generatorCopy[locale] : id === "zakhrafa" ? zakhrafaCopy[locale] : tattooCopy[locale];
+    : id === "generator" ? generatorCopy[locale] : zakhrafaCopy[locale];
   if (!copy) return null;
   const faqHeading = locale === "ar" ? "أسئلة شائعة" : locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
   const related = locale === "ar"
-    ? linkListHtml([[textToImagePage.path, textToImagePage.heading], [zakhrafaPage.path, zakhrafaPage.heading], ["/", "مكتبة الخطوط العربية"]])
+    ? linkListHtml(arToolLinks().filter(([href]) => href !== copy.path))
     : linkListHtml(intlToolLinks(locale).filter(([href]) => href !== copy.path));
-  const extra = id === "tattoo" && locale !== "ar"
-    ? `<section><h2>${locale === "fr" ? "Mots arabes populaires en tatouage" : "Popular Arabic tattoo words"}</h2>${linkListHtml(arabicPhrases.filter((phrase) => phrase.kind === "word").map((phrase) => [phrasePath(locale, phrase.slug), `${phraseLabel(phrase, locale)} — ${phrase.arabic}`]))}</section>`
-    : "";
+  const tattooWords = arabicPhrases.filter((phrase) => phrase.kind === "word");
+  const extra = id !== "tattoo" ? ""
+    : locale === "ar"
+      ? `<section><h2>كلمات عربية شائعة في التاتو</h2>${linkListHtml(tattooWords.map((phrase) => [phrasePath("ar", phrase.slug), `${phrase.arabic} — ${phraseTextAr[phrase.slug]?.english ?? phrase.latin}`]))}</section>`
+      : `<section><h2>${locale === "fr" ? "Mots arabes populaires en tatouage" : "Popular Arabic tattoo words"}</h2>${linkListHtml(tattooWords.map((phrase) => [phrasePath(locale, phrase.slug), `${phraseLabel(phrase, locale)} — ${phrase.arabic}`]))}</section>`;
   return {
     locale,
     path: copy.path,
@@ -957,7 +963,7 @@ function resolveIntlToolPage(id: "keyboard" | "generator" | "zakhrafa" | "tattoo
     description: copy.description,
     heading: copy.heading,
     bodyHtml: `<p>${escapeHtml(copy.intro)}</p>${sectionsHtml(copy.sections)}${extra}${faqHtml(faqHeading, copy.faqs)}${related}`,
-    alternates: intlAlternates(toolPaths[id]),
+    alternates: intlAlternates(toolPaths[id], id === "tattoo" ? "en" : "ar"),
     jsonLd: [
       breadcrumbNode([homeCrumb(locale), [copy.heading, copy.path]]),
       webAppNode(copy.heading, copy.description, `${SITE_ORIGIN}${copy.path}`, locale),
@@ -991,7 +997,7 @@ function resolveNamesPage(locale: "en" | "fr", slug?: string): SeoPage | null {
       description: hub.description,
       heading: hub.heading,
       bodyHtml: `<p>${escapeHtml(hub.intro)}</p><section><h2>${locale === "fr" ? "Prénoms féminins" : "Girls' names"}</h2>${list("f")}</section><section><h2>${locale === "fr" ? "Prénoms masculins" : "Boys' names"}</h2>${list("m")}</section>${sectionsHtml(hub.sections)}${faqHtml(faqHeading, hub.faqs)}${linkListHtml(intlToolLinks(locale))}`,
-      alternates: intlAlternates(toolPaths.names),
+      alternates: intlAlternates(toolPaths.names, "en"),
       jsonLd: [
         breadcrumbNode([homeCrumb(locale), [hub.heading, hub.path]]),
         { "@type": "CollectionPage", name: hub.heading, description: hub.description, url: `${SITE_ORIGIN}${hub.path}`, inLanguage: locale },
@@ -1011,7 +1017,7 @@ function resolveNamesPage(locale: "en" | "fr", slug?: string): SeoPage | null {
     description: content.description,
     heading: content.heading,
     bodyHtml: `${detailHtml(locale, content, name.arabic, name.latin, true)}${related}${linkListHtml(intlToolLinks(locale))}`,
-    alternates: intlAlternates({ en: namePath("en", name.slug), fr: namePath("fr", name.slug) }),
+    alternates: intlAlternates({ ar: namePath("ar", name.slug), en: namePath("en", name.slug), fr: namePath("fr", name.slug) }, "en"),
     jsonLd: [
       breadcrumbNode([homeCrumb(locale), [hub.heading, NAME_PATHS[locale]], [content.heading, pagePath]]),
       { "@type": "WebPage", name: content.heading, description: content.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
@@ -1031,7 +1037,7 @@ function resolvePhrasesPage(locale: "en" | "fr", slug?: string): SeoPage | null 
       description: hub.description,
       heading: hub.heading,
       bodyHtml: `<p>${escapeHtml(hub.intro)}</p>${linkListHtml(arabicPhrases.map((phrase) => [phrasePath(locale, phrase.slug), `${phraseLabel(phrase, locale)} — ${phrase.arabic}: ${phrase[locale].meaning}`]))}${sectionsHtml(hub.sections)}${faqHtml(faqHeading, hub.faqs)}${linkListHtml(intlToolLinks(locale))}`,
-      alternates: intlAlternates(toolPaths.phrases),
+      alternates: intlAlternates(toolPaths.phrases, "en"),
       jsonLd: [
         breadcrumbNode([homeCrumb(locale), [hub.heading, hub.path]]),
         { "@type": "CollectionPage", name: hub.heading, description: hub.description, url: `${SITE_ORIGIN}${hub.path}`, inLanguage: locale },
@@ -1052,10 +1058,112 @@ function resolvePhrasesPage(locale: "en" | "fr", slug?: string): SeoPage | null 
     description: content.description,
     heading: content.heading,
     bodyHtml: `${detailHtml(locale, content, phrase.arabic, label, !phrase.arabic.includes(" "))}${others}${linkListHtml(intlToolLinks(locale))}`,
-    alternates: intlAlternates({ en: phrasePath("en", phrase.slug), fr: phrasePath("fr", phrase.slug) }),
+    alternates: intlAlternates({ ar: phrasePath("ar", phrase.slug), en: phrasePath("en", phrase.slug), fr: phrasePath("fr", phrase.slug) }, "en"),
     jsonLd: [
       breadcrumbNode([homeCrumb(locale), [hub.heading, PHRASE_PATHS[locale]], [content.heading, pagePath]]),
       { "@type": "WebPage", name: content.heading, description: content.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
+      faqNode(content.faqs),
+    ],
+  };
+}
+
+function arToolLinks(): Array<[string, string]> {
+  return [
+    [toolPaths.zakhrafa.ar!, "زخرفة الأسماء"],
+    [toolPaths.generator.ar!, "كتابة الاسم بالخط العربي صورة"],
+    [toolPaths.tattoo.ar!, "خطوط تاتو عربية"],
+    [toolPaths.names.ar!, "أسماء بالإنجليزي"],
+    [toolPaths.phrases.ar!, "عبارات بالإنجليزي"],
+    [toolPaths.keyboard.ar!, "كيبورد عربي اونلاين"],
+    ["/", "مكتبة الخطوط العربية"],
+  ];
+}
+
+// The Arabic name and phrase pages: the English spelling and meaning, the
+// text in calligraphy and ready-made decorated forms.
+function arDetailHtml(content: DetailContent, arabic: string, latin: string, word: string): string {
+  const facts = `<dl>${content.facts.map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`).join("")}</dl>`;
+  const decorated = [arabic, latin].flatMap((text) => decorate(text).slice(0, 8)).map((item) => `<li>${escapeHtml(item.value)}</li>`).join("");
+  return `<p>${escapeHtml(content.intro)}</p><p dir="ltr">${escapeHtml(latin)}</p>${facts}`
+    + `<section><h2>${escapeHtml(word)} بالخط العربي</h2><p>${escapeHtml(`${arabic} بخطوط الثلث والنستعليق والكوفي والنسخ وخطوط التصميم، وكل خط قابل للتحميل صورة PNG شفافة.`)}</p></section>`
+    + `<section><h2>زخرفة ${escapeHtml(word)}</h2><ul>${decorated}</ul></section>`
+    + `${sectionsHtml(content.sections)}${faqHtml("أسئلة شائعة", content.faqs)}`;
+}
+
+function resolveArNamesPage(slug?: string): SeoPage | null {
+  const hub = namesHubCopy.ar;
+  if (!slug) {
+    const list = (gender: "f" | "m") => linkListHtml(arabicNames.filter((name) => name.gender === gender).sort((a, b) => a.arabic.localeCompare(b.arabic, "ar")).map((name) => [namePath("ar", name.slug), `${name.arabic} — ${name.latin}`]));
+    return {
+      locale: "ar",
+      path: hub.path,
+      title: hub.title,
+      description: hub.description,
+      heading: hub.heading,
+      bodyHtml: `<p>${escapeHtml(hub.intro)}</p><section><h2>أسماء بنات</h2>${list("f")}</section><section><h2>أسماء أولاد</h2>${list("m")}</section>${sectionsHtml(hub.sections)}${faqHtml("أسئلة شائعة", hub.faqs)}${linkListHtml(arToolLinks())}`,
+      alternates: intlAlternates(toolPaths.names, "en"),
+      jsonLd: [
+        breadcrumbNode([homeCrumb("ar"), [hub.heading, hub.path]]),
+        { "@type": "CollectionPage", name: hub.heading, description: hub.description, url: `${SITE_ORIGIN}${hub.path}`, inLanguage: "ar" },
+        faqNode(hub.faqs),
+      ],
+    };
+  }
+  const name = getArabicName(slug);
+  if (!name) return null;
+  const content = nameContentAr(name);
+  const pagePath = namePath("ar", name.slug);
+  const related = `<section><h2>أسماء قريبة</h2>${linkListHtml(relatedNames(name).map((item) => [namePath("ar", item.slug), `${item.arabic} — ${item.latin}: ${nameMeaningAr(item)}`]))}</section>`;
+  return {
+    locale: "ar",
+    path: pagePath,
+    title: content.title,
+    description: content.description,
+    heading: content.heading,
+    bodyHtml: `${arDetailHtml(content, name.arabic, name.latin, `اسم ${name.arabic}`)}${related}${linkListHtml(arToolLinks())}`,
+    alternates: intlAlternates({ ar: pagePath, en: namePath("en", name.slug), fr: namePath("fr", name.slug) }, "en"),
+    jsonLd: [
+      breadcrumbNode([homeCrumb("ar"), [hub.heading, NAME_PATHS.ar], [content.heading, pagePath]]),
+      { "@type": "WebPage", name: content.heading, description: content.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: "ar" },
+      faqNode(content.faqs),
+    ],
+  };
+}
+
+function resolveArPhrasesPage(slug?: string): SeoPage | null {
+  const hub = phrasesHubCopy.ar;
+  if (!slug) {
+    return {
+      locale: "ar",
+      path: hub.path,
+      title: hub.title,
+      description: hub.description,
+      heading: hub.heading,
+      bodyHtml: `<p>${escapeHtml(hub.intro)}</p>${linkListHtml(arabicPhrases.map((phrase) => [phrasePath("ar", phrase.slug), `${phrase.arabic} — ${phraseTransliteration(phrase)}: ${phraseTextAr[phrase.slug]?.english ?? phrase.latin}`]))}${sectionsHtml(hub.sections)}${faqHtml("أسئلة شائعة", hub.faqs)}${linkListHtml(arToolLinks())}`,
+      alternates: intlAlternates(toolPaths.phrases, "en"),
+      jsonLd: [
+        breadcrumbNode([homeCrumb("ar"), [hub.heading, hub.path]]),
+        { "@type": "CollectionPage", name: hub.heading, description: hub.description, url: `${SITE_ORIGIN}${hub.path}`, inLanguage: "ar" },
+        faqNode(hub.faqs),
+      ],
+    };
+  }
+  const phrase = getArabicPhrase(slug);
+  if (!phrase) return null;
+  const content = phraseContentAr(phrase);
+  const pagePath = phrasePath("ar", phrase.slug);
+  const others = `<section><h2>عبارات أخرى</h2>${linkListHtml(arabicPhrases.filter((item) => item.slug !== phrase.slug).slice(0, 12).map((item) => [phrasePath("ar", item.slug), item.arabic]))}</section>`;
+  return {
+    locale: "ar",
+    path: pagePath,
+    title: content.title,
+    description: content.description,
+    heading: content.heading,
+    bodyHtml: `${arDetailHtml(content, phrase.arabic, phraseDisplayLatin(phrase), phrase.arabic)}${others}${linkListHtml(arToolLinks())}`,
+    alternates: intlAlternates({ ar: pagePath, en: phrasePath("en", phrase.slug), fr: phrasePath("fr", phrase.slug) }, "en"),
+    jsonLd: [
+      breadcrumbNode([homeCrumb("ar"), [hub.heading, PHRASE_PATHS.ar], [content.heading, pagePath]]),
+      { "@type": "WebPage", name: content.heading, description: content.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: "ar" },
       faqNode(content.faqs),
     ],
   };
@@ -1068,6 +1176,10 @@ function resolveIntlPage(pathname: string): SeoPage | null | undefined {
   }
   const card = parseCardPath(pathname);
   if (card && card.locale !== "ar") return resolveCardsPage(card.locale, card.slug);
+  if (pathname === NAME_PATHS.ar) return resolveArNamesPage();
+  if (pathname.startsWith(`${NAME_PATHS.ar}/`)) return resolveArNamesPage(decodeURIComponent(pathname.slice(NAME_PATHS.ar.length + 1)));
+  if (pathname === PHRASE_PATHS.ar) return resolveArPhrasesPage();
+  if (pathname.startsWith(`${PHRASE_PATHS.ar}/`)) return resolveArPhrasesPage(decodeURIComponent(pathname.slice(PHRASE_PATHS.ar.length + 1)));
   for (const locale of ["en", "fr"] as const) {
     if (pathname === NAME_PATHS[locale]) return resolveNamesPage(locale);
     if (pathname.startsWith(`${NAME_PATHS[locale]}/`)) return resolveNamesPage(locale, decodeURIComponent(pathname.slice(NAME_PATHS[locale].length + 1)));
@@ -1372,13 +1484,15 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
       if (toolPath !== textToImagePage.path) add(toolPath, intlLastmod);
     }
   }
-  const namesLastmod = sourceLastmod("client/src/lib/arabicNames.ts", "client/src/lib/intlContent.ts");
+  const namesLastmod = sourceLastmod("client/src/lib/arabicNames.ts", "client/src/lib/intlContent.ts", "client/src/lib/arabicNamesAr.ts", "client/src/lib/arContent.ts");
   for (const name of arabicNames) {
+    add(namePath("ar", name.slug), namesLastmod);
     add(namePath("en", name.slug), namesLastmod);
     add(namePath("fr", name.slug), namesLastmod);
   }
-  const phrasesLastmod = sourceLastmod("client/src/lib/arabicPhrases.ts", "client/src/lib/intlContent.ts");
+  const phrasesLastmod = sourceLastmod("client/src/lib/arabicPhrases.ts", "client/src/lib/intlContent.ts", "client/src/lib/arabicPhrasesAr.ts", "client/src/lib/arContent.ts");
   for (const phrase of arabicPhrases) {
+    add(phrasePath("ar", phrase.slug), phrasesLastmod);
     add(phrasePath("en", phrase.slug), phrasesLastmod);
     add(phrasePath("fr", phrase.slug), phrasesLastmod);
   }
@@ -1442,6 +1556,9 @@ async function renderLlmsTxt(res: Response): Promise<void> {
     `- [${keyboardCopy.en.heading}](${SITE_ORIGIN}${keyboardCopy.en.path}): ${keyboardCopy.en.description}`,
     `- [${generatorCopy.en.heading}](${SITE_ORIGIN}${generatorCopy.en.path}): ${generatorCopy.en.description}`,
     `- [${tattooCopy.en.heading}](${SITE_ORIGIN}${tattooCopy.en.path}): ${tattooCopy.en.description}`,
+    `- [${tattooCopy.ar.heading}](${SITE_ORIGIN}${tattooCopy.ar.path}): ${tattooCopy.ar.description}`,
+    `- [${namesHubCopy.ar.heading}](${SITE_ORIGIN}${namesHubCopy.ar.path}): ${namesHubCopy.ar.description}`,
+    `- [${phrasesHubCopy.ar.heading}](${SITE_ORIGIN}${phrasesHubCopy.ar.path}): ${phrasesHubCopy.ar.description}`,
     `- [${namesHubCopy.en.heading}](${SITE_ORIGIN}${namesHubCopy.en.path}): ${namesHubCopy.en.description}`,
     `- [${phrasesHubCopy.en.heading}](${SITE_ORIGIN}${phrasesHubCopy.en.path}): ${phrasesHubCopy.en.description}`,
     ...OCCASIONS.map((occasion) => `  - [${occasion.heading}](${SITE_ORIGIN}${cardOccasionPath("ar", occasion.slug)})`),
