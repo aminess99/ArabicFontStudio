@@ -510,6 +510,8 @@ function paintFor(ctx: CanvasRenderingContext2D, paint: Paint, y: number, size: 
 
 function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, slot: Slot, family: string, maxWidth: number) {
   if (!text.trim()) return;
+  // Names and notes may be typed in Latin letters on the English and French pages.
+  ctx.direction = /[\u0600-\u06FF]/.test(text) ? "rtl" : "ltr";
   let size = slot.size;
   ctx.font = `${size}px "${family}", serif`;
   // Shrink long names and phrases to fit instead of overflowing the frame.
@@ -533,7 +535,6 @@ export async function renderCard(canvas: HTMLCanvasElement, template: CardTempla
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(background, 0, 0, w, h);
   const layout = template.layout(w, h);
-  ctx.direction = "rtl";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   const x = w / 2;
@@ -541,7 +542,6 @@ export async function renderCard(canvas: HTMLCanvasElement, template: CardTempla
   drawText(ctx, content.name, x, layout.name, fontFamily(content.nameFont), layout.maxWidth);
   drawText(ctx, content.from, x, layout.from, fontFamily(BODY_FONT.id), layout.maxWidth);
   drawText(ctx, content.note, x, layout.note, fontFamily(BODY_FONT.id), layout.maxWidth);
-  ctx.direction = "ltr";
   drawText(ctx, "xfontat.com", x, layout.footer, fontFamily(LABEL_FONT.id), layout.maxWidth);
 }
 

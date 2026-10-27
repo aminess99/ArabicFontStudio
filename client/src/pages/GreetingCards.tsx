@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useRoute } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Download, Loader2, Share2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { IntlShell } from "@/components/IntlShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,7 +16,6 @@ import {
   CARDS_HUB,
   OCCASIONS,
   getOccasion,
-  occasionPath,
   renderCard,
   type CardContent,
   type CardFontId,
@@ -23,6 +23,17 @@ import {
   type CardTemplate,
   type Occasion,
 } from "@/lib/greetingCards";
+import {
+  CARD_PATHS,
+  CARD_UI,
+  cardFontLabel,
+  cardOccasionPath,
+  cardsHubCopy,
+  localizeOccasion,
+  parseCardPath,
+  templateLabel,
+  type CardLocale,
+} from "@/lib/greetingCardsIntl";
 
 const CUSTOM = "__custom";
 
@@ -50,10 +61,13 @@ function CardThumbnail({ template, content, size = "square", className = "" }: {
   );
 }
 
-function sampleContent(occasion: Occasion): CardContent {
+const homePath = (locale: CardLocale) => (locale === "ar" ? "/" : `/${locale}`);
+
+function sampleContent(occasion: Occasion, locale: CardLocale): CardContent {
+  const ui = CARD_UI[locale];
   return {
     message: occasion.messages[0],
-    name: occasion.slug === "wedding" ? "أحمد وسارة" : "اسمك هنا",
+    name: occasion.slug === "wedding" ? ui.couple : ui.yourName,
     from: "",
     note: occasion.defaultNote,
     messageFont: occasion.defaultFont,
@@ -61,13 +75,13 @@ function sampleContent(occasion: Occasion): CardContent {
   };
 }
 
-function OccasionNav({ current }: { current?: string }) {
+function OccasionNav({ current, locale }: { current?: string; locale: CardLocale }) {
   return (
-    <nav aria-label="المناسبات" className="flex gap-2 overflow-x-auto pb-1">
-      {OCCASIONS.map((occasion) => (
+    <nav aria-label={CARD_UI[locale].occasions} className="flex gap-2 overflow-x-auto pb-1">
+      {OCCASIONS.map((item) => localizeOccasion(item, locale)).map((occasion) => (
         <Link
           key={occasion.slug}
-          href={occasionPath(occasion.slug)}
+          href={cardOccasionPath(locale, occasion.slug)}
           aria-current={occasion.slug === current ? "page" : undefined}
           className={`h-10 shrink-0 whitespace-nowrap rounded-full border px-4 text-sm leading-10 transition-colors ${occasion.slug === current ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted"}`}
         >
@@ -78,34 +92,45 @@ function OccasionNav({ current }: { current?: string }) {
   );
 }
 
-function Hub() {
+// hreflang links for a card page: the hub or one occasion in every language.
+function cardAlternates(slug?: string) {
+  const path = (locale: CardLocale) => (slug ? cardOccasionPath(locale, slug) : CARD_PATHS[locale]);
+  return [
+    ...(["ar", "en", "fr"] as const).map((lang) => ({ lang, href: `${SITE_ORIGIN}${path(lang)}` })),
+    { lang: "x-default", href: `${SITE_ORIGIN}${path("ar")}` },
+  ];
+}
+
+function Hub({ locale }: { locale: CardLocale }) {
+  const hub = cardsHubCopy[locale];
+  const ui = CARD_UI[locale];
   const schema = useMemo(() => ({
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "CollectionPage", name: CARDS_HUB.heading, url: `${SITE_ORIGIN}${CARDS_HUB.path}`, description: CARDS_HUB.description, inLanguage: "ar" },
-      faqSchema(CARDS_HUB.faqs),
-      createBreadcrumbSchema([{ name: "الرئيسية", url: `${SITE_ORIGIN}/` }, { name: CARDS_HUB.heading, url: `${SITE_ORIGIN}${CARDS_HUB.path}` }]),
+      { "@type": "CollectionPage", name: hub.heading, url: `${SITE_ORIGIN}${CARD_PATHS[locale]}`, description: hub.description, inLanguage: locale },
+      faqSchema(hub.faqs),
+      createBreadcrumbSchema([{ name: ui.home, url: `${SITE_ORIGIN}${homePath(locale)}` }, { name: hub.heading, url: `${SITE_ORIGIN}${CARD_PATHS[locale]}` }]),
     ],
-  }), []);
+  }), [hub, ui, locale]);
   return (
     <>
-      <SEOHead title={CARDS_HUB.title} description={CARDS_HUB.description} path={CARDS_HUB.path} schema={schema} localized={false} />
-      <h1 className="text-3xl md:text-4xl font-bold mb-3">{CARDS_HUB.heading}</h1>
-      <p className="text-muted-foreground leading-loose mb-8">{CARDS_HUB.intro}</p>
+      <SEOHead title={hub.title} description={hub.description} path={CARD_PATHS[locale]} schema={schema} lang={locale} direction={locale === "ar" ? "rtl" : "ltr"} exactAlternates={cardAlternates()} />
+      <h1 className="text-3xl md:text-4xl font-bold mb-3">{hub.heading}</h1>
+      <p className="text-muted-foreground leading-loose mb-8">{hub.intro}</p>
       <ul className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {OCCASIONS.map((occasion) => (
+        {OCCASIONS.map((item) => localizeOccasion(item, locale)).map((occasion) => (
           <li key={occasion.slug}>
-            <Link href={occasionPath(occasion.slug)} className="group block" data-testid={`link-occasion-${occasion.slug}`}>
-              <CardThumbnail template={occasion.templates[0]} content={sampleContent(occasion)} className="border transition-colors group-hover:border-primary" />
-              <span className="mt-2 block font-semibold group-hover:text-primary transition-colors">بطاقات {occasion.name}</span>
+            <Link href={cardOccasionPath(locale, occasion.slug)} className="group block" data-testid={`link-occasion-${occasion.slug}`}>
+              <CardThumbnail template={occasion.templates[0]} content={sampleContent(occasion, locale)} className="border transition-colors group-hover:border-primary" />
+              <span className="mt-2 block font-semibold group-hover:text-primary transition-colors">{ui.cardsFor(occasion.name)}</span>
             </Link>
           </li>
         ))}
       </ul>
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4">أسئلة شائعة</h2>
+        <h2 className="text-2xl font-semibold mb-4">{ui.faq}</h2>
         <div className="space-y-5">
-          {CARDS_HUB.faqs.map((faq) => (
+          {hub.faqs.map((faq) => (
             <div key={faq.question}>
               <h3 className="font-semibold mb-1">{faq.question}</h3>
               <p className="text-muted-foreground leading-loose">{faq.answer}</p>
@@ -117,11 +142,12 @@ function Hub() {
   );
 }
 
-function Designer({ occasion }: { occasion: Occasion }) {
+function Designer({ occasion, locale }: { occasion: Occasion; locale: CardLocale }) {
+  const ui = CARD_UI[locale];
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [templateId, setTemplateId] = useState(occasion.templates[0].id);
-  const [name, setName] = useState(occasion.slug === "wedding" ? "أحمد وسارة" : "");
+  const [name, setName] = useState(occasion.slug === "wedding" ? ui.couple : "");
   const [from, setFrom] = useState("");
   const [messageChoice, setMessageChoice] = useState(occasion.messages[0]);
   const [customMessage, setCustomMessage] = useState("");
@@ -148,12 +174,12 @@ function Designer({ occasion }: { occasion: Occasion }) {
   const template = occasion.templates.find((item) => item.id === templateId) || occasion.templates[0];
   const content: CardContent = useMemo(() => ({
     message: messageChoice === CUSTOM ? customMessage : messageChoice,
-    name: name.trim() || "اسمك هنا",
+    name: name.trim() || ui.yourName,
     from: from.trim(),
     note: note.trim(),
     messageFont,
     nameFont,
-  }), [messageChoice, customMessage, name, from, note, messageFont, nameFont]);
+  }), [messageChoice, customMessage, name, from, note, messageFont, nameFont, ui]);
   const galleryContent = useMemo(() => ({ ...content, from: "" }), [content]);
 
   useEffect(() => {
@@ -162,9 +188,9 @@ function Designer({ occasion }: { occasion: Occasion }) {
     setRendering(true);
     renderCard(canvasRef.current, template, content, size, () => !cancelled)
       .then(() => { if (!cancelled) setRendering(false); })
-      .catch(() => { if (!cancelled) toast({ title: "تعذّر رسم البطاقة", description: "حدّث الصفحة وحاول مرة أخرى.", variant: "destructive" }); });
+      .catch(() => { if (!cancelled) toast({ title: ui.renderError, description: ui.renderErrorHint, variant: "destructive" }); });
     return () => { cancelled = true; };
-  }, [template, content, size, toast]);
+  }, [template, content, size, toast, ui]);
 
   const fileName = `xfontat-${occasion.slug}-${size}.png`;
   const toBlob = () => new Promise<Blob | null>((resolve) => canvasRef.current?.toBlob(resolve, "image/png"));
@@ -189,29 +215,30 @@ function Designer({ occasion }: { occasion: Occasion }) {
     }
   };
 
-  const pagePath = occasionPath(occasion.slug);
+  const pagePath = cardOccasionPath(locale, occasion.slug);
+  const hub = cardsHubCopy[locale];
   const schema = useMemo(() => ({
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "WebApplication", name: occasion.heading, url: `${SITE_ORIGIN}${pagePath}`, description: occasion.description, applicationCategory: "DesignApplication", operatingSystem: "Web", inLanguage: "ar", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+      { "@type": "WebApplication", name: occasion.heading, url: `${SITE_ORIGIN}${pagePath}`, description: occasion.description, applicationCategory: "DesignApplication", operatingSystem: "Web", inLanguage: locale, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
       faqSchema(occasion.faqs),
       createBreadcrumbSchema([
-        { name: "الرئيسية", url: `${SITE_ORIGIN}/` },
-        { name: CARDS_HUB.heading, url: `${SITE_ORIGIN}${CARDS_HUB.path}` },
+        { name: ui.home, url: `${SITE_ORIGIN}${homePath(locale)}` },
+        { name: hub.heading, url: `${SITE_ORIGIN}${CARD_PATHS[locale]}` },
         { name: occasion.heading, url: `${SITE_ORIGIN}${pagePath}` },
       ]),
     ],
-  }), [occasion, pagePath]);
+  }), [occasion, pagePath, locale, ui, hub]);
 
   return (
     <>
-      <SEOHead title={occasion.title} description={occasion.description} path={pagePath} schema={schema} localized={false} />
+      <SEOHead title={occasion.title} description={occasion.description} path={pagePath} schema={schema} lang={locale} direction={locale === "ar" ? "rtl" : "ltr"} exactAlternates={cardAlternates(occasion.slug)} />
       <h1 className="text-3xl md:text-4xl font-bold mb-3">{occasion.heading}</h1>
       <p className="text-muted-foreground leading-loose mb-5">{occasion.intro}</p>
-      <OccasionNav current={occasion.slug} />
+      <OccasionNav current={occasion.slug} locale={locale} />
 
       <section aria-labelledby="gallery-heading" className="mt-6">
-        <h2 id="gallery-heading" className="text-lg font-semibold mb-3">اختر القالب</h2>
+        <h2 id="gallery-heading" className="text-lg font-semibold mb-3">{ui.chooseTemplate}</h2>
         <ul className="grid grid-cols-3 gap-3 md:max-w-xl">
           {occasion.templates.map((item) => (
             <li key={item.id}>
@@ -223,7 +250,7 @@ function Designer({ occasion }: { occasion: Occasion }) {
                 data-testid={`button-template-${item.id}`}
               >
                 <CardThumbnail template={item} content={galleryContent} />
-                <span className="mt-1 block text-xs sm:text-sm">{item.label}</span>
+                <span className="mt-1 block text-xs sm:text-sm">{templateLabel(item.id, item.label, locale)}</span>
               </button>
             </li>
           ))}
@@ -233,50 +260,50 @@ function Designer({ occasion }: { occasion: Occasion }) {
       <div className="mt-8 grid gap-8 lg:grid-cols-[340px_1fr]">
         <div className="space-y-5">
           <div>
-            <label htmlFor="card-name" className="block text-sm font-medium mb-2">{occasion.slug === "wedding" ? "اسم العروسين" : "الاسم"}</label>
-            <Input id="card-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={40} placeholder="اكتب الاسم" className="h-11 text-lg" data-testid="input-card-name" />
+            <label htmlFor="card-name" className="block text-sm font-medium mb-2">{occasion.slug === "wedding" ? ui.coupleNames : ui.name}</label>
+            <Input id="card-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={40} placeholder={ui.namePlaceholder} className="h-11 text-lg" data-testid="input-card-name" />
           </div>
           <div>
-            <label htmlFor="card-from" className="block text-sm font-medium mb-2">من (اختياري)</label>
-            <Input id="card-from" value={from} onChange={(event) => setFrom(event.target.value)} maxLength={50} placeholder="مثلاً: من عائلة أحمد" className="h-11" />
+            <label htmlFor="card-from" className="block text-sm font-medium mb-2">{ui.from}</label>
+            <Input id="card-from" value={from} onChange={(event) => setFrom(event.target.value)} maxLength={50} placeholder={ui.fromPlaceholder} className="h-11" />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">العبارة</label>
+            <label className="block text-sm font-medium mb-2">{ui.message}</label>
             <Select value={messageChoice} onValueChange={setMessageChoice}>
               <SelectTrigger className="h-11" data-testid="select-card-message"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {occasion.messages.map((message) => <SelectItem key={message} value={message}>{message}</SelectItem>)}
-                <SelectItem value={CUSTOM}>عبارة أخرى…</SelectItem>
+                <SelectItem value={CUSTOM}>{ui.otherMessage}</SelectItem>
               </SelectContent>
             </Select>
             {messageChoice === CUSTOM && (
-              <Input value={customMessage} onChange={(event) => setCustomMessage(event.target.value)} maxLength={30} placeholder="اكتب عبارتك" className="mt-2 h-11" />
+              <Input value={customMessage} onChange={(event) => setCustomMessage(event.target.value)} maxLength={30} placeholder={ui.customPlaceholder} className="mt-2 h-11" />
             )}
           </div>
           <div>
-            <label htmlFor="card-note" className="block text-sm font-medium mb-2">سطر إضافي</label>
+            <label htmlFor="card-note" className="block text-sm font-medium mb-2">{ui.note}</label>
             <Input id="card-note" value={note} onChange={(event) => setNote(event.target.value)} maxLength={60} className="h-11" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium mb-2">خط العبارة</label>
+              <label className="block text-sm font-medium mb-2">{ui.messageFont}</label>
               <Select value={messageFont} onValueChange={(value) => setMessageFont(value as CardFontId)}>
                 <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
-                <SelectContent>{CARD_FONTS.map((font) => <SelectItem key={font.id} value={font.id}>{font.label}</SelectItem>)}</SelectContent>
+                <SelectContent>{CARD_FONTS.map((font) => <SelectItem key={font.id} value={font.id}>{cardFontLabel(font.id, font.label, locale)}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">خط الاسم</label>
+              <label className="block text-sm font-medium mb-2">{ui.nameFont}</label>
               <Select value={nameFont} onValueChange={(value) => setNameFont(value as CardFontId)}>
                 <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
-                <SelectContent>{CARD_FONTS.map((font) => <SelectItem key={font.id} value={font.id}>{font.label}</SelectItem>)}</SelectContent>
+                <SelectContent>{CARD_FONTS.map((font) => <SelectItem key={font.id} value={font.id}>{cardFontLabel(font.id, font.label, locale)}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
           <div>
-            <span className="block text-sm font-medium mb-2">المقاس</span>
-            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="المقاس">
-              {([["square", "مربع — واتساب وإنستغرام"], ["story", "ستوري — الحالات"]] as const).map(([value, label]) => (
+            <span className="block text-sm font-medium mb-2">{ui.size}</span>
+            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={ui.size}>
+              {([["square", ui.square], ["story", ui.story]] as const).map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
@@ -292,13 +319,13 @@ function Designer({ occasion }: { occasion: Occasion }) {
           </div>
           <div className="flex gap-2">
             <Button onClick={download} disabled={rendering} className="h-11 flex-1" data-testid="button-card-download">
-              <Download className="ml-2 h-4 w-4" />
-              تحميل البطاقة
+              <Download className="me-2 h-4 w-4" />
+              {ui.download}
             </Button>
             {canShareFiles && (
               <Button onClick={share} disabled={rendering} variant="outline" className="h-11" data-testid="button-card-share">
-                <Share2 className="ml-2 h-4 w-4" />
-                مشاركة
+                <Share2 className="me-2 h-4 w-4" />
+                {ui.share}
               </Button>
             )}
           </div>
@@ -306,23 +333,23 @@ function Designer({ occasion }: { occasion: Occasion }) {
 
         <div className="lg:sticky lg:top-24 self-start">
           <div className={`relative mx-auto overflow-hidden rounded-lg border shadow-sm ${size === "story" ? "max-w-[340px] aspect-[9/16]" : "max-w-[560px] aspect-square"}`}>
-            <canvas ref={canvasRef} className="h-full w-full" aria-label={`معاينة ${occasion.heading}`} />
+            <canvas ref={canvasRef} className="h-full w-full" aria-label={ui.preview(occasion.heading)} />
             {rendering && <Loader2 className="absolute inset-0 m-auto h-8 w-8 animate-spin text-muted-foreground" aria-hidden="true" />}
           </div>
         </div>
       </div>
 
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4">عبارات تهنئة {occasion.name}</h2>
+        <h2 className="text-2xl font-semibold mb-4">{ui.greetings(occasion.name)}</h2>
         <ul className="space-y-3">
           {occasion.greetings.map((greeting) => (
-            <li key={greeting} className="rounded-lg border bg-card p-4 leading-loose">{greeting}</li>
+            <li key={greeting} className="rounded-lg border bg-card p-4 leading-loose" dir="auto">{greeting}</li>
           ))}
         </ul>
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4">أسئلة شائعة</h2>
+        <h2 className="text-2xl font-semibold mb-4">{ui.faq}</h2>
         <div className="space-y-5">
           {occasion.faqs.map((faq) => (
             <div key={faq.question}>
@@ -334,37 +361,51 @@ function Designer({ occasion }: { occasion: Occasion }) {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4">بطاقات لمناسبات أخرى</h2>
-        <OccasionNav current={occasion.slug} />
+        <h2 className="text-2xl font-semibold mb-4">{ui.other}</h2>
+        <OccasionNav current={occasion.slug} locale={locale} />
       </section>
     </>
   );
 }
 
 export default function GreetingCards() {
-  const [, params] = useRoute("/tahnia/:slug");
-  const occasion = params?.slug ? getOccasion(params.slug) : undefined;
-  const breadcrumbItems = [
-    { label: "الرئيسية", href: "/" },
-    { label: "بطاقات التهنئة", href: CARDS_HUB.path },
-    ...(occasion ? [{ label: occasion.name, href: occasionPath(occasion.slug) }] : []),
-  ];
+  const [location] = useLocation();
+  const parsed = parseCardPath(location.replace(/\/+$/, "")) ?? { locale: "ar" as const };
+  const { locale, slug } = parsed;
+  const ui = CARD_UI[locale];
+  const base = slug ? getOccasion(slug) : undefined;
+  const occasion = base ? localizeOccasion(base, locale) : undefined;
+  const content = (
+    <div className="max-w-6xl mx-auto">
+      {slug && !occasion ? (
+        <p className="text-muted-foreground">{ui.notFound} <Link href={CARD_PATHS[locale]} className="text-primary underline">{ui.allCards}</Link></p>
+      ) : occasion ? (
+        <Designer occasion={occasion} locale={locale} />
+      ) : (
+        <Hub locale={locale} />
+      )}
+    </div>
+  );
 
+  if (locale !== "ar") {
+    const languages = {
+      ar: slug ? cardOccasionPath("ar", slug) : CARD_PATHS.ar,
+      en: slug ? cardOccasionPath("en", slug) : CARD_PATHS.en,
+      fr: slug ? cardOccasionPath("fr", slug) : CARD_PATHS.fr,
+    };
+    return <IntlShell locale={locale} languages={languages}>{content}</IntlShell>;
+  }
+
+  const breadcrumbItems = [
+    { label: ui.home, href: "/" },
+    { label: ui.cards, href: CARDS_HUB.path },
+    ...(occasion ? [{ label: occasion.name, href: cardOccasionPath("ar", occasion.slug) }] : []),
+  ];
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <Breadcrumb items={breadcrumbItems} />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {params?.slug && !occasion ? (
-            <p className="text-muted-foreground">لم نجد هذه المناسبة. <Link href={CARDS_HUB.path} className="text-primary underline">كل البطاقات</Link></p>
-          ) : occasion ? (
-            <Designer occasion={occasion} />
-          ) : (
-            <Hub />
-          )}
-        </div>
-      </main>
+      <main className="flex-1 container mx-auto px-4 py-8">{content}</main>
       <Footer />
     </div>
   );
