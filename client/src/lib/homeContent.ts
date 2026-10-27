@@ -2,7 +2,7 @@
 // server/seoHtml.ts so search engines and AI crawlers read the same title,
 // headings and text that visitors see.
 
-export const homeTitle = "خطوط عربية مجانية للتحميل — أكثر من 850 خطاً | xfontat";
+export const homeTitle = "تحميل خطوط عربية مجاناً — أكثر من 850 خطاً للتصميم | xfontat";
 export const homeDescription = "مكتبة خطوط عربية مجانية للتحميل: ثلث وديواني ورقعة وكوفي ونسخ وخطوط تصميم وفوتوشوب. عاين النص بكل خط وراجع الصيغة والترخيص قبل التحميل.";
 export const homeHeading = "مكتبة خطوط عربية مجانية للتحميل الفوري";
 
@@ -75,6 +75,8 @@ export const homeCollections = {
     { name: "خطوط لليوتيوبرز", slug: "khotot-lil-youtubiyeen", desc: "كوفي ورقعة" },
     { name: "خطوط للدعوات", slug: "khotot-lil-dawaat", desc: "ثلث وديواني" },
     { name: "خطوط مجانية", slug: "khotot-bidoon-hoqooq", desc: "جميع الفئات" },
+    { name: "خطوط انشوت", slug: "khotot-inshot", desc: "لتطبيق InShot" },
+    { name: "خطوط كاب كات", slug: "khotot-capcut", desc: "لتطبيق CapCut" },
   ],
 };
 

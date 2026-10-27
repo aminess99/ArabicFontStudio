@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
+import { arabicCategoryMeta } from "@/lib/arabicCategoryContent";
 import { CategoryContent } from "@/components/CategoryContent";
 import { useToast } from "@/hooks/use-toast";
 import { groupFontsByFamily } from "@/lib/fontFamily";
@@ -19,53 +20,10 @@ import type { Font } from "@shared/schema";
 
 const FONTS_PER_PAGE = 15;
 
-const categoryMeta: Record<string, { title: string; description: string; arabicName: string }> = {
-  'ثلث': {
-    title: 'خطوط ثلث عربية - تحميل مجاني | xfontat',
-    description: 'استكشف خطوط الثلث العربية، وعاين شكل الحروف وتحقق من صيغة الملف وترخيصه قبل الاستخدام.',
-    arabicName: 'خطوط الثلث'
-  },
-  'ديواني': {
-    title: 'خطوط ديواني عربية - تحميل مجاني | xfontat',
-    description: 'استكشف خطوط الديواني والديواني الجلي، وجرّب وضوح النص في الدعوات والعناوين الفنية.',
-    arabicName: 'خطوط الديواني'
-  },
-  'رقعة': {
-    title: 'خطوط رقعة عربية - تحميل مجاني | xfontat',
-    description: 'استكشف خطوط الرقعة وعاين النصوص بالحجم المستهدف؛ راجع الصيغة والترخيص في صفحة كل ملف.',
-    arabicName: 'خطوط الرقعة'
-  },
-  'كوفي': {
-    title: 'خطوط كوفي عربية - تحميل مجاني | xfontat',
-    description: 'استكشف أنماط الخط الكوفي، بما فيها النماذج الهندسية، واختبر وضوحها في التصميم المقصود.',
-    arabicName: 'خطوط الكوفي'
-  },
-  'نسخ': {
-    title: 'خطوط نسخ عربية - تحميل مجاني | xfontat',
-    description: 'استكشف خطوط النسخ واختبر وضوح الحروف والتشكيل في الكتب والمواقع والمستندات.',
-    arabicName: 'خطوط النسخ'
-  },
-  'تصميم': {
-    title: 'خطوط تصميم عربية | xfontat',
-    description: 'استكشف خطوط التصميم العربية بأنماط مختلفة، وتحقق من دعم الحروف والصيغة والترخيص لكل ملف.',
-    arabicName: 'خطوط التصميم'
-  },
-  'خطوط الحرة': {
-    title: 'خطوط حرة عربية وغرافيتي - تحميل مجاني | xfontat',
-    description: 'استكشف الخطوط العربية الحرة والغرافيتي والزخرفية، وراجع الصيغة والترخيص قبل الاستخدام.',
-    arabicName: 'خطوط الحرة'
-  },
-  'فوتوشوب': {
-    title: 'خطوط فوتوشوب عربية - تحميل مجاني | xfontat',
-    description: 'استكشف الخطوط المصنفة للفوتوشوب، واختبر دعم العربية وتوافق الملف مع إصدار البرنامج المستخدم.',
-    arabicName: 'خطوط الفوتوشوب'
-  },
-  'نستعليق': {
-    title: 'خطوط نستعليق عربية وفارسية - تحميل مجاني | xfontat',
-    description: 'استكشف خطوط النستعليق واختبر دعم الملف للغة والنص المطلوبين، مع مراجعة الترخيص قبل الاستخدام.',
-    arabicName: 'خطوط النستعليق'
-  }
-};
+// Title, heading and description shared with the server-rendered page.
+const categoryMeta = Object.fromEntries(
+  Object.entries(arabicCategoryMeta).map(([key, meta]) => [key, { ...meta, arabicName: meta.heading }]),
+);
 
 export default function CategoryFonts() {
   const [match, params] = useRoute("/fonts/:category");

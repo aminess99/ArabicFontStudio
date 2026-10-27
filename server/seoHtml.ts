@@ -16,7 +16,7 @@ import { collections } from "../client/src/lib/collectionsData";
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "../client/src/lib/blogTranslations";
 import { generateLegacyFontSlug } from "../client/src/lib/slugify";
-import { categoryContent, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
+import { arabicCategoryMeta, categoryContent, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
 import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDetails";
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
 import {
@@ -335,12 +335,13 @@ function resolveCategory(locale: Locale, slug: string, fonts: Font[]): SeoPage |
   const localizedCategory = locale === "fr"
     ? frenchCategories.find((item) => item.slug === slug)
     : category;
-  const heading = locale === "ar" ? category.arabicCategory : localizedCategory?.heading || localizedCategory?.name || category.name;
+  const arabicMeta = arabicCategoryMeta[category.arabicCategory];
+  const heading = locale === "ar" ? arabicMeta?.heading || category.arabicCategory : localizedCategory?.heading || localizedCategory?.name || category.name;
   const title = locale === "ar"
-    ? `${category.arabicCategory} - خطوط عربية للتحميل والمعاينة | xfontat`
+    ? arabicMeta?.title || `${category.arabicCategory} - خطوط عربية للتحميل والمعاينة | xfontat`
     : localizedCategory?.title || `${heading} Arabic Fonts | xfontat`;
   const description = locale === "ar"
-    ? `تصفح ملفات الخطوط العربية ضمن تصنيف ${category.arabicCategory}. عاين النص وراجع صيغة كل ملف وترخيصه ومصدره.`
+    ? arabicMeta?.description || `تصفح ملفات الخطوط العربية ضمن تصنيف ${category.arabicCategory}. عاين النص وراجع صيغة كل ملف وترخيصه ومصدره.`
     : localizedCategory?.description || `Browse ${heading} Arabic font files, preview sample text, and check each file’s format and license.`;
   const intro = locale === "ar"
     ? `تضم هذه الصفحة ${categoryFonts.length} ملفاً مصنفاً ضمن ${category.arabicCategory}. تختلف أشكال الحروف والتوافق والتراخيص بحسب الملف، لذلك راجع التفاصيل قبل الاستخدام.`
@@ -395,9 +396,28 @@ function resolveCollection(locale: Locale, slug: string, fonts: Font[]): SeoPage
     title: `${title} | xfontat`,
     description,
     heading: title,
-    bodyHtml: `<p>${escapeHtml(bodyIntro)}</p><section><h2>${escapeHtml(locale === "fr" ? "Styles associés" : locale === "en" ? "Related styles" : "التصنيفات المرتبطة")}</h2><ul>${categoryLinks}</ul></section><section><h2>${escapeHtml(locale === "fr" ? "Fichiers de police de la collection" : locale === "en" ? "Font files in this collection" : "ملفات الخطوط في المجموعة")}</h2>${fontLinkList(collectionFonts, locale)}</section>`,
+    bodyHtml: [
+      `<p>${escapeHtml(bodyIntro)}</p>`,
+      locale === "ar" && collection.callout ? `<p>${escapeHtml(collection.callout.text)} <a href="${escapeHtml(collection.callout.href)}">${escapeHtml(collection.callout.label)}</a></p>` : "",
+      locale === "ar" && collection.guide ? `<section><h2>${escapeHtml(collection.guide.heading)}</h2><ol>${collection.guide.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>${collection.guide.note ? `<p>${escapeHtml(collection.guide.note)}</p>` : ""}</section>` : "",
+      `<section><h2>${escapeHtml(locale === "fr" ? "Styles associés" : locale === "en" ? "Related styles" : "التصنيفات المرتبطة")}</h2><ul>${categoryLinks}</ul></section>`,
+      `<section><h2>${escapeHtml(locale === "fr" ? "Fichiers de police de la collection" : locale === "en" ? "Font files in this collection" : "ملفات الخطوط في المجموعة")}</h2>${fontLinkList(collectionFonts, locale)}</section>`,
+      locale === "ar" ? faqHtml("أسئلة شائعة", collection.faqs) : "",
+    ].join(""),
     noindex: !availableTranslation,
-    alternates: pageAlternates(`/collection/${slug}`),
+    // Collections without English and French versions only list Arabic.
+    alternates: localizedCollections.en[slug] || localizedCollections.fr[slug]
+      ? pageAlternates(`/collection/${slug}`)
+      : { ar: `${SITE_ORIGIN}/collection/${slug}`, "x-default": `${SITE_ORIGIN}/collection/${slug}` },
+    jsonLd: locale === "ar" ? [
+      breadcrumbNode([["الرئيسية", "/"], [collection.titleArabic, `/collection/${slug}`]]),
+      faqNode(collection.faqs),
+      ...(collection.guide ? [{
+        "@type": "HowTo",
+        name: collection.guide.heading,
+        step: collection.guide.steps.map((text, index) => ({ "@type": "HowToStep", position: index + 1, text })),
+      }] : []),
+    ] : undefined,
   };
 }
 
@@ -1039,6 +1059,22 @@ function resolveIntlPage(pathname: string): SeoPage | null | undefined {
   return undefined;
 }
 
+// Style page for a removed font, guessed from words in its old slug.
+const REMOVED_FONT_STYLES: Array<[RegExp, string]> = [
+  [/diwan|diwany/, "diwani"],
+  [/thuluth|thulth|suls/, "thuluth"],
+  [/roqa|ruqaa|ruqa|rikaa|rika/, "ruqaa"],
+  [/naskh/, "naskh"],
+  [/kufi|kufic/, "kufi"],
+  [/nastaliq|nastaligh/, "nastaliq"],
+  [/hand|free/, "graffiti"],
+];
+
+function removedFontTarget(locale: Locale, slug: string): string {
+  const style = REMOVED_FONT_STYLES.find(([pattern]) => pattern.test(slug))?.[1];
+  return style ? getCategoryPath(locale, style) : pathForLocale(locale, "/");
+}
+
 async function resolvePage(pathname: string): Promise<SeoPage | null> {
   const intlPage = resolveIntlPage(normalizePath(pathname));
   if (intlPage !== undefined) return intlPage;
@@ -1052,7 +1088,9 @@ async function resolvePage(pathname: string): Promise<SeoPage | null> {
   if (fontMatch) {
     const requestedSlug = decodeURIComponent(fontMatch[1]);
     const font = await storage.getFontBySlug(requestedSlug);
-    if (!font) return null;
+    // Fonts removed from the library keep their search traffic by sending
+    // visitors to the closest style page instead of a 404.
+    if (!font) throw Object.assign(new Error("Removed font"), { status: 301, location: removedFontTarget(locale, requestedSlug) });
     if (requestedSlug !== font.slug) {
       throw Object.assign(new Error("Font slug alias"), {
         status: 301,
@@ -1070,7 +1108,21 @@ async function resolvePage(pathname: string): Promise<SeoPage | null> {
 
   if (pagePath === "/blog") return resolveBlogIndex(locale, posts);
   const blogMatch = /^\/blog\/([^/]+)$/.exec(pagePath);
-  if (blogMatch) return resolveBlogArticle(locale, decodeURIComponent(blogMatch[1]), posts);
+  if (blogMatch) {
+    const article = resolveBlogArticle(locale, decodeURIComponent(blogMatch[1]), posts);
+    // Old auto-generated articles ("gen-…") were removed; send them to the blog.
+    if (!article && blogMatch[1].startsWith("gen-")) {
+      throw Object.assign(new Error("Removed article"), { status: 301, location: pathForLocale(locale, "/blog") });
+    }
+    return article;
+  }
+
+  // Category URLs from the first version of the site: /category/نسخ.
+  const legacyCategory = /^\/category\/([^/]+)$/.exec(pagePath);
+  if (legacyCategory) {
+    const category = englishCategories.find((item) => item.arabicCategory === decodeURIComponent(legacyCategory[1]));
+    if (category) throw Object.assign(new Error("Legacy category"), { status: 301, location: getCategoryPath(locale, category.slug) });
+  }
 
   if (["/about", "/contact", "/privacy", "/terms"].includes(pagePath)) {
     return resolveStaticPage(locale, pagePath.slice(1) as "about" | "contact" | "privacy" | "terms");
