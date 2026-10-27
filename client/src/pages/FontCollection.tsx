@@ -10,7 +10,7 @@ import { localizedCollections } from "@/lib/localizedPagesContent";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useToast } from "@/hooks/use-toast";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
-import { getCollectionBySlug, collections } from "@/lib/collectionsData";
+import { getCollectionBySlug, collections, collectionFonts } from "@/lib/collectionsData";
 import { getCanonicalFontSlug } from "@/lib/slugify";
 import type { Font } from "@shared/schema";
 
@@ -36,7 +36,7 @@ export default function FontCollection() {
     enabled: !!categoriesParam,
   });
 
-  const filteredFonts = allCategoryFonts
+  const filteredFonts = (collection ? collectionFonts(collection, allCategoryFonts) : allCategoryFonts)
     .filter(font => {
       if (!searchQuery) return true;
       return (

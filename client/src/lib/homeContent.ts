@@ -69,6 +69,7 @@ export const homeCollections = {
   items: [
     { name: "خطوط للشعارات", slug: "khotot-lil-shiaarat", desc: "كوفي وتصميم" },
     { name: "خطوط للتيك توك", slug: "khotot-lil-tiktok", desc: "رقعة وتصميم" },
+    { name: "خطوط أطفال", slug: "khotot-atfal", desc: "مرحة ودائرية" },
     { name: "خطوط مزخرفة", slug: "khotot-muzakhrafa", desc: "ثلث وديواني" },
     { name: "خطوط للكتب", slug: "khotot-lil-kotob", desc: "نسخ كلاسيكية" },
     { name: "خطوط للفوتوشوب", slug: "khotot-lil-photoshop", desc: "فوتوشوب وإلستريتور" },

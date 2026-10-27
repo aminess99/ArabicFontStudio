@@ -16,7 +16,7 @@ const UI = {
   ar: {
     home: "الرئيسية", examples: ["محمد", "سارة", "Ahmed", "نور"], label: "اكتب الاسم أو النص", placeholder: "اكتب اسمك هنا", examplesLabel: "أمثلة:",
     results: "النتائج", empty: "اكتب نصاً لتظهر الزخارف.", copied: "تم النسخ", copyFail: "تعذّر النسخ", copyFailHint: "حدّد النص وانسخه يدوياً.", copy: "نسخ",
-    ctaBefore: "تريد اسمك بخط عربي حقيقي مثل الثلث أو الديواني؟", ctaTool: "اكتب اسمك بالخط العربي وحمّله صورة", ctaOr: "أو", ctaLibrary: "تصفّح مكتبة الخطوط العربية", faq: "أسئلة شائعة",
+    ctaBefore: "تريد اسمك بخط الرقعة أو الثلث أو الديواني؟", ctaTool: "اكتب اسمك بالخط العربي وحمّله صورة", ctaOr: "أو", ctaLibrary: "تصفّح مكتبة الخطوط العربية", faq: "أسئلة شائعة",
   },
   en: {
     home: "Home", examples: ["نور", "Sarah", "محمد", "Adam"], label: "Type a name or text", placeholder: "Type your name", examplesLabel: "Examples:",

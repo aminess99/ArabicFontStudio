@@ -6,11 +6,12 @@ import type { ToolPageCopy } from "./toolPages";
 import { blogPostPath } from "./blogSlugs";
 
 export type IntlLocale = "ar" | "en" | "fr";
-export type IntlToolId = "keyboard" | "generator" | "zakhrafa" | "tattoo" | "names" | "phrases";
+export type IntlToolId = "keyboard" | "generator" | "ruqaa" | "zakhrafa" | "tattoo" | "names" | "phrases";
 
 export const toolPaths: Record<IntlToolId, Partial<Record<IntlLocale, string>>> = {
   keyboard: { ar: "/keyboard", en: "/en/arabic-keyboard", fr: "/fr/clavier-arabe" },
   generator: { ar: "/arabic-text-to-image", en: "/en/arabic-font-generator", fr: "/fr/generateur-police-arabe" },
+  ruqaa: { ar: "/tahweel-khat-ruqaa", en: "/en/ruqaa-font-generator", fr: "/fr/generateur-ecriture-ruqaa" },
   zakhrafa: { ar: "/zakhrafa", en: "/en/arabic-fancy-text", fr: "/fr/texte-arabe-stylise" },
   tattoo: { ar: "/khotot-tattoo", en: "/en/arabic-tattoo-fonts", fr: "/fr/police-arabe-tatouage" },
   names: { ar: "/asmaa", en: "/en/names-in-arabic", fr: "/fr/prenoms-en-arabe" },
@@ -175,6 +176,62 @@ export const generatorCopy: Record<"en" | "fr", Copy> = {
       { question: "Le générateur est-il gratuit ?", answer: "Oui, sans inscription. L'image est créée dans votre navigateur." },
       { question: "Puis-je utiliser l'image pour un tatouage ?", answer: "Oui, mais faites vérifier l'orthographe par un arabophone et choisissez une police dont la licence le permet. Voir notre guide des polices arabes pour tatouage." },
       { question: "Pourquoi les lettres sont-elles séparées sur d'autres sites ?", answer: "Les lettres arabes changent de forme selon leur position. Beaucoup de générateurs ne gèrent pas cela ; le nôtre utilise de vrais fichiers de police arabe." },
+    ],
+  },
+};
+
+// The text-to-image tool opened on Ruqaa fonts, for "convert text to Ruqaa".
+export const ruqaaCopy: Record<IntlLocale, Copy> = {
+  ar: {
+    locale: "ar",
+    path: toolPaths.ruqaa.ar!,
+    title: "تحويل الكتابة إلى خط الرقعة اونلاين — حمّلها صورة | xfontat",
+    description: "حوّل أي نص أو اسم إلى خط الرقعة مجاناً: اكتب النص واختر من خطوط الرقعة العربية، ثم حمّله صورة PNG شفافة أو بخلفية ملونة.",
+    heading: "تحويل الكتابة إلى خط الرقعة",
+    intro: "اكتب النص أو الاسم فيظهر فوراً بخط الرقعة. اختر من عدة خطوط رقعة، وعدّل الحجم واللون، ثم حمّل النتيجة صورة جاهزة للتصاميم والمنشورات.",
+    sections: [
+      { heading: "ما هو خط الرقعة؟", body: "الرقعة أكثر الخطوط العربية استخداماً في الكتابة اليدوية اليومية، ويتميز بحروف قصيرة مستقيمة وسرعة في الكتابة ووضوح في القراءة. ظهر في العهد العثماني ولا يزال يُستخدم في العناوين والإعلانات واللافتات." },
+      { heading: "استخدامات النص بخط الرقعة", body: "يناسب خط الرقعة العناوين القصيرة والعبارات والأسماء في التصاميم، وصور الملف الشخصي، والمنشورات، وأغلفة الفيديو. حمّل الصورة بخلفية شفافة لتضعها فوق أي تصميم في كانفا أو فوتوشوب أو إن شوت." },
+      { heading: "أريد خط الرقعة على جهازي", body: "إذا أردت الكتابة بخط الرقعة في وورد أو فوتوشوب مباشرة فحمّل أحد خطوط الرقعة من صفحة خطوط الرقعة وثبّته على جهازك، ثم اختره من قائمة الخطوط." },
+    ],
+    faqs: [
+      { question: "كيف أحوّل الكتابة إلى خط الرقعة؟", answer: "اكتب النص في المربع، واختر خط رقعة من القائمة، ثم اضغط تحميل الصورة." },
+      { question: "هل يمكنني نسخ النص بخط الرقعة ولصقه؟", answer: "لا، فخط الرقعة شكل خط وليس رموزاً نصية، لذلك تُحمّل النتيجة صورة. لنسخ نص مزخرف استخدم أداة زخرفة الأسماء." },
+      { question: "هل الأداة مجانية؟", answer: "نعم، مجانية بالكامل وتعمل في المتصفح، ولا يُرسل النص إلى أي خادم." },
+    ],
+  },
+  en: {
+    locale: "en",
+    path: toolPaths.ruqaa.en!,
+    title: "Ruqaa Font Generator — Write Arabic Text in Ruqaa Online | xfontat",
+    description: "Turn any Arabic text or name into Ruqaa calligraphy online. Pick a Ruqaa font, set the size and colour, and download a transparent PNG.",
+    heading: "Ruqaa font generator",
+    intro: "Type Arabic text or a name and see it in Ruqaa straight away. Choose between several Ruqaa fonts, adjust the size and colour, and download the result as an image.",
+    sections: [
+      { heading: "What is Ruqaa?", body: "Ruqaa (riq'a) is the most common Arabic handwriting style. Its short, straight strokes are quick to write and easy to read. It took shape in the Ottoman era and is still used for headlines, ads and signs." },
+      { heading: "What to use it for", body: "Ruqaa suits short titles, names and phrases in designs, profile pictures, social posts and video thumbnails. Download a transparent PNG to place it over any design in Canva or Photoshop." },
+    ],
+    faqs: [
+      { question: "How do I write text in Ruqaa?", answer: "Type the text in Arabic, pick a Ruqaa font from the list and download the image. For a name in English letters, find its Arabic spelling in our Names in Arabic guide first." },
+      { question: "Can I copy and paste Ruqaa text?", answer: "No. Ruqaa is a typeface, not a set of characters, so the result is an image." },
+      { question: "Is it free?", answer: "Yes. It runs in your browser and the text is never sent to a server." },
+    ],
+  },
+  fr: {
+    locale: "fr",
+    path: toolPaths.ruqaa.fr!,
+    title: "Générateur d'écriture ruqaa — texte arabe en ruqaa en ligne | xfontat",
+    description: "Transformez un texte ou un prénom arabe en calligraphie ruqaa en ligne. Choisissez une police ruqaa, la taille et la couleur, puis téléchargez un PNG.",
+    heading: "Générateur d'écriture ruqaa",
+    intro: "Tapez un texte arabe ou un prénom et voyez-le aussitôt en ruqaa. Choisissez parmi plusieurs polices ruqaa, réglez la taille et la couleur, puis téléchargez l'image.",
+    sections: [
+      { heading: "Qu'est-ce que le ruqaa ?", body: "Le ruqaa (riq'a) est l'écriture manuscrite arabe la plus courante. Ses traits courts et droits sont rapides à écrire et faciles à lire. Né à l'époque ottomane, il sert encore aux titres, publicités et enseignes." },
+      { heading: "À quoi sert-il ?", body: "Le ruqaa convient aux titres courts, prénoms et phrases dans les visuels, photos de profil, publications et miniatures vidéo. Téléchargez un PNG transparent pour le placer sur n'importe quel design." },
+    ],
+    faqs: [
+      { question: "Comment écrire un texte en ruqaa ?", answer: "Tapez le texte en arabe, choisissez une police ruqaa et téléchargez l'image. Pour un prénom en lettres latines, cherchez d'abord son orthographe dans notre guide des prénoms en arabe." },
+      { question: "Peut-on copier-coller du texte en ruqaa ?", answer: "Non, le ruqaa est une police et non des caractères : le résultat est une image." },
+      { question: "Est-ce gratuit ?", answer: "Oui, l'outil fonctionne dans le navigateur et le texte n'est jamais envoyé à un serveur." },
     ],
   },
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { fontTitleName } from "@/lib/fontArabicNames";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Download, Heart, Monitor, Apple, Layers } from "lucide-react";
@@ -235,7 +236,7 @@ export default function FontDetails() {
   ];
 
   // Duplicate copies share the primary's name, so qualify them by category.
-  const seoTitle = `تحميل خط ${font.nameArabic}${font.duplicateOf ? ` (${font.category})` : ""} مجاناً | xfontat`;
+  const seoTitle = `تحميل خط ${fontTitleName(font)}${font.duplicateOf ? ` (${font.category})` : ""} مجاناً | xfontat`;
   const profile = font.duplicateOf ? undefined : getFontProfile(font.slug);
   const seoDescription = arabicFontDescription(font);
 

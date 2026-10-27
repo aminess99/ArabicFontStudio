@@ -1,4 +1,5 @@
 import { howToPosts } from "./howToPosts";
+import { guidePosts } from "./guidePosts";
 
 export interface BlogPostData {
   slug: string;
@@ -1042,4 +1043,4 @@ console.log(document.fonts.check('16px "MyArabicFont"'));
   }
 ];
 
-export const blogPosts: BlogPostData[] = [...howToPosts, ...editorialPosts];
+export const blogPosts: BlogPostData[] = [...guidePosts, ...howToPosts, ...editorialPosts];
