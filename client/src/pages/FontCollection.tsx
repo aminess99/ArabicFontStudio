@@ -6,6 +6,7 @@ import { FontListItem } from "@/components/FontListItem";
 import { Pagination } from "@/components/Pagination";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
+import { localizedCollections } from "@/lib/localizedPagesContent";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useToast } from "@/hooks/use-toast";
 import { createBreadcrumbSchema, SITE_ORIGIN } from "@/lib/schemas";
@@ -85,7 +86,8 @@ export default function FontCollection() {
     { label: collection.titleArabic, href: `/collection/${slug}` }
   ];
 
-  const seoDescription = `${collection.description} تختلف صيغ الملفات وشروط استخدامها؛ راجع صفحة كل خط.`;
+  // Matches the server-rendered description in server/seoHtml.ts.
+  const seoDescription = collection.description;
 
   const schema = {
     "@context": "https://schema.org",
@@ -124,9 +126,15 @@ export default function FontCollection() {
           "name": faq.question,
           "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
         }))
-      }
+      },
+      ...(collection.guide ? [{
+        "@type": "HowTo",
+        "name": collection.guide.heading,
+        "step": collection.guide.steps.map((text, index) => ({ "@type": "HowToStep", "position": index + 1, "text": text })),
+      }] : []),
     ]
   };
+  const hasTranslation = Boolean(localizedCollections.en[collection.slug] || localizedCollections.fr[collection.slug]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -135,6 +143,7 @@ export default function FontCollection() {
         description={seoDescription}
         path={`/collection/${slug}`}
         schema={schema}
+        localized={hasTranslation}
       />
 
       <Header
@@ -158,6 +167,23 @@ export default function FontCollection() {
             <span key={uc} className="px-3 py-1 bg-muted text-sm rounded-md">{uc}</span>
           ))}
         </div>
+        {collection.callout && (
+          <div className="mb-4 rounded-lg border border-primary/40 bg-primary/5 p-4">
+            <p className="text-sm leading-relaxed mb-3">{collection.callout.text}</p>
+            <Link href={collection.callout.href} className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+              {collection.callout.label}
+            </Link>
+          </div>
+        )}
+        {collection.guide && (
+          <section className="mb-4 rounded-lg border p-4 md:p-5">
+            <h2 className="text-lg md:text-xl font-bold mb-3">{collection.guide.heading}</h2>
+            <ol className="list-decimal space-y-2 ps-5 text-sm md:text-base leading-relaxed">
+              {collection.guide.steps.map((step) => <li key={step}>{step}</li>)}
+            </ol>
+            {collection.guide.note && <p className="mt-3 text-xs md:text-sm text-muted-foreground">{collection.guide.note}</p>}
+          </section>
+        )}
       </div>
 
       <main className="flex-1 container mx-auto px-3 md:px-4 py-4 md:py-6">

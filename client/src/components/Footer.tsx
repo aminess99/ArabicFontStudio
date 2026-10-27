@@ -24,6 +24,8 @@ export function Footer() {
     { name: "خطوط لليوتيوبرز", path: "/collection/khotot-lil-youtubiyeen" },
     { name: "خطوط للدعوات", path: "/collection/khotot-lil-dawaat" },
     { name: "خطوط مجانية", path: "/collection/khotot-bidoon-hoqooq" },
+    { name: "خطوط انشوت", path: "/collection/khotot-inshot" },
+    { name: "خطوط كاب كات", path: "/collection/khotot-capcut" },
   ];
 
   return (
