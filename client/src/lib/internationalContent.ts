@@ -12,7 +12,7 @@ export interface InternationalCategory {
 }
 
 export const englishHome = {
-  title: "Arabic Fonts — Free Download, 850+ Arabic Calligraphy Fonts | xfontat",
+  title: "Arabic Fonts — Free Download for Calligraphy & Design | xfontat",
   description:
     "Download 850+ free Arabic fonts: Thuluth, Diwani, Kufi, Naskh, Ruqaa and Nastaliq. Preview your own text and try our Arabic keyboard and name tools.",
   heading: "Free Arabic fonts to download and preview",
@@ -327,7 +327,7 @@ export const englishCategories: InternationalCategory[] = [
 ];
 
 export const frenchHome = {
-  title: "Polices arabes gratuites — plus de 850 polices à télécharger | xfontat",
+  title: "Polices arabes gratuites à télécharger — calligraphie | xfontat",
   description:
     "Plus de 850 polices arabes gratuites : thuluth, diwani, coufique, naskh, ruqaa et nastaliq. Prévisualisez votre texte et essayez notre clavier arabe.",
   heading: "Polices arabes gratuites à télécharger et prévisualiser",
