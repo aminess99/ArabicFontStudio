@@ -31,6 +31,20 @@ export function findIntlTool(path: string): { id: IntlToolId; locale: IntlLocale
   return undefined;
 }
 
+// Arabic pages with no English or French version; their language links lead
+// to the home page of that language.
+const ARABIC_ONLY = [/^\/zakhrafa$/, /^\/tahnia(?:\/[^/]+)?$/];
+
+// Where the EN/FR language links of an Arabic page lead. Tools have their own
+// path in each language, so prefixing /en or /fr would point to a missing page.
+export function localeSwitchPath(locale: "en" | "fr", arabicPath: string): string {
+  const path = arabicPath.replace(/\/+$/, "") || "/";
+  const tool = findIntlTool(path);
+  if (tool) return toolPaths[tool.id][locale] ?? `/${locale}`;
+  if (path === "/" || ARABIC_ONLY.some((pattern) => pattern.test(path))) return `/${locale}`;
+  return `/${locale}${path}`;
+}
+
 type Copy = ToolPageCopy & { locale: IntlLocale };
 
 export const keyboardCopy: Record<IntlLocale, Copy> = {
