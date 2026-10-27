@@ -169,6 +169,43 @@
   }
 }
 
+/* The server-rendered version of each page, shown until the app takes over
+   (and to crawlers). Styled to match the app so visitors see no plain-HTML flash. */
+[data-seo-fallback] {
+  display: block;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 4rem;
+  line-height: 1.9;
+  color: hsl(var(--muted-foreground));
+}
+[data-seo-fallback] h1 {
+  margin-bottom: 1rem;
+  font-size: clamp(1.875rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: hsl(var(--foreground));
+}
+[data-seo-fallback] h2 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+[data-seo-fallback] h3 {
+  margin: 1rem 0 0.25rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+[data-seo-fallback] p,
+[data-seo-fallback] dl { margin-bottom: 1rem; }
+[data-seo-fallback] ul,
+[data-seo-fallback] ol { margin: 0 0 1rem; padding-inline-start: 1.25rem; list-style: disc; }
+[data-seo-fallback] ol { list-style: decimal; }
+[data-seo-fallback] a { color: hsl(var(--primary)); text-decoration: underline; text-underline-offset: 4px; }
+[data-seo-fallback] dt { font-weight: 600; color: hsl(var(--foreground)); }
+[data-seo-fallback] dd { margin: 0 0 0.5rem; }
+
 @layer utilities {
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
