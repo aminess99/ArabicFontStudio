@@ -169,5 +169,5 @@ export function getArabicPhrase(slug: string): ArabicPhrase | undefined {
   return arabicPhrases.find((phrase) => phrase.slug === slug);
 }
 
-export const PHRASE_PATHS = { en: "/en/arabic-phrases", fr: "/fr/expressions-arabes" } as const;
-export const phrasePath = (locale: "en" | "fr", slug: string) => `${PHRASE_PATHS[locale]}/${slug}`;
+export const PHRASE_PATHS = { ar: "/ibarat", en: "/en/arabic-phrases", fr: "/fr/expressions-arabes" } as const;
+export const phrasePath = (locale: "ar" | "en" | "fr", slug: string) => `${PHRASE_PATHS[locale]}/${slug}`;

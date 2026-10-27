@@ -293,5 +293,5 @@ export function relatedNames(name: ArabicName, count = 8): ArabicName[] {
   return [...sameGender.slice(start), ...sameGender.slice(0, start)].slice(0, count);
 }
 
-export const NAME_PATHS = { en: "/en/names-in-arabic", fr: "/fr/prenoms-en-arabe" } as const;
-export const namePath = (locale: "en" | "fr", slug: string) => `${NAME_PATHS[locale]}/${slug}`;
+export const NAME_PATHS = { ar: "/asmaa", en: "/en/names-in-arabic", fr: "/fr/prenoms-en-arabe" } as const;
+export const namePath = (locale: "ar" | "en" | "fr", slug: string) => `${NAME_PATHS[locale]}/${slug}`;
