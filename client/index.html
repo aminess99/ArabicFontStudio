@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Apply the saved theme before the first paint so the server-rendered
+         page does not flash white before the app loads. -->
+    <script>try{document.documentElement.classList.add(localStorage.getItem("theme")||"dark")}catch(e){document.documentElement.classList.add("dark")}</script>
     <meta name="google-site-verification" content="DDMPlvnijVkSqGV5M8mQUzBUBKB4sbdDYh9V3Ygi_Po" />
     
     <!-- Favicon -->
