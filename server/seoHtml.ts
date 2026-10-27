@@ -24,6 +24,7 @@ import {
   localeSwitchPath,
   generatorCopy,
   keyboardCopy,
+  zakhrafaCopy,
   namesHubCopy,
   phrasesHubCopy,
   tattooCopy,
@@ -36,7 +37,8 @@ import { spellArabic } from "../client/src/lib/arabicLetters";
 import { arabicFontDescription, getFontProfile, profileDescription } from "../client/src/lib/fontProfiles";
 import { blogPostPath, blogSeo, localizedBlogSlug, originalBlogSlug } from "../client/src/lib/blogSlugs";
 import { nameContent, phraseContent, phraseLabel, type DetailContent } from "../client/src/lib/intlContent";
-import { CARDS_HUB, OCCASIONS, getOccasion, occasionPath } from "../client/src/lib/greetingCards";
+import { OCCASIONS, getOccasion } from "../client/src/lib/greetingCards";
+import { CARD_PATHS, cardOccasionPath, cardsHubCopy, localizeOccasion, parseCardPath, type CardLocale } from "../client/src/lib/greetingCardsIntl";
 import * as home from "../client/src/lib/homeContent";
 import { howToPosts } from "../client/src/lib/howToPosts";
 import { getGeneratedPosts } from "./blogGenerator";
@@ -790,7 +792,7 @@ function resolveToolPage(tool: ToolPageCopy): SeoPage {
     heading: tool.heading,
     bodyHtml: `<p>${escapeHtml(tool.intro)}</p>${sections}<section><h2>أسئلة شائعة</h2>${faqs}</section><ul>${related}<li><a href="/">مكتبة الخطوط العربية</a></li></ul>`
       ,
-    alternates: tool === textToImagePage ? intlAlternates(toolPaths.generator) : { ar: url, "x-default": url },
+    alternates: intlAlternates(tool === textToImagePage ? toolPaths.generator : toolPaths.zakhrafa),
     jsonLd: [
       breadcrumbNode([["الرئيسية", "/"], [tool.heading, tool.path]]),
       {
@@ -808,49 +810,63 @@ function resolveToolPage(tool: ToolPageCopy): SeoPage {
   };
 }
 
-// Greeting card pages exist only in Arabic.
-function resolveCardsPage(pagePath: string): SeoPage | null {
-  const occasionLinks = (current?: string) => `<ul>${OCCASIONS.filter((item) => item.slug !== current).map((item) => `<li><a href="${occasionPath(item.slug)}">بطاقات تهنئة ${escapeHtml(item.name)}</a></li>`).join("")}</ul>`;
-  if (pagePath === CARDS_HUB.path) {
-    const url = `${SITE_ORIGIN}${CARDS_HUB.path}`;
+// Greeting card hub and occasion pages, in Arabic, English and French.
+function cardAlternates(slug?: string): SeoPage["alternates"] {
+  const path = (locale: CardLocale) => (slug ? cardOccasionPath(locale, slug) : CARD_PATHS[locale]);
+  return { ar: `${SITE_ORIGIN}${path("ar")}`, en: `${SITE_ORIGIN}${path("en")}`, fr: `${SITE_ORIGIN}${path("fr")}`, "x-default": `${SITE_ORIGIN}${path("ar")}` };
+}
+
+function resolveCardsPage(locale: CardLocale, slug?: string): SeoPage | null {
+  const hub = cardsHubCopy[locale];
+  const faqHeading = locale === "ar" ? "أسئلة شائعة" : locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
+  const cardsFor = (name: string) => (locale === "ar" ? `بطاقات تهنئة ${name}` : locale === "fr" ? `Cartes ${name}` : `${name} cards`);
+  const occasionLinks = (current?: string) => `<ul>${OCCASIONS.filter((item) => item.slug !== current).map((item) => `<li><a href="${cardOccasionPath(locale, item.slug)}">${escapeHtml(cardsFor(localizeOccasion(item, locale).name))}</a></li>`).join("")}</ul>`;
+  if (!slug) {
+    const url = `${SITE_ORIGIN}${CARD_PATHS[locale]}`;
     return {
-      locale: "ar",
-      path: CARDS_HUB.path,
-      title: CARDS_HUB.title,
-      description: CARDS_HUB.description,
-      heading: CARDS_HUB.heading,
-      bodyHtml: `<p>${escapeHtml(CARDS_HUB.intro)}</p><section><h2>المناسبات</h2>${occasionLinks()}</section>${faqHtml("أسئلة شائعة", CARDS_HUB.faqs)}`,
-      alternates: { ar: url, "x-default": url },
+      locale,
+      path: CARD_PATHS[locale],
+      title: hub.title,
+      description: hub.description,
+      heading: hub.heading,
+      bodyHtml: `<p>${escapeHtml(hub.intro)}</p><section><h2>${locale === "ar" ? "المناسبات" : locale === "fr" ? "Occasions" : "Occasions"}</h2>${occasionLinks()}</section>${faqHtml(faqHeading, hub.faqs)}`,
+      alternates: cardAlternates(),
       jsonLd: [
-        breadcrumbNode([["الرئيسية", "/"], [CARDS_HUB.heading, CARDS_HUB.path]]),
-        { "@type": "CollectionPage", name: CARDS_HUB.heading, description: CARDS_HUB.description, url, inLanguage: "ar" },
-        faqNode(CARDS_HUB.faqs),
+        breadcrumbNode([homeCrumb(locale), [hub.heading, CARD_PATHS[locale]]]),
+        { "@type": "CollectionPage", name: hub.heading, description: hub.description, url, inLanguage: locale },
+        faqNode(hub.faqs),
       ],
     };
   }
-  const match = new RegExp(`^${CARDS_HUB.path}/([^/]+)$`).exec(pagePath);
-  const occasion = match ? getOccasion(decodeURIComponent(match[1])) : undefined;
-  if (!occasion) return null;
-  const path = occasionPath(occasion.slug);
+  const base = getOccasion(slug);
+  if (!base) return null;
+  const occasion = localizeOccasion(base, locale);
+  const path = cardOccasionPath(locale, occasion.slug);
   const url = `${SITE_ORIGIN}${path}`;
-  const templates = occasion.templates.map((template) => template.label).join("، ");
+  const sizes = locale === "ar"
+    ? `القوالب المتاحة: ${occasion.templates.map((template) => template.label).join("، ")}. المقاسات: مربع 1080×1080 وستوري 1080×1920. الخطوط منشورة بترخيص SIL Open Font License.`
+    : locale === "fr"
+      ? "Formats : carré 1080×1080 et story 1080×1920. Les polices sont publiées sous licence SIL Open Font License."
+      : "Sizes: square 1080×1080 and story 1080×1920. The fonts are published under the SIL Open Font License.";
+  const greetingsHeading = locale === "ar" ? `عبارات تهنئة ${occasion.name}` : locale === "fr" ? `Vœux en arabe : ${occasion.name}` : `${occasion.name} greetings in Arabic`;
+  const otherHeading = locale === "ar" ? "بطاقات لمناسبات أخرى" : locale === "fr" ? "Cartes pour d'autres occasions" : "Cards for other occasions";
   return {
-    locale: "ar",
+    locale,
     path,
     title: occasion.title,
     description: occasion.description,
     heading: occasion.heading,
     bodyHtml: [
       `<p>${escapeHtml(occasion.intro)}</p>`,
-      `<p>${escapeHtml(`القوالب المتاحة: ${templates}. المقاسات: مربع 1080×1080 وستوري 1080×1920. الخطوط منشورة بترخيص SIL Open Font License.`)}</p>`,
-      `<section><h2>عبارات تهنئة ${escapeHtml(occasion.name)}</h2><ul>${occasion.greetings.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`,
-      faqHtml("أسئلة شائعة", occasion.faqs),
-      `<section><h2>بطاقات لمناسبات أخرى</h2>${occasionLinks(occasion.slug)}</section>`,
+      `<p>${escapeHtml(sizes)}</p>`,
+      `<section><h2>${escapeHtml(greetingsHeading)}</h2><ul>${occasion.greetings.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`,
+      faqHtml(faqHeading, occasion.faqs),
+      `<section><h2>${escapeHtml(otherHeading)}</h2>${occasionLinks(occasion.slug)}</section>`,
     ].join(""),
-    alternates: { ar: url, "x-default": url },
+    alternates: cardAlternates(occasion.slug),
     jsonLd: [
-      breadcrumbNode([["الرئيسية", "/"], [CARDS_HUB.heading, CARDS_HUB.path], [occasion.heading, path]]),
-      { "@type": "WebApplication", name: occasion.heading, description: occasion.description, url, applicationCategory: "DesignApplication", operatingSystem: "Web", inLanguage: "ar", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+      breadcrumbNode([homeCrumb(locale), [hub.heading, CARD_PATHS[locale]], [occasion.heading, path]]),
+      { "@type": "WebApplication", name: occasion.heading, description: occasion.description, url, applicationCategory: "DesignApplication", operatingSystem: "Web", inLanguage: locale, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
       faqNode(occasion.faqs),
     ],
   };
@@ -871,11 +887,10 @@ function resolveUtilityPage(locale: Locale, pagePath: string, fonts: Font[]): Se
       alternates: pageAlternates(pagePath),
     };
   }
-  if (pagePath === CARDS_HUB.path || pagePath.startsWith(`${CARDS_HUB.path}/`)) {
-    return locale === "ar" ? resolveCardsPage(pagePath) : null;
-  }
+  const card = locale === "ar" ? parseCardPath(pagePath) : undefined;
+  if (card) return resolveCardsPage("ar", card.slug);
   const tool = [zakhrafaPage, textToImagePage].find((item) => item.path === pagePath);
-  // The tool pages exist only in Arabic.
+  // English and French versions of these tools live at their own paths.
   if (tool) return locale === "ar" ? resolveToolPage(tool) : null;
   if (pagePath === "/youtube-thumbnail-maker") {
     const title = locale === "fr" ? "Créateur de miniatures YouTube | xfontat" : locale === "en" ? "YouTube Thumbnail Maker | xfontat" : "منشئ صور يوتيوب المصغرة | xfontat";
@@ -911,8 +926,8 @@ function linkListHtml(links: Array<[string, string]>): string {
 
 function intlToolLinks(locale: "en" | "fr"): Array<[string, string]> {
   return locale === "fr"
-    ? [[toolPaths.keyboard.fr!, "Clavier arabe en ligne"], [toolPaths.names.fr!, "Prénoms en arabe"], [toolPaths.generator.fr!, "Générateur de police arabe"], [toolPaths.tattoo.fr!, "Polices arabes pour tatouage"], [toolPaths.phrases.fr!, "Mots et expressions arabes"], ["/fr", "Bibliothèque de polices arabes"]]
-    : [[toolPaths.keyboard.en!, "Online Arabic keyboard"], [toolPaths.names.en!, "Names in Arabic"], [toolPaths.generator.en!, "Arabic font generator"], [toolPaths.tattoo.en!, "Arabic tattoo fonts"], [toolPaths.phrases.en!, "Arabic words and phrases"], ["/en", "Arabic font library"]];
+    ? [[toolPaths.keyboard.fr!, "Clavier arabe en ligne"], [toolPaths.names.fr!, "Prénoms en arabe"], [toolPaths.generator.fr!, "Générateur de police arabe"], [toolPaths.zakhrafa.fr!, "Écriture arabe stylée"], [CARD_PATHS.fr, "Cartes de vœux arabes"], [toolPaths.tattoo.fr!, "Polices arabes pour tatouage"], [toolPaths.phrases.fr!, "Mots et expressions arabes"], ["/fr", "Bibliothèque de polices arabes"]]
+    : [[toolPaths.keyboard.en!, "Online Arabic keyboard"], [toolPaths.names.en!, "Names in Arabic"], [toolPaths.generator.en!, "Arabic font generator"], [toolPaths.zakhrafa.en!, "Arabic fancy text"], [CARD_PATHS.en, "Arabic greeting cards"], [toolPaths.tattoo.en!, "Arabic tattoo fonts"], [toolPaths.phrases.en!, "Arabic words and phrases"], ["/en", "Arabic font library"]];
 }
 
 function webAppNode(name: string, description: string, url: string, locale: IntlLocale): object {
@@ -923,10 +938,10 @@ function homeCrumb(locale: IntlLocale): [string, string] {
   return locale === "ar" ? ["الرئيسية", "/"] : locale === "fr" ? ["Accueil", "/fr"] : ["Home", "/en"];
 }
 
-function resolveIntlToolPage(id: "keyboard" | "generator" | "tattoo", locale: IntlLocale): SeoPage | null {
+function resolveIntlToolPage(id: "keyboard" | "generator" | "zakhrafa" | "tattoo", locale: IntlLocale): SeoPage | null {
   const copy = id === "keyboard" ? keyboardCopy[locale]
     : locale === "ar" ? null
-    : id === "generator" ? generatorCopy[locale] : tattooCopy[locale];
+    : id === "generator" ? generatorCopy[locale] : id === "zakhrafa" ? zakhrafaCopy[locale] : tattooCopy[locale];
   if (!copy) return null;
   const faqHeading = locale === "ar" ? "أسئلة شائعة" : locale === "fr" ? "Questions fréquentes" : "Frequently asked questions";
   const related = locale === "ar"
@@ -1048,9 +1063,11 @@ function resolvePhrasesPage(locale: "en" | "fr", slug?: string): SeoPage | null 
 
 function resolveIntlPage(pathname: string): SeoPage | null | undefined {
   const tool = findIntlTool(pathname);
-  if (tool && (tool.id === "keyboard" || tool.id === "tattoo" || (tool.id === "generator" && tool.locale !== "ar"))) {
+  if (tool && (tool.id === "keyboard" || tool.id === "tattoo" || ((tool.id === "generator" || tool.id === "zakhrafa") && tool.locale !== "ar"))) {
     return resolveIntlToolPage(tool.id, tool.locale);
   }
+  const card = parseCardPath(pathname);
+  if (card && card.locale !== "ar") return resolveCardsPage(card.locale, card.slug);
   for (const locale of ["en", "fr"] as const) {
     if (pathname === NAME_PATHS[locale]) return resolveNamesPage(locale);
     if (pathname.startsWith(`${NAME_PATHS[locale]}/`)) return resolveNamesPage(locale, decodeURIComponent(pathname.slice(NAME_PATHS[locale].length + 1)));
@@ -1365,9 +1382,11 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
     add(phrasePath("en", phrase.slug), phrasesLastmod);
     add(phrasePath("fr", phrase.slug), phrasesLastmod);
   }
-  const cardsLastmod = sourceLastmod("client/src/lib/greetingCards.ts");
-  add(CARDS_HUB.path, cardsLastmod);
-  for (const occasion of OCCASIONS) add(occasionPath(occasion.slug), cardsLastmod);
+  const cardsLastmod = sourceLastmod("client/src/lib/greetingCards.ts", "client/src/lib/greetingCardsIntl.ts");
+  for (const locale of ["ar", "en", "fr"] as const) {
+    add(CARD_PATHS[locale], cardsLastmod);
+    for (const occasion of OCCASIONS) add(cardOccasionPath(locale, occasion.slug), cardsLastmod);
+  }
   const thumbnailLastmod = sourceLastmod("client/src/pages/YouTubeThumbnailStudio.tsx");
   add("/youtube-thumbnail-maker", thumbnailLastmod);
   add("/en/youtube-thumbnail-maker", thumbnailLastmod);
@@ -1416,14 +1435,16 @@ async function renderLlmsTxt(res: Response): Promise<void> {
     "## Free tools",
     ...tools,
     `- [منشئ صور يوتيوب المصغرة](${SITE_ORIGIN}/youtube-thumbnail-maker): AI YouTube thumbnail maker with Arabic titles.`,
-    `- [${CARDS_HUB.heading}](${SITE_ORIGIN}${CARDS_HUB.path}): ${CARDS_HUB.description}`,
+    `- [${cardsHubCopy.ar.heading}](${SITE_ORIGIN}${CARD_PATHS.ar}): ${cardsHubCopy.ar.description}`,
+    `- [${cardsHubCopy.en.heading}](${SITE_ORIGIN}${CARD_PATHS.en}): ${cardsHubCopy.en.description}`,
+    `- [${zakhrafaCopy.en.heading}](${SITE_ORIGIN}${zakhrafaCopy.en.path}): ${zakhrafaCopy.en.description}`,
     `- [${keyboardCopy.ar.heading}](${SITE_ORIGIN}${keyboardCopy.ar.path}): ${keyboardCopy.ar.description}`,
     `- [${keyboardCopy.en.heading}](${SITE_ORIGIN}${keyboardCopy.en.path}): ${keyboardCopy.en.description}`,
     `- [${generatorCopy.en.heading}](${SITE_ORIGIN}${generatorCopy.en.path}): ${generatorCopy.en.description}`,
     `- [${tattooCopy.en.heading}](${SITE_ORIGIN}${tattooCopy.en.path}): ${tattooCopy.en.description}`,
     `- [${namesHubCopy.en.heading}](${SITE_ORIGIN}${namesHubCopy.en.path}): ${namesHubCopy.en.description}`,
     `- [${phrasesHubCopy.en.heading}](${SITE_ORIGIN}${phrasesHubCopy.en.path}): ${phrasesHubCopy.en.description}`,
-    ...OCCASIONS.map((occasion) => `  - [${occasion.heading}](${SITE_ORIGIN}${occasionPath(occasion.slug)})`),
+    ...OCCASIONS.map((occasion) => `  - [${occasion.heading}](${SITE_ORIGIN}${cardOccasionPath("ar", occasion.slug)})`),
     "",
     "## Guides",
     ...guides,

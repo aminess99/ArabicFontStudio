@@ -48,6 +48,16 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       description: "Browse downloadable Arabic font files. Download availability does not determine usage rights; review each file’s license.",
       useCases: ["Personal projects", "Print", "Web and apps"],
     },
+    "khotot-inshot": {
+      title: "Arabic fonts for InShot",
+      description: "Arabic fonts that work in InShot video captions. Download a font file, add it in InShot's text tool, then type your Arabic text.",
+      useCases: ["Video captions", "Reels and Shorts", "Stories"],
+    },
+    "khotot-capcut": {
+      title: "Arabic fonts for CapCut",
+      description: "Arabic fonts for CapCut titles and captions. Download a font file, import it in CapCut's text settings, then type your Arabic text.",
+      useCases: ["Video titles", "Captions", "TikTok edits"],
+    },
   },
   fr: {
     "khotot-lil-shiaarat": {
@@ -89,6 +99,16 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       title: "Fichiers de polices arabes à télécharger",
       description: "Parcourez des fichiers de polices arabes téléchargeables. La disponibilité au téléchargement ne définit pas les droits d’usage : vérifiez chaque licence.",
       useCases: ["Projets personnels", "Impression", "Web et applications"],
+    },
+    "khotot-inshot": {
+      title: "Polices arabes pour InShot",
+      description: "Des polices arabes pour les textes de vos vidéos InShot. Téléchargez un fichier, ajoutez-le dans l'outil texte d'InShot, puis écrivez en arabe.",
+      useCases: ["Sous-titres vidéo", "Reels et Shorts", "Stories"],
+    },
+    "khotot-capcut": {
+      title: "Polices arabes pour CapCut",
+      description: "Des polices arabes pour les titres et sous-titres CapCut. Téléchargez un fichier, importez-le dans les réglages de texte, puis écrivez en arabe.",
+      useCases: ["Titres vidéo", "Sous-titres", "Montages TikTok"],
     },
   },
 };

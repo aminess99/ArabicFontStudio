@@ -79,6 +79,12 @@ function Router() {
         <Route path="/fr/clavier-arabe" component={ArabicKeyboard} />
         <Route path="/en/arabic-font-generator" component={ArabicTextToImage} />
         <Route path="/fr/generateur-police-arabe" component={ArabicTextToImage} />
+        <Route path="/en/arabic-fancy-text" component={Zakhrafa} />
+        <Route path="/fr/texte-arabe-stylise" component={Zakhrafa} />
+        <Route path="/en/greeting-cards" component={GreetingCards} />
+        <Route path="/en/greeting-cards/:slug" component={GreetingCards} />
+        <Route path="/fr/cartes-de-voeux" component={GreetingCards} />
+        <Route path="/fr/cartes-de-voeux/:slug" component={GreetingCards} />
         <Route path="/en/arabic-tattoo-fonts" component={TattooFonts} />
         <Route path="/fr/police-arabe-tatouage" component={TattooFonts} />
         <Route path="/en/names-in-arabic" component={NamesPage} />

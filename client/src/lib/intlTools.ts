@@ -6,11 +6,12 @@ import type { ToolPageCopy } from "./toolPages";
 import { blogPostPath } from "./blogSlugs";
 
 export type IntlLocale = "ar" | "en" | "fr";
-export type IntlToolId = "keyboard" | "generator" | "tattoo" | "names" | "phrases";
+export type IntlToolId = "keyboard" | "generator" | "zakhrafa" | "tattoo" | "names" | "phrases";
 
 export const toolPaths: Record<IntlToolId, Partial<Record<IntlLocale, string>>> = {
   keyboard: { ar: "/keyboard", en: "/en/arabic-keyboard", fr: "/fr/clavier-arabe" },
   generator: { ar: "/arabic-text-to-image", en: "/en/arabic-font-generator", fr: "/fr/generateur-police-arabe" },
+  zakhrafa: { ar: "/zakhrafa", en: "/en/arabic-fancy-text", fr: "/fr/texte-arabe-stylise" },
   tattoo: { en: "/en/arabic-tattoo-fonts", fr: "/fr/police-arabe-tatouage" },
   names: { en: "/en/names-in-arabic", fr: "/fr/prenoms-en-arabe" },
   phrases: { en: "/en/arabic-phrases", fr: "/fr/expressions-arabes" },
@@ -32,9 +33,23 @@ export function findIntlTool(path: string): { id: IntlToolId; locale: IntlLocale
   return undefined;
 }
 
-// Arabic pages with no English or French version; their language links lead
-// to the home page of that language.
-const ARABIC_ONLY = [/^\/zakhrafa$/, /^\/tahnia(?:\/[^/]+)?$/];
+// Greeting card pages: a hub and one page per occasion in each language.
+export const CARD_PATHS: Record<IntlLocale, string> = { ar: "/tahnia", en: "/en/greeting-cards", fr: "/fr/cartes-de-voeux" };
+
+export function cardOccasionPath(locale: IntlLocale, slug: string): string {
+  return `${CARD_PATHS[locale]}/${slug}`;
+}
+
+// The locale and occasion slug of a greeting card path, if it is one.
+export function parseCardPath(path: string): { locale: IntlLocale; slug?: string } | undefined {
+  for (const locale of ["ar", "en", "fr"] as const) {
+    const base = CARD_PATHS[locale];
+    if (path === base) return { locale };
+    const rest = path.startsWith(`${base}/`) ? path.slice(base.length + 1) : "";
+    if (rest && !rest.includes("/")) return { locale, slug: decodeURIComponent(rest) };
+  }
+  return undefined;
+}
 
 // Where the EN/FR language links of an Arabic page lead. Tools have their own
 // path in each language, so prefixing /en or /fr would point to a missing page.
@@ -42,9 +57,11 @@ export function localeSwitchPath(locale: "en" | "fr", arabicPath: string): strin
   const path = arabicPath.replace(/\/+$/, "") || "/";
   const tool = findIntlTool(path);
   if (tool) return toolPaths[tool.id][locale] ?? `/${locale}`;
+  const card = parseCardPath(path);
+  if (card?.locale === "ar") return card.slug ? cardOccasionPath(locale, card.slug) : CARD_PATHS[locale];
   const blogPost = path.match(/^\/blog\/([^/]+)$/);
   if (blogPost) return blogPostPath(locale, decodeURIComponent(blogPost[1]));
-  if (path === "/" || ARABIC_ONLY.some((pattern) => pattern.test(path))) return `/${locale}`;
+  if (path === "/") return `/${locale}`;
   return `/${locale}${path}`;
 }
 
@@ -152,6 +169,47 @@ export const generatorCopy: Record<"en" | "fr", Copy> = {
       { question: "Le générateur est-il gratuit ?", answer: "Oui, sans inscription. L'image est créée dans votre navigateur." },
       { question: "Puis-je utiliser l'image pour un tatouage ?", answer: "Oui, mais faites vérifier l'orthographe par un arabophone et choisissez une police dont la licence le permet. Voir notre guide des polices arabes pour tatouage." },
       { question: "Pourquoi les lettres sont-elles séparées sur d'autres sites ?", answer: "Les lettres arabes changent de forme selon leur position. Beaucoup de générateurs ne gèrent pas cela ; le nôtre utilise de vrais fichiers de police arabe." },
+    ],
+  },
+};
+
+export const zakhrafaCopy: Record<"en" | "fr", Copy> = {
+  en: {
+    locale: "en",
+    path: toolPaths.zakhrafa.en!,
+    title: "Arabic Fancy Text Generator — Copy and Paste | xfontat",
+    description: "Decorate Arabic and English names with 40+ fancy text styles: tatweel, harakat, frames and Unicode letters, ready to copy and paste in games and apps.",
+    heading: "Arabic fancy text generator",
+    intro: "Type a name in Arabic or English and get dozens of decorated versions at once. Tap any style to copy it, then paste it in a game, Instagram, WhatsApp or TikTok.",
+    sections: [
+      { heading: "Fancy names for PUBG and Free Fire", body: "Games accept Unicode characters, not font files, so decorated text works in player and clan names. Some games limit the length or reject certain symbols; if a style is refused, try a shorter one or one without a frame." },
+      { heading: "How Arabic text decoration works", body: "Arabic decoration, called zakhrafa, stretches the joins between letters with the tatweel character ـ, adds vowel marks such as shadda and tanween, and wraps the word in symbols. The letters stay real text, so you can copy them anywhere." },
+      { heading: "Decorated text or Arabic calligraphy?", body: "Decorated text changes the characters themselves; calligraphy changes the shape of the letters and needs a font file or an image. For a name in Thuluth or Diwani calligraphy, use the Arabic font generator and download a PNG." },
+    ],
+    faqs: [
+      { question: "How do I decorate my name?", answer: "Type the name in the box, then tap the style you like to copy it and paste it wherever you want." },
+      { question: "Can I decorate my name in Arabic letters?", answer: "Yes. Find your name's Arabic spelling in our Names in Arabic guide, or type it with the online Arabic keyboard, then paste it here." },
+      { question: "Why do some symbols show as empty boxes?", answer: "The font on that device does not include the symbol. Try another style or update the operating system." },
+      { question: "Is the tool free?", answer: "Yes. It is completely free, works in your browser without sign-up, and the text you type is never sent to a server." },
+    ],
+  },
+  fr: {
+    locale: "fr",
+    path: toolPaths.zakhrafa.fr!,
+    title: "Écriture arabe stylée — générateur à copier-coller | xfontat",
+    description: "Décorez des prénoms en arabe ou en français avec plus de 40 styles : tatweel, voyelles, cadres et lettres Unicode, à copier-coller dans les jeux et applis.",
+    heading: "Générateur d'écriture arabe stylée",
+    intro: "Tapez un prénom en arabe ou en lettres latines et obtenez des dizaines de versions décorées. Touchez un style pour le copier, puis collez-le dans un jeu, sur Instagram, WhatsApp ou TikTok.",
+    sections: [
+      { heading: "Pseudos stylés pour PUBG et Free Fire", body: "Les jeux acceptent les caractères Unicode, pas les fichiers de police : le texte décoré fonctionne donc dans les pseudos et noms de clan. Certains jeux limitent la longueur ou refusent certains symboles ; essayez alors un style plus court ou sans cadre." },
+      { heading: "Comment fonctionne la décoration arabe", body: "La décoration arabe, appelée zakhrafa, étire les liaisons entre les lettres avec le caractère tatweel ـ, ajoute des voyelles comme la chadda ou le tanwin, et entoure le mot de symboles. Les lettres restent du vrai texte, que l'on peut copier partout." },
+      { heading: "Texte décoré ou calligraphie arabe ?", body: "Le texte décoré modifie les caractères eux-mêmes ; la calligraphie change la forme des lettres et demande un fichier de police ou une image. Pour un prénom en thuluth ou en diwani, utilisez le générateur de police arabe et téléchargez un PNG." },
+    ],
+    faqs: [
+      { question: "Comment décorer mon prénom ?", answer: "Tapez le prénom dans le champ, puis touchez le style qui vous plaît pour le copier et collez-le où vous voulez." },
+      { question: "Puis-je décorer mon prénom en lettres arabes ?", answer: "Oui. Cherchez l'orthographe arabe de votre prénom dans notre guide des prénoms en arabe, ou tapez-le avec le clavier arabe, puis collez-le ici." },
+      { question: "Pourquoi certains symboles s'affichent-ils en carrés vides ?", answer: "La police de l'appareil ne contient pas ce symbole. Essayez un autre style ou mettez à jour le système." },
+      { question: "L'outil est-il gratuit ?", answer: "Oui, entièrement gratuit, il fonctionne dans le navigateur sans inscription et le texte saisi n'est jamais envoyé à un serveur." },
     ],
   },
 };
@@ -276,6 +334,7 @@ export const intlNav: Record<"en" | "fr", Array<{ id: IntlToolId | "fonts" | "bl
     { id: "keyboard", href: toolPaths.keyboard.en!, label: "Arabic keyboard" },
     { id: "names", href: toolPaths.names.en!, label: "Names in Arabic" },
     { id: "generator", href: toolPaths.generator.en!, label: "Font generator" },
+    { id: "zakhrafa", href: toolPaths.zakhrafa.en!, label: "Fancy text" },
     { id: "tattoo", href: toolPaths.tattoo.en!, label: "Tattoo fonts" },
     { id: "phrases", href: toolPaths.phrases.en!, label: "Arabic phrases" },
     { id: "blog", href: "/en/blog", label: "Blog" },
@@ -285,6 +344,7 @@ export const intlNav: Record<"en" | "fr", Array<{ id: IntlToolId | "fonts" | "bl
     { id: "keyboard", href: toolPaths.keyboard.fr!, label: "Clavier arabe" },
     { id: "names", href: toolPaths.names.fr!, label: "Prénoms en arabe" },
     { id: "generator", href: toolPaths.generator.fr!, label: "Générateur" },
+    { id: "zakhrafa", href: toolPaths.zakhrafa.fr!, label: "Texte stylé" },
     { id: "tattoo", href: toolPaths.tattoo.fr!, label: "Tatouage" },
     { id: "phrases", href: toolPaths.phrases.fr!, label: "Expressions" },
     { id: "blog", href: "/fr/blog", label: "Blog" },
