@@ -2,8 +2,8 @@
 // server/seoHtml.ts so search engines and AI crawlers read the same title,
 // headings and text that visitors see.
 
-export const homeTitle = "تحميل خطوط عربية مجاناً — أكثر من 850 خطاً للتصميم | xfontat";
-export const homeDescription = "مكتبة خطوط عربية مجانية للتحميل: ثلث وديواني ورقعة وكوفي ونسخ وخطوط تصميم وفوتوشوب. عاين النص بكل خط وراجع الصيغة والترخيص قبل التحميل.";
+export const homeTitle = "تحميل خطوط عربية مجاناً للتصميم والنسخ | xfontat";
+export const homeDescription = "أكثر من 850 خطاً عربياً مجانياً للتحميل: ثلث وديواني ورقعة وكوفي ونسخ، وخطوط للتصميم والفوتوشوب وإن شوت. عاين نصك بكل خط قبل التحميل.";
 export const homeHeading = "مكتبة خطوط عربية مجانية للتحميل الفوري";
 
 export type HomeStats = { total: number; categories: Array<{ category: string; count: number }> };
