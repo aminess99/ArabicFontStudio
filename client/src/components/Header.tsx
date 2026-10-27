@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./ThemeToggle";
+import { localeSwitchPath } from "@/lib/intlTools";
 
 // Every prop is optional: pages that list fonts pass the search and preview
 // controls; other pages get the same header, with search sending the visitor
@@ -35,8 +36,8 @@ export function Header({ searchQuery, onSearchChange, previewText, onPreviewText
   const [location, navigate] = useLocation();
   const [localQuery, setLocalQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const englishPath = location === "/" ? "/en" : `/en${location}`;
-  const frenchPath = location === "/" ? "/fr" : `/fr${location}`;
+  const englishPath = localeSwitchPath("en", location);
+  const frenchPath = localeSwitchPath("fr", location);
   const query = onSearchChange ? searchQuery ?? "" : localQuery;
   const showPreview = Boolean(onPreviewTextChange);
 

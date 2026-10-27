@@ -21,6 +21,7 @@ import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDeta
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
 import {
   findIntlTool,
+  localeSwitchPath,
   generatorCopy,
   keyboardCopy,
   namesHubCopy,
@@ -1463,6 +1464,13 @@ export function registerSeoHtmlRoute(app: Express): void {
     try {
       const page = await resolvePage(pathname);
       if (page) return await renderPage(req, res, page);
+      // An Arabic page path under /en or /fr (e.g. /en/keyboard) goes to that
+      // page's English or French version, or to the language home page.
+      const localized = pathname.match(/^\/(en|fr)(\/.+)$/);
+      if (localized) {
+        const target = localeSwitchPath(localized[1] as "en" | "fr", localized[2]);
+        if (target !== pathname && (await resolvePage(target))) return res.redirect(301, target);
+      }
       return await renderPage(req, res, notFoundPage(pathname), 404);
     } catch (error) {
       const redirect = error as { status?: number; location?: string };
