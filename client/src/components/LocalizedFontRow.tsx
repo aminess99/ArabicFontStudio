@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Heart } from "lucide-react";
 import { generateFontFamily, loadFont } from "@/lib/fontLoader";
@@ -29,8 +29,25 @@ export function LocalizedFontRow({
 }: LocalizedFontRowProps) {
   const [fontLoaded, setFontLoaded] = useState(false);
   const fontFamily = generateFontFamily(font.name);
+  const rowRef = useRef<HTMLElement>(null);
+  const [nearViewport, setNearViewport] = useState(false);
+
+  // Download the font file only when the row is about to scroll into view.
+  useEffect(() => {
+    const element = rowRef.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setNearViewport(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "200px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
+    if (!nearViewport) return;
     let active = true;
     loadFont(fontFamily, font.fileUrl)
       .then(() => {
@@ -42,13 +59,13 @@ export function LocalizedFontRow({
     return () => {
       active = false;
     };
-  }, [fontFamily, font.fileUrl]);
+  }, [nearViewport, fontFamily, font.fileUrl]);
 
   const format = font.fileFormat || font.fileName.split(".").pop()?.toUpperCase();
   const detailsPath = `/${locale}/font/${getCanonicalFontSlug(font)}`;
 
   return (
-    <article className="border-b py-5" data-testid={`international-font-${font.id}`}>
+    <article ref={rowRef} className="border-b py-5" data-testid={`international-font-${font.id}`}>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">

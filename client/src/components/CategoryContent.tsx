@@ -1,4 +1,6 @@
 
+import { categoryComparison, categoryDeepDive } from "@/lib/arabicCategoryContent";
+
 const categoryData: Record<string, {
   intro: string;
   history: string;
@@ -471,6 +473,7 @@ interface CategoryContentProps {
 export function CategoryContent({ category }: CategoryContentProps) {
   const data = categoryData[category];
   if (!data) return null;
+  const deep = categoryDeepDive[category];
 
   return (
     <div className="mt-12 space-y-10">
@@ -481,8 +484,15 @@ export function CategoryContent({ category }: CategoryContentProps) {
 
       <section>
         <h2 className="text-xl font-bold mb-4">تاريخ ونشأة الخط</h2>
-        <p className="text-base text-muted-foreground leading-loose">{data.history}</p>
+        <p className="text-base text-muted-foreground leading-loose">{deep?.history ?? data.history}</p>
       </section>
+
+      {deep && (
+        <section>
+          <h2 className="text-xl font-bold mb-4">كيف تختار خط {category}؟</h2>
+          <p className="text-base text-muted-foreground leading-loose">{deep.choose}</p>
+        </section>
+      )}
 
       <section>
         <h2 className="text-xl font-bold mb-4">مميزات وخصائص الخط</h2>
@@ -520,10 +530,31 @@ export function CategoryContent({ category }: CategoryContentProps) {
         </div>
       </section>
 
+      {deep && (
+        <section>
+          <h2 className="text-xl font-bold mb-3">{categoryComparison.heading}</h2>
+          <p className="mb-4 text-sm text-muted-foreground">{categoryComparison.intro}</p>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead><tr className="border-b text-start"><th className="p-3 text-start">الخط</th><th className="p-3 text-start">الشكل</th><th className="p-3 text-start">الأنسب لـ</th></tr></thead>
+              <tbody>
+                {categoryComparison.rows.map((row) => (
+                  <tr key={row.name} className="border-b align-top">
+                    <td className="p-3 font-semibold">{row.name}</td>
+                    <td className="p-3 text-muted-foreground">{row.look}</td>
+                    <td className="p-3 text-muted-foreground">{row.use}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       <section>
         <h2 className="text-xl font-bold mb-6">أسئلة شائعة</h2>
         <div className="space-y-4">
-          {data.faq.map((item, i) => (
+          {[...data.faq, ...(deep?.faqs.map((item) => ({ q: item.question, a: item.answer })) ?? [])].map((item, i) => (
             <div key={i} className="border rounded-lg p-5">
               <h3 className="font-semibold text-base mb-2">{item.q}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
