@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { specsFaqs, specsRows } from "@/lib/fontSpecs";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
@@ -256,6 +257,8 @@ export default function LocalizedContentPage() {
   const homeCopy = currentLabel ? frenchHome : englishHome;
   const fontLabels = localizedFontDetailCopy[locale];
   const localizedFont = font ? getLocalizedFontPageContent(font, locale) : undefined;
+  const fontSpecRows = font ? specsRows(locale, font) : [];
+  const fontFaqs = localizedFont && font ? [...specsFaqs(locale, font), ...localizedFont.faqs] : [];
   const fontProfile = font && !font.duplicateOf ? getFontProfile(font.slug) : undefined;
   const fontFamily = font ? detectFontFamily(font.name) : "";
   const familyVariants = font
@@ -404,7 +407,7 @@ export default function LocalizedContentPage() {
           }] : []),
           {
             "@type": "FAQPage",
-            mainEntity: localizedFont.faqs.map((faq) => ({
+            mainEntity: fontFaqs.map((faq) => ({
               "@type": "Question",
               name: faq.question,
               acceptedAnswer: { "@type": "Answer", text: faq.answer },
@@ -628,6 +631,20 @@ export default function LocalizedContentPage() {
                 {fontLabels.download}
               </a>
 
+              {fontSpecRows.length ? (
+                <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-specs-heading">
+                  <h2 id="font-specs-heading" className="text-xl font-semibold">{locale === "fr" ? "Caractéristiques de la police" : "Font specifications"}</h2>
+                  <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                    {fontSpecRows.map(([label, value]) => (
+                      <div key={label} className="flex flex-wrap gap-2">
+                        <dt className="text-muted-foreground">{label}:</dt>
+                        <dd className="font-medium">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+              ) : null}
+
               {localizedFont?.useCases.length ? (
                 <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-uses-heading">
                   <h2 id="font-uses-heading" className="text-xl font-semibold">{fontLabels.usesHeading}</h2>
@@ -690,11 +707,11 @@ export default function LocalizedContentPage() {
                 </figure>
               </section>
 
-              {localizedFont?.faqs.length ? (
+              {fontFaqs.length ? (
                 <section className="mt-8 rounded-lg border p-5 sm:p-6" aria-labelledby="font-faq-heading">
                   <h2 id="font-faq-heading" className="text-xl font-semibold">{fontLabels.categoryFaqHeading}</h2>
                   <div className="mt-4 space-y-5">
-                    {localizedFont.faqs.map((faq) => (
+                    {fontFaqs.map((faq) => (
                       <div key={faq.question}>
                         <h3 className="font-medium">{faq.question}</h3>
                         <p className="mt-1 leading-7 text-muted-foreground">{faq.answer}</p>

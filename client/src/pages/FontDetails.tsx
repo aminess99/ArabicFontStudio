@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { SEOHead } from "@/components/SEOHead";
 import { arabicFontDescription, getFontProfile } from "@/lib/fontProfiles";
+import { specsFaqs, specsRows } from "@/lib/fontSpecs";
 import { categoryDescriptions, categoryUseCases } from "@/lib/arabicCategoryContent";
 import { Header } from "@/components/Header";
 import { loadFont, generateFontFamily } from "@/lib/fontLoader";
@@ -240,6 +241,8 @@ export default function FontDetails() {
   const seoTitle = `تحميل خط ${fontTitleName(font)}${font.duplicateOf ? ` (${font.category})` : ""} مجاناً | xfontat`;
   const profile = font.duplicateOf ? undefined : getFontProfile(font.slug);
   const seoDescription = arabicFontDescription(font);
+  const specRows = specsRows("ar", font);
+  const specFaqs = specsFaqs("ar", font);
 
   const fontPageSchema = {
     "@context": "https://schema.org",
@@ -294,7 +297,8 @@ export default function FontDetails() {
               "@type": "Answer",
               "text": `خط ${font.nameArabic} من فئة ${font.category} ومناسب لـ${useCases.join("، ")}. ${categoryDesc}`
             }
-          }
+          },
+          ...specFaqs.map((faq) => ({ "@type": "Question", "name": faq.question, "acceptedAnswer": { "@type": "Answer", "text": faq.answer } }))
         ]
       }
     ]
@@ -486,6 +490,28 @@ export default function FontDetails() {
                   </div>
                 </div>
               </div>
+
+              {specRows.length > 0 && (
+                <section className="border rounded-lg p-6 mb-8">
+                  <h2 className="text-xl font-bold mb-4">مواصفات خط {font.nameArabic}</h2>
+                  <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                    {specRows.map(([label, value]) => (
+                      <div key={label} className="flex flex-wrap gap-2">
+                        <dt className="text-muted-foreground">{label}:</dt>
+                        <dd className="font-medium">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <div className="mt-6 space-y-4">
+                    {specFaqs.map((faq) => (
+                      <div key={faq.question}>
+                        <h3 className="font-semibold">{faq.question}</h3>
+                        <p className="text-sm leading-relaxed text-muted-foreground">{faq.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div className="border rounded-lg p-6 mb-8">
                 <h2 className="text-xl font-bold mb-4">استخدامات خط {font.nameArabic}</h2>

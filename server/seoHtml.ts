@@ -36,6 +36,7 @@ import { arabicNames, getArabicName, namePath, relatedNames, NAME_PATHS } from "
 import { arabicPhrases, getArabicPhrase, phrasePath, PHRASE_PATHS } from "../client/src/lib/arabicPhrases";
 import { spellArabic } from "../client/src/lib/arabicLetters";
 import { arabicFontDescription, getFontProfile, profileDescription } from "../client/src/lib/fontProfiles";
+import { specsFaqs, specsRows } from "../client/src/lib/fontSpecs";
 import { blogPostPath, blogSeo, localizedBlogSlug, originalBlogSlug } from "../client/src/lib/blogSlugs";
 import { nameContent, phraseContent, phraseLabel, type DetailContent } from "../client/src/lib/intlContent";
 import { nameContentAr, nameMeaningAr, phraseContentAr, phraseDisplayLatin, phraseTransliteration } from "../client/src/lib/arContent";
@@ -481,8 +482,10 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
         `Téléchargez le fichier ${font.fileFormat}. Sous Windows, faites un clic droit puis Installer ; sous macOS, double-cliquez puis Installer dans Livre des polices. Relancez ensuite votre logiciel.`,
       ),
     },
+    ...specsFaqs(locale, font),
     ...(locale === "ar" ? [] : localized!.faqs),
   ];
+  const specRows = specsRows(locale, font);
   const details = [
     [t("التصنيف", "Category", "Catégorie"), category],
     [t("الصيغة", "Format", "Format"), font.fileFormat],
@@ -515,6 +518,7 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
     profileText ? `<section><h2>${escapeHtml(locale === "ar" ? `عن خط ${font.nameArabic}` : `About ${font.name}`)}</h2>${profileText.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</section>` : "",
     `<p>${escapeHtml(summary)}</p>`,
     `<dl>${details.map(([label, value]) => `<dt>${escapeHtml(label!)}</dt><dd>${escapeHtml(value!)}</dd>`).join("")}</dl>`,
+    specRows.length ? `<section><h2>${escapeHtml(t("مواصفات الخط", "Font specifications", "Caractéristiques de la police"))}</h2><dl>${specRows.map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`).join("")}</dl></section>` : "",
     useCases.length ? `<section><h2>${escapeHtml(t("استخدامات الخط", "Suggested uses", "Usages suggérés"))}</h2><ul>${useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>` : "",
     `<p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${escapeHtml(t("تحميل الملف", "Download file", "Télécharger le fichier"))}</a></p>`,
     toolLink,

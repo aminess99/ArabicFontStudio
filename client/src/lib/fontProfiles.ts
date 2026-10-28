@@ -1,3 +1,4 @@
+import { specsDescriptionAr, type FontSpecs } from "./fontSpecs";
 // Hand-written descriptions for the most-used fonts, shown on their font pages
 // and used for the meta description. The first sentence of each language is
 // the meta description, so keep it under 160 characters. Only state a
@@ -226,7 +227,8 @@ export function profileDescription(slug: string, locale: "ar" | "en"): string | 
 }
 
 // Arabic meta description, shared by FontDetails.tsx and server/seoHtml.ts.
-export function arabicFontDescription(font: { slug: string; nameArabic: string; fileFormat: string }): string {
+export function arabicFontDescription(font: { slug: string; name: string; nameArabic: string; fileFormat: string; category?: string; designer?: string | null; specs?: FontSpecs }): string {
   return profileDescription(font.slug, "ar")
+    ?? specsDescriptionAr(font)
     ?? `حمّل خط ${font.nameArabic} بصيغة ${font.fileFormat}. راجع التصنيف والمصمم والترخيص والمصدر قبل استخدام ملف الخط.`;
 }
