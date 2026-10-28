@@ -29,6 +29,7 @@ const ArabicKeyboard = lazy(() => import("@/pages/ArabicKeyboard"));
 const TattooFonts = lazy(() => import("@/pages/TattooFonts"));
 const NamesPage = lazy(() => import("@/pages/InArabicPages").then((m) => ({ default: m.NamesPage })));
 const PhrasesPage = lazy(() => import("@/pages/InArabicPages").then((m) => ({ default: m.PhrasesPage })));
+const FontFamilyPage = lazy(() => import("@/pages/FontFamilyPage"));
 const ArNamesPage = lazy(() => import("@/pages/ArabicNamePages").then((m) => ({ default: m.ArNamesPage })));
 const ArPhrasesPage = lazy(() => import("@/pages/ArabicNamePages").then((m) => ({ default: m.ArPhrasesPage })));
 const PurpleLogoPreview = lazy(() =>
@@ -92,6 +93,9 @@ function Router() {
         <Route path="/fr/cartes-de-voeux/:slug" component={GreetingCards} />
         <Route path="/en/arabic-tattoo-fonts" component={TattooFonts} />
         <Route path="/fr/police-arabe-tatouage" component={TattooFonts} />
+        <Route path="/family/:slug" component={FontFamilyPage} />
+        <Route path="/en/family/:slug" component={FontFamilyPage} />
+        <Route path="/fr/family/:slug" component={FontFamilyPage} />
         <Route path="/asmaa" component={ArNamesPage} />
         <Route path="/asmaa/:slug" component={ArNamesPage} />
         <Route path="/ibarat" component={ArPhrasesPage} />

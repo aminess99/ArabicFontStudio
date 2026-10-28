@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { fontTitleName } from "@/lib/fontArabicNames";
+import { familyName, familyPath, familySlug } from "@/lib/fontFamilies";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Download, Heart, Monitor, Apple, Layers } from "lucide-react";
@@ -571,6 +572,11 @@ export default function FontDetails() {
                     <Layers className="w-5 h-5 text-muted-foreground" />
                     <h2 className="text-xl font-bold">أوزان الخط ({familyVariants.length + 1} أوزان)</h2>
                   </div>
+                  <p className="mb-4 text-sm">
+                    <Link href={familyPath("ar", familySlug(familyName(font.name)))} className="text-primary underline underline-offset-4">
+                      كل أوزان هذا الخط في صفحة واحدة
+                    </Link>
+                  </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="border rounded-lg p-4 bg-muted/30">
                       <div className="flex items-start justify-between gap-2 mb-2">
