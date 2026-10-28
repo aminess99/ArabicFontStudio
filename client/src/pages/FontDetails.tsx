@@ -318,9 +318,10 @@ export default function FontDetails() {
           <div className="grid lg:grid-cols-3 gap-8 mt-6">
             <div className="lg:col-span-2 min-w-0">
               <h1 className="text-2xl md:text-3xl font-bold mb-2" data-testid="text-font-name">
-                تحميل خط {font.nameArabic} مجاناً
+                تحميل خط {font.nameArabic}
+                {fontTitleName(font) !== font.nameArabic && <> <span dir="ltr">{font.name}</span></>} مجاناً
               </h1>
-              <p className="text-muted-foreground mb-4">{font.name} - خط {font.category} عربي احترافي</p>
+              <p className="text-muted-foreground mb-4">{fontTitleName(font) !== font.nameArabic ? "" : `${font.name} - `}خط {font.category} عربي احترافي</p>
               <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                 {categoryDesc} يتوفر خط {font.nameArabic} بصيغة {font.fileFormat} وهو مناسب لـ{useCases.join("، ")}.
               </p>
