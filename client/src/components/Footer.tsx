@@ -73,6 +73,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/alternatives" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-alternatives">
+                  بدائل الخطوط المدفوعة
+                </Link>
+              </li>
+              <li>
                 <Link href="/zakhrafa" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-zakhrafa">
                   زخرفة الأسماء
                 </Link>

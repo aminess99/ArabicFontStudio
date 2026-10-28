@@ -43,6 +43,7 @@ import { nameContentAr, nameMeaningAr, phraseContentAr, phraseDisplayLatin, phra
 import { phraseTextAr } from "../client/src/lib/arabicPhrasesAr";
 import { decorate } from "../client/src/lib/zakhrafa";
 import { fontTitleName } from "../client/src/lib/fontArabicNames";
+import { FONT_ALTERNATIVES, alternativeCopy, alternativePath, alternativesHubCopy, alternativesHubPath, altDisplayName, findAlternative, resolveAlternatives } from "../client/src/lib/fontAlternatives";
 import { buildFontFamilies, familyCopy, familyOfFont, familyPath, familyTitleName, findFontFamily, weightLabel, type FontFamilyGroup } from "../client/src/lib/fontFamilies";
 import { OCCASIONS, getOccasion } from "../client/src/lib/greetingCards";
 import { CARD_PATHS, cardOccasionPath, cardsHubCopy, localizeOccasion, parseCardPath, type CardLocale } from "../client/src/lib/greetingCardsIntl";
@@ -1257,6 +1258,64 @@ function resolveFamily(locale: Locale, family: FontFamilyGroup<Font>, fonts: Fon
   };
 }
 
+function alternativeAlternates(original?: { slug: string }) {
+  const build = (locale: Locale) => `${SITE_ORIGIN}${original ? alternativePath(locale, original.slug) : alternativesHubPath(locale)}`;
+  return { ar: build("ar"), en: build("en"), fr: build("fr"), "x-default": build("ar") };
+}
+
+function resolveAlternativesHub(locale: Locale): SeoPage {
+  const copy = alternativesHubCopy(locale);
+  const t = (ar: string, en: string, fr: string) => (locale === "ar" ? ar : locale === "fr" ? fr : en);
+  const pagePath = alternativesHubPath(locale);
+  const list = `<ul>${FONT_ALTERNATIVES.map((item) => `<li><a href="${escapeHtml(alternativePath(locale, item.slug))}">${escapeHtml(locale === "ar" ? `${item.nameAr} (${item.name})` : item.name)}</a> — ${escapeHtml(item.look[locale].split(/[.،]/)[0])}.</li>`).join("")}</ul>`;
+  return {
+    locale,
+    path: pagePath,
+    title: copy.title,
+    description: copy.description,
+    heading: copy.heading,
+    bodyHtml: `<p>${escapeHtml(copy.intro)}</p>${list}`,
+    alternates: alternativeAlternates(),
+    jsonLd: [
+      breadcrumbNode([[t("الرئيسية", "Home", "Accueil"), pathForLocale(locale, "/")], [copy.heading, pagePath]]),
+      { "@type": "CollectionPage", name: copy.heading, description: copy.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
+    ],
+  };
+}
+
+function resolveAlternative(locale: Locale, slug: string, fonts: Font[]): SeoPage | null {
+  const original = findAlternative(slug);
+  if (!original) return null;
+  const items = resolveAlternatives(original, fonts, locale);
+  if (items.length === 0) return null;
+  const t = (ar: string, en: string, fr: string) => (locale === "ar" ? ar : locale === "fr" ? fr : en);
+  const copy = alternativeCopy(original, locale, items.length, items.map((item) => altDisplayName(item, locale)));
+  const hub = alternativesHubCopy(locale);
+  const pagePath = alternativePath(locale, original.slug);
+  const picks = items.map((item) => `<li><h3><a href="${escapeHtml(getFontPath(locale, item.font))}">${escapeHtml(altDisplayName(item, locale))}</a></h3><p>${escapeHtml(item.blurb[locale])}</p><p>${item.familyPath ? `<a href="${escapeHtml(item.familyPath)}">${escapeHtml(t(`كل الأوزان (${item.weights})`, `All ${item.weights} weights`, `Les ${item.weights} graisses`))}</a> — ` : ""}<a href="${escapeHtml(item.font.fileUrl)}" download="${escapeHtml(item.font.fileName)}">${escapeHtml(t("تحميل", "Download", "Télécharger"))}</a></p></li>`).join("");
+  const others = FONT_ALTERNATIVES.filter((item) => item.slug !== original.slug);
+  return {
+    locale,
+    path: pagePath,
+    title: copy.title,
+    description: copy.description,
+    heading: copy.heading,
+    bodyHtml: [
+      `<p>${escapeHtml(copy.intro)}</p>`,
+      `<section><h2>${escapeHtml(t("الخطوط البديلة", "Alternative fonts", "Polices alternatives"))}</h2><ul>${picks}</ul></section>`,
+      faqHtml(t("أسئلة شائعة", "Frequently asked questions", "Questions fréquentes"), copy.faqs),
+      `<section><h2>${escapeHtml(t("بدائل لخطوط أخرى", "Alternatives to other fonts", "Alternatives à d'autres polices"))}</h2><ul>${others.map((item) => `<li><a href="${escapeHtml(alternativePath(locale, item.slug))}">${escapeHtml(locale === "ar" ? item.nameAr : item.name)}</a></li>`).join("")}</ul><p><a href="${escapeHtml(alternativesHubPath(locale))}">${escapeHtml(t("كل البدائل", "All alternatives", "Toutes les alternatives"))}</a></p></section>`,
+    ].join(""),
+    alternates: alternativeAlternates(original),
+    jsonLd: [
+      breadcrumbNode([[t("الرئيسية", "Home", "Accueil"), pathForLocale(locale, "/")], [hub.heading, alternativesHubPath(locale)], [copy.heading, pagePath]]),
+      { "@type": "CollectionPage", name: copy.heading, description: copy.description, url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
+      { "@type": "ItemList", numberOfItems: items.length, itemListElement: items.map((item, index) => ({ "@type": "ListItem", position: index + 1, url: `${SITE_ORIGIN}${getFontPath(locale, item.font)}`, name: item.name })) },
+      faqNode(copy.faqs),
+    ],
+  };
+}
+
 async function resolvePage(pathname: string): Promise<SeoPage | null> {
   const intlPage = resolveIntlPage(normalizePath(pathname));
   if (intlPage !== undefined) return intlPage;
@@ -1287,6 +1346,10 @@ async function resolvePage(pathname: string): Promise<SeoPage | null> {
     const family = findFontFamily(fonts, decodeURIComponent(familyMatch[1]));
     return family ? resolveFamily(locale, family, fonts) : null;
   }
+
+  if (pagePath === "/alternatives") return resolveAlternativesHub(locale);
+  const alternativeMatch = /^\/alternative\/([^/]+)$/.exec(pagePath);
+  if (alternativeMatch) return resolveAlternative(locale, decodeURIComponent(alternativeMatch[1]), fonts);
 
   const categoryMatch = /^\/fonts\/([^/]+)$/.exec(pagePath);
   if (categoryMatch) return resolveCategory(locale, decodeURIComponent(categoryMatch[1]), fonts);
@@ -1501,6 +1564,11 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   for (const family of buildFontFamilies(fonts)) {
     const lastmod = family.fonts.map((font) => new Date(font.addedAt).toISOString()).sort().pop();
     for (const locale of ["ar", "en", "fr"] as const) add(familyPath(locale, family.slug), lastmod);
+  }
+
+  for (const locale of ["ar", "en", "fr"] as const) {
+    add(alternativesHubPath(locale), sourceLastmod("client/src/lib/fontAlternatives.ts"));
+    for (const original of FONT_ALTERNATIVES) add(alternativePath(locale, original.slug), sourceLastmod("client/src/lib/fontAlternatives.ts"));
   }
 
   for (const collection of collections) {
