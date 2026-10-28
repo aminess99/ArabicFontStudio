@@ -30,6 +30,7 @@ const TattooFonts = lazy(() => import("@/pages/TattooFonts"));
 const NamesPage = lazy(() => import("@/pages/InArabicPages").then((m) => ({ default: m.NamesPage })));
 const PhrasesPage = lazy(() => import("@/pages/InArabicPages").then((m) => ({ default: m.PhrasesPage })));
 const FontFamilyPage = lazy(() => import("@/pages/FontFamilyPage"));
+const FontAlternativePage = lazy(() => import("@/pages/FontAlternativePage"));
 const ArNamesPage = lazy(() => import("@/pages/ArabicNamePages").then((m) => ({ default: m.ArNamesPage })));
 const ArPhrasesPage = lazy(() => import("@/pages/ArabicNamePages").then((m) => ({ default: m.ArPhrasesPage })));
 const PurpleLogoPreview = lazy(() =>
@@ -96,6 +97,12 @@ function Router() {
         <Route path="/family/:slug" component={FontFamilyPage} />
         <Route path="/en/family/:slug" component={FontFamilyPage} />
         <Route path="/fr/family/:slug" component={FontFamilyPage} />
+        <Route path="/alternative/:slug" component={FontAlternativePage} />
+        <Route path="/en/alternative/:slug" component={FontAlternativePage} />
+        <Route path="/fr/alternative/:slug" component={FontAlternativePage} />
+        <Route path="/alternatives" component={FontAlternativePage} />
+        <Route path="/en/alternatives" component={FontAlternativePage} />
+        <Route path="/fr/alternatives" component={FontAlternativePage} />
         <Route path="/asmaa" component={ArNamesPage} />
         <Route path="/asmaa/:slug" component={ArNamesPage} />
         <Route path="/ibarat" component={ArPhrasesPage} />
