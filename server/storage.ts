@@ -12,6 +12,9 @@ import { type Font, type InsertFont, fontSlugAliases, fontsTable } from "@shared
 import { generateSlug } from "../client/src/lib/slugify";
 import { familyKeysForArabicQuery, withArabicName } from "../client/src/lib/fontArabicNames";
 import { db } from "./db";
+import fs from "fs";
+import path from "path";
+import type { FontSpecs } from "../client/src/lib/fontSpecs";
 
 export interface IStorage {
   getAllFonts(): Promise<Font[]>;
@@ -28,7 +31,24 @@ export interface IStorage {
   deleteFont(id: string): Promise<boolean>;
 }
 
-const named = (fonts: Font[]) => fonts.map(withArabicName);
+// What each font file supports, keyed "<folder>/<file>" (scripts/font-specs.py).
+let specsByFile: Record<string, FontSpecs> | undefined;
+function fontSpecs(fileUrl: string): FontSpecs | undefined {
+  if (!specsByFile) {
+    try {
+      specsByFile = JSON.parse(fs.readFileSync(path.join(process.cwd(), "server/data/font-specs.json"), "utf8"));
+    } catch {
+      specsByFile = {};
+    }
+  }
+  return specsByFile![fileUrl.replace(/^\/fonts\//, "")];
+}
+
+function withDetails(font: Font): Font {
+  const specs = fontSpecs(font.fileUrl);
+  return specs ? { ...withArabicName(font), specs } as Font : withArabicName(font);
+}
+const named = (fonts: Font[]) => fonts.map(withDetails);
 
 function buildWhere(category?: string, q?: string) {
   const conditions = [];
@@ -73,7 +93,7 @@ class DatabaseStorage implements IStorage {
 
   async getFontById(id: string): Promise<Font | undefined> {
     const [font] = await db.select().from(fontsTable).where(eq(fontsTable.id, id)).limit(1);
-    return font && withArabicName(font);
+    return font && withDetails(font);
   }
 
   async getFontsByCategory(category: string): Promise<Font[]> {
@@ -87,7 +107,7 @@ class DatabaseStorage implements IStorage {
 
   async getFontBySlug(slug: string): Promise<Font | undefined> {
     const [canonical] = await db.select().from(fontsTable).where(eq(fontsTable.slug, slug)).limit(1);
-    if (canonical) return withArabicName(canonical);
+    if (canonical) return withDetails(canonical);
 
     const [aliased] = await db
       .select({ font: fontsTable })
@@ -95,7 +115,7 @@ class DatabaseStorage implements IStorage {
       .innerJoin(fontsTable, eq(fontSlugAliases.fontId, fontsTable.id))
       .where(eq(fontSlugAliases.oldSlug, slug))
       .limit(1);
-    return aliased?.font && withArabicName(aliased.font);
+    return aliased?.font && withDetails(aliased.font);
   }
 
   async addSlugAlias(oldSlug: string, fontId: string): Promise<void> {
