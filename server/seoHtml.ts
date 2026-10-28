@@ -16,7 +16,7 @@ import { collections, collectionFonts } from "../client/src/lib/collectionsData"
 import { blogPosts as staticBlogPosts } from "../client/src/lib/blogData";
 import { fullBlogTranslations, localizedBlogPosts } from "../client/src/lib/blogTranslations";
 import { generateLegacyFontSlug } from "../client/src/lib/slugify";
-import { arabicCategoryMeta, categoryContent, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
+import { arabicCategoryMeta, categoryComparison, categoryContent, categoryDeepDive, categoryDescriptions, categoryUseCases } from "../client/src/lib/arabicCategoryContent";
 import { getLocalizedFontPageContent } from "../client/src/lib/localizedFontDetails";
 import { textToImagePage, toolFaqSchema, zakhrafaPage, type ToolPageCopy } from "../client/src/lib/toolPages";
 import {
@@ -358,11 +358,15 @@ function resolveCategory(locale: Locale, slug: string, fonts: Font[]): SeoPage |
     ? `تضم هذه الصفحة ${categoryFonts.length} ملفاً مصنفاً ضمن ${category.arabicCategory}. تختلف أشكال الحروف والتوافق والتراخيص بحسب الملف، لذلك راجع التفاصيل قبل الاستخدام.`
     : localizedCategory?.intro || description;
   const guide = locale === "ar" ? categoryContent[category.arabicCategory] : undefined;
+  const deep = locale === "ar" ? categoryDeepDive[category.arabicCategory] : undefined;
+  const comparisonHtml = deep
+    ? `<section><h2>${escapeHtml(categoryComparison.heading)}</h2><p>${escapeHtml(categoryComparison.intro)}</p><ul>${categoryComparison.rows.map((row) => `<li><strong>${escapeHtml(row.name)}</strong>: ${escapeHtml(row.look)}. الأنسب لـ${escapeHtml(row.use)}.</li>`).join("")}</ul></section>`
+    : "";
   const guideHtml = guide
-    ? `<p>${escapeHtml(guide.intro)}</p><section><h2>نبذة عن ${escapeHtml(category.arabicCategory)}</h2><p>${escapeHtml(guide.history)}</p></section><section><h2>نصائح الاستخدام</h2><p>${escapeHtml(guide.usageTips)}</p></section>`
+    ? `<p>${escapeHtml(guide.intro)}</p><section><h2>نبذة عن ${escapeHtml(category.arabicCategory)}</h2><p>${escapeHtml(deep?.history ?? guide.history)}</p></section>${deep ? `<section><h2>كيف تختار خط ${escapeHtml(category.arabicCategory)}؟</h2><p>${escapeHtml(deep.choose)}</p></section>` : ""}<section><h2>نصائح الاستخدام</h2><p>${escapeHtml(guide.usageTips)}</p></section>${comparisonHtml}`
     : (localizedCategory?.guide || []).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
   const faqs = locale === "ar"
-    ? (guide ? [{ question: `أسئلة عن خط ${category.arabicCategory}`, answer: guide.faq }] : [])
+    ? (guide ? [{ question: `أسئلة عن خط ${category.arabicCategory}`, answer: guide.faq }, ...(deep?.faqs ?? [])] : [])
     : (locale === "fr" ? frenchCategories.find((item) => item.slug === slug)?.faqs : category.faqs) || [];
   const home = locale === "fr" ? "Accueil" : locale === "en" ? "Home" : "الرئيسية";
   return {
@@ -520,6 +524,7 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
     `<p>${escapeHtml(summary)}</p>`,
     `<dl>${details.map(([label, value]) => `<dt>${escapeHtml(label!)}</dt><dd>${escapeHtml(value!)}</dd>`).join("")}</dl>`,
     specRows.length ? `<section><h2>${escapeHtml(t("مواصفات الخط", "Font specifications", "Caractéristiques de la police"))}</h2><dl>${specRows.map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`).join("")}</dl></section>` : "",
+    imagePath !== "/og-image.png" ? `<figure><img src="${escapeHtml(imagePath)}" alt="${escapeHtml(t(`معاينة خط ${fontTitleName(font)} وخريطة حروفه`, `Character map preview of the ${font.name} Arabic font`, `Aperçu des caractères de la police arabe ${font.name}`))}" width="1400" height="760" loading="lazy"></figure>` : "",
     useCases.length ? `<section><h2>${escapeHtml(t("استخدامات الخط", "Suggested uses", "Usages suggérés"))}</h2><ul>${useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>` : "",
     `<p><a href="${escapeHtml(font.fileUrl)}" download="${escapeHtml(font.fileName)}">${escapeHtml(t("تحميل الملف", "Download file", "Télécharger le fichier"))}</a></p>`,
     toolLink,
@@ -1581,6 +1586,8 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
     if (localizedCollections.fr[collection.slug]) add(`/fr/collection/${collection.slug}`, lastmod);
   }
 
+  // Font pages also list their character-map preview, so the images can show in Google Images.
+  const pageImages = new Map<string, string>();
   for (const font of fonts) {
     if (font.duplicateOf) continue;
     const cleanPath = `/font/${font.slug}`;
@@ -1588,6 +1595,11 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
     add(cleanPath, lastmod);
     add(`/en${cleanPath}`, lastmod);
     add(`/fr${cleanPath}`, lastmod);
+    const previewSlug = generateLegacyFontSlug(font.name, font.fileName, font.category);
+    if (fs.existsSync(path.join(process.cwd(), "client/public/font-previews", `${previewSlug}.webp`))) {
+      const image = `${SITE_ORIGIN}/font-previews/${previewSlug}.webp`;
+      for (const prefix of ["", "/en", "/fr"]) pageImages.set(`${prefix}${cleanPath}`, image);
+    }
   }
 
   const blogLastmod = newestDate(posts.map((post) => post.dateModified || post.dateISO))
@@ -1652,9 +1664,11 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
 
   const urlNodes = Array.from(entries.entries()).map(([urlPath, lastmod]) => {
     const lastmodNode = lastmod ? `\n    <lastmod>${xmlEscape(lastmod)}</lastmod>` : "";
-    return `  <url>\n    <loc>${xmlEscape(`${SITE_ORIGIN}${urlPath}`)}</loc>${lastmodNode}\n  </url>`;
+    const image = pageImages.get(urlPath);
+    const imageNode = image ? `\n    <image:image>\n      <image:loc>${xmlEscape(image)}</image:loc>\n    </image:image>` : "";
+    return `  <url>\n    <loc>${xmlEscape(`${SITE_ORIGIN}${urlPath}`)}</loc>${lastmodNode}${imageNode}\n  </url>`;
   });
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlNodes.join("\n")}\n</urlset>`;
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${urlNodes.join("\n")}\n</urlset>`;
   res.type("application/xml").send(xml);
 }
 
