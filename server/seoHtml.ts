@@ -444,7 +444,7 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
     ? arabicFontDescription(font)
     : (locale === "en" && !font.duplicateOf && profileDescription(font.slug, "en")) || localizedMeta!.description;
   const heading = locale === "ar"
-    ? `تحميل خط ${font.nameArabic}`
+    ? `تحميل خط ${fontTitleName(font)}`
     : locale === "fr"
       ? `Télécharger la police arabe ${font.name}`
       : `Download ${font.name} Arabic Font`;
