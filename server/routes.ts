@@ -250,6 +250,7 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/tahnia(?:\/[^/]+)?$/,
   /^\/keyboard$/,
   /^\/khotot-tattoo$/,
+  /^\/(?:en\/|fr\/)?family\/[^/]+$/,
   /^\/tahweel-khat-ruqaa$/,
   /^\/en\/ruqaa-font-generator$/,
   /^\/fr\/generateur-ecriture-ruqaa$/,
