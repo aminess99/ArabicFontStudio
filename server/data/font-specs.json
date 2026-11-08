@@ -941,6 +941,24 @@
   "variable": false,
   "designer": "Mohammad Saleh Souzanchi"
  },
+ "تصميم/Beiruti-VF.ttf": {
+  "glyphs": 1459,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": true,
+  "weightRange": [
+   200,
+   900
+  ],
+  "designer": "Arlette Boutros",
+  "vendor": "Boutros"
+ },
  "تصميم/BigVesta Arabic Bold.ttf": {
   "glyphs": 273,
   "arabic": true,
@@ -1404,6 +1422,24 @@
   "variable": false,
   "designer": "Nadine Chahine and Adrian Frutiger",
   "vendor": "Adobe / Linotype GmbH"
+ },
+ "تصميم/Fustat-VF.ttf": {
+  "glyphs": 1006,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": true,
+  "weightRange": [
+   200,
+   800
+  ],
+  "designer": "Mohamed Gaber, Khaled Hosny, Laura Garcia Mut",
+  "vendor": "Kief Type Foundry, Alif Type Foundry, Hard Type Foundry"
  },
  "تصميم/GE-Aridi-NaskhBlack_8.otf": {
   "glyphs": 247,
@@ -2740,6 +2776,24 @@
   "variable": false,
   "designer": "Ahmed Hamdy"
  },
+ "تصميم/Handjet-VF.ttf": {
+  "glyphs": 1605,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": true,
+  "weightRange": [
+   100,
+   900
+  ],
+  "designer": "David Brezina",
+  "vendor": "Rosetta Type Foundry"
+ },
  "تصميم/Hayah.otf": {
   "glyphs": 791,
   "arabic": true,
@@ -3354,6 +3408,23 @@
   "westernDigits": true,
   "variable": false,
   "designer": "Boutros International"
+ },
+ "تصميم/PlaypenSansArabic-VF.ttf": {
+  "glyphs": 1620,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": true,
+  "weightRange": [
+   100,
+   800
+  ],
+  "vendor": "TypeTogether"
  },
  "تصميم/QWxuYXNlZWItUmVndWxhci5vdGYxNjU2NDg4NDM5ODI3.otf": {
   "glyphs": 436,
@@ -10210,6 +10281,118 @@
   "variable": false,
   "designer": "Khaled Hosny"
  },
+ "كوفي/Montserrat-Arabic-Black.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-Bold.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-ExtraBold.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-ExtraLight.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-Light.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-Medium.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-SemiBold.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
+ "كوفي/Montserrat-Arabic-Thin.ttf": {
+  "glyphs": 2018,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Mohamed Gaber",
+  "vendor": "Kief Type Foundry"
+ },
  "كوفي/Montserrat-Arabic.ttf": {
   "glyphs": 2018,
   "arabic": true,
@@ -10401,6 +10584,66 @@
   "variable": false,
   "designer": "MTTYPEFOUNDRY",
   "vendor": "MTTYPEFOUNDRY™"
+ },
+ "كوفي/Sahel-Black.ttf": {
+  "glyphs": 552,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false
+ },
+ "كوفي/Sahel-Bold.ttf": {
+  "glyphs": 552,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false
+ },
+ "كوفي/Sahel-Light.ttf": {
+  "glyphs": 552,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false
+ },
+ "كوفي/Sahel-SemiBold.ttf": {
+  "glyphs": 552,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false
+ },
+ "كوفي/Sahel.ttf": {
+  "glyphs": 552,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false
  },
  "كوفي/Takeaway-Combo.otf": {
   "glyphs": 533,
@@ -11584,6 +11827,20 @@
   "variable": false,
   "designer": "Khalid Alabdullah"
  },
+ "نسخ/KFGQPCUthmanTahaNaskh.ttf": {
+  "glyphs": 637,
+  "arabic": true,
+  "harakat": true,
+  "persian": true,
+  "urdu": true,
+  "latin": false,
+  "easternDigits": true,
+  "persianDigits": true,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Ashfaq Ahmad Niazi",
+  "vendor": "IT Department"
+ },
  "نسخ/KacstBook.ttf": {
   "glyphs": 206,
   "arabic": true,
@@ -12238,6 +12495,62 @@
   "variable": false,
   "designer": "RTLtype | Osama Alnajdi",
   "vendor": "RTLtype"
+ },
+ "نسخ/Ruwudu-Bold.ttf": {
+  "glyphs": 912,
+  "arabic": true,
+  "harakat": true,
+  "persian": false,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": false,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Becca Hirsbrunner Spalinger",
+  "vendor": "SIL International"
+ },
+ "نسخ/Ruwudu-Medium.ttf": {
+  "glyphs": 912,
+  "arabic": true,
+  "harakat": true,
+  "persian": false,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": false,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Becca Hirsbrunner Spalinger",
+  "vendor": "SIL International"
+ },
+ "نسخ/Ruwudu-Regular.ttf": {
+  "glyphs": 912,
+  "arabic": true,
+  "harakat": true,
+  "persian": false,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": false,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Becca Hirsbrunner Spalinger",
+  "vendor": "SIL International"
+ },
+ "نسخ/Ruwudu-SemiBold.ttf": {
+  "glyphs": 912,
+  "arabic": true,
+  "harakat": true,
+  "persian": false,
+  "urdu": false,
+  "latin": true,
+  "easternDigits": true,
+  "persianDigits": false,
+  "westernDigits": true,
+  "variable": false,
+  "designer": "Becca Hirsbrunner Spalinger",
+  "vendor": "SIL International"
  },
  "نسخ/SIMPLEX-DISPLAY.otf": {
   "glyphs": 196,
