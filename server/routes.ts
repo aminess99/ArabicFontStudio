@@ -253,6 +253,7 @@ const KNOWN_ROUTE_PATTERNS = [
   /^\/(?:en\/|fr\/)?family\/[^/]+$/,
   /^\/(?:en\/|fr\/)?alternative\/[^/]+$/,
   /^\/(?:en\/|fr\/)?alternatives$/,
+  /^\/(?:en\/|fr\/)?captions(?:\/[^/]+)?$/,
   /^\/tahweel-khat-ruqaa$/,
   /^\/en\/ruqaa-font-generator$/,
   /^\/fr\/generateur-ecriture-ruqaa$/,

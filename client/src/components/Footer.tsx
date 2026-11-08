@@ -75,6 +75,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/captions" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-captions">
+                  كابشن للصور
+                </Link>
+              </li>
+              <li>
                 <Link href="/alternatives" className="text-muted-foreground hover:text-foreground transition-colors" data-testid="link-footer-alternatives">
                   بدائل الخطوط المدفوعة
                 </Link>
