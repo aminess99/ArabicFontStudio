@@ -58,6 +58,16 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       description: "Arabic fonts that work in InShot video captions. Download a font file, add it in InShot's text tool, then type your Arabic text.",
       useCases: ["Video captions", "Reels and Shorts", "Stories"],
     },
+    "khotot-android": {
+      title: "Arabic fonts for Android",
+      description: "Arabic fonts for Android phones in TTF: Droid fonts and open-licence fonts such as Noto Sans Arabic, Cairo and Tajawal, with notes on using them in apps.",
+      useCases: ["Mobile apps", "Video titles", "Social graphics"],
+    },
+    "khotot-iphone": {
+      title: "Arabic fonts for iPhone",
+      description: "Free Arabic fonts close to the iPhone look: open-licence alternatives to SF Arabic, with notes on what iOS lets you change.",
+      useCases: ["iPhone-style designs", "App interfaces", "Video titles"],
+    },
     "khotot-capcut": {
       title: "Arabic fonts for CapCut",
       description: "Arabic fonts for CapCut titles and captions. Download a font file, import it in CapCut's text settings, then type your Arabic text.",
@@ -114,6 +124,16 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       title: "Polices arabes pour InShot",
       description: "Des polices arabes pour les textes de vos vidéos InShot. Téléchargez un fichier, ajoutez-le dans l'outil texte d'InShot, puis écrivez en arabe.",
       useCases: ["Sous-titres vidéo", "Reels et Shorts", "Stories"],
+    },
+    "khotot-android": {
+      title: "Polices arabes pour Android",
+      description: "Des polices arabes pour téléphones Android en TTF : polices Droid et polices libres comme Noto Sans Arabic, Cairo et Tajawal, avec des conseils d'utilisation dans les apps.",
+      useCases: ["Applications mobiles", "Titres vidéo", "Visuels réseaux sociaux"],
+    },
+    "khotot-iphone": {
+      title: "Polices arabes pour iPhone",
+      description: "Des polices arabes gratuites proches de l'aspect de l'iPhone : alternatives libres à SF Arabic, avec ce qu'iOS permet ou non de changer.",
+      useCases: ["Designs façon iPhone", "Interfaces d'applications", "Titres vidéo"],
     },
     "khotot-capcut": {
       title: "Polices arabes pour CapCut",

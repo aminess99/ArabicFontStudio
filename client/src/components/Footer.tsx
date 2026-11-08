@@ -26,6 +26,8 @@ export function Footer() {
     { name: "خطوط مجانية", path: "/collection/khotot-bidoon-hoqooq" },
     { name: "خطوط انشوت", path: "/collection/khotot-inshot" },
     { name: "خطوط كاب كات", path: "/collection/khotot-capcut" },
+    { name: "خطوط أندرويد", path: "/collection/khotot-android" },
+    { name: "خطوط الآيفون", path: "/collection/khotot-iphone" },
   ];
 
   return (
