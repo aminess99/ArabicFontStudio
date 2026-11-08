@@ -43,6 +43,7 @@ import { nameContentAr, nameMeaningAr, phraseContentAr, phraseDisplayLatin, phra
 import { phraseTextAr } from "../client/src/lib/arabicPhrasesAr";
 import { decorate } from "../client/src/lib/zakhrafa";
 import { fontTitleName } from "../client/src/lib/fontArabicNames";
+import { CAPTION_PAGES, captionImageHref, captionPath, findCaptionPage } from "../client/src/lib/captions";
 import { FONT_ALTERNATIVES, alternativeCopy, alternativePath, alternativesHubCopy, alternativesHubPath, altDisplayName, findAlternative, resolveAlternatives } from "../client/src/lib/fontAlternatives";
 import { buildFontFamilies, familyCopy, familyOfFont, familyPath, familyTitleName, findFontFamily, weightLabel, type FontFamilyGroup } from "../client/src/lib/fontFamilies";
 import { OCCASIONS, getOccasion } from "../client/src/lib/greetingCards";
@@ -1321,6 +1322,40 @@ function resolveAlternative(locale: Locale, slug: string, fonts: Font[]): SeoPag
   };
 }
 
+function resolveCaptions(locale: Locale, slug: string): SeoPage | null {
+  const page = findCaptionPage(slug);
+  if (!page) return null;
+  const t = (ar: string, en: string, fr: string) => (locale === "ar" ? ar : locale === "fr" ? fr : en);
+  const pagePath = captionPath(locale, page.slug);
+  const faqs = page.faqs[locale];
+  const items = page.captions.map((text) => `<li lang="ar" dir="rtl">${escapeHtml(text)} <a href="${escapeHtml(captionImageHref(locale, text))}">${escapeHtml(t("حمّله صورة", "Make image", "Créer l'image"))}</a></li>`).join("");
+  const others = CAPTION_PAGES.filter((item) => item.slug !== page.slug);
+  const alt = (lang: Locale) => `${SITE_ORIGIN}${captionPath(lang, page.slug)}`;
+  return {
+    locale,
+    path: pagePath,
+    title: page.title[locale],
+    description: page.description[locale],
+    heading: page.heading[locale],
+    bodyHtml: [
+      `<p>${escapeHtml(page.intro[locale])}</p>`,
+      `<ul>${items}</ul>`,
+      faqHtml(t("أسئلة شائعة", "Frequently asked questions", "Questions fréquentes"), faqs),
+      `<section><h2>${escapeHtml(t("كابشنات أخرى", "More captions", "Autres légendes"))}</h2><ul>${others.map((item) => `<li><a href="${escapeHtml(captionPath(locale, item.slug))}">${escapeHtml(item.name[locale])}</a></li>`).join("")}</ul></section>`,
+    ].join(""),
+    alternates: { ar: alt("ar"), en: alt("en"), fr: alt("fr"), "x-default": alt("ar") },
+    jsonLd: [
+      breadcrumbNode([
+        [t("الرئيسية", "Home", "Accueil"), pathForLocale(locale, "/")],
+        ...(page.slug ? [[CAPTION_PAGES[0].name[locale], captionPath(locale, "")] as [string, string]] : []),
+        [page.name[locale], pagePath],
+      ]),
+      { "@type": "CollectionPage", name: page.heading[locale], description: page.description[locale], url: `${SITE_ORIGIN}${pagePath}`, inLanguage: locale },
+      faqNode(faqs),
+    ],
+  };
+}
+
 async function resolvePage(pathname: string): Promise<SeoPage | null> {
   const intlPage = resolveIntlPage(normalizePath(pathname));
   if (intlPage !== undefined) return intlPage;
@@ -1353,6 +1388,8 @@ async function resolvePage(pathname: string): Promise<SeoPage | null> {
   }
 
   if (pagePath === "/alternatives") return resolveAlternativesHub(locale);
+  const captionsMatch = /^\/captions(?:\/([^/]+))?$/.exec(pagePath);
+  if (captionsMatch) return resolveCaptions(locale, captionsMatch[1] ? decodeURIComponent(captionsMatch[1]) : "");
   const alternativeMatch = /^\/alternative\/([^/]+)$/.exec(pagePath);
   if (alternativeMatch) return resolveAlternative(locale, decodeURIComponent(alternativeMatch[1]), fonts);
 
@@ -1574,6 +1611,10 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   for (const locale of ["ar", "en", "fr"] as const) {
     add(alternativesHubPath(locale), sourceLastmod("client/src/lib/fontAlternatives.ts"));
     for (const original of FONT_ALTERNATIVES) add(alternativePath(locale, original.slug), sourceLastmod("client/src/lib/fontAlternatives.ts"));
+  }
+
+  for (const locale of ["ar", "en", "fr"] as const) {
+    for (const page of CAPTION_PAGES) add(captionPath(locale, page.slug), sourceLastmod("client/src/lib/captions.ts"));
   }
 
   for (const collection of collections) {
