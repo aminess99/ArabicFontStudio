@@ -78,6 +78,8 @@ export const homeCollections = {
     { name: "خطوط مجانية", slug: "khotot-bidoon-hoqooq", desc: "جميع الفئات" },
     { name: "خطوط انشوت", slug: "khotot-inshot", desc: "لتطبيق InShot" },
     { name: "خطوط كاب كات", slug: "khotot-capcut", desc: "لتطبيق CapCut" },
+    { name: "خطوط أندرويد", slug: "khotot-android", desc: "للجوال" },
+    { name: "خطوط الآيفون", slug: "khotot-iphone", desc: "بدائل SF Arabic" },
   ],
 };
 
