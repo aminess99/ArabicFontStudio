@@ -68,6 +68,21 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       description: "Free Arabic fonts close to the iPhone look: open-licence alternatives to SF Arabic, with notes on what iOS lets you change.",
       useCases: ["iPhone-style designs", "App interfaces", "Video titles"],
     },
+    "khotot-droid": {
+      title: "Droid Arabic fonts",
+      description: "Download the Droid Arabic fonts that shipped with Android: Droid Arabic Kufi, Droid Naskh and Droid Sans Arabic, in TTF with a live preview.",
+      useCases: ["Android-style designs", "Clear Arabic text", "Simple headings"],
+    },
+    "khotot-arqam": {
+      title: "Arabic fonts with Arabic numerals",
+      description: "Arabic fonts that support both Eastern Arabic numerals (١٢٣) and Western numerals (123) in TTF, for prices, dates, certificates and designs.",
+      useCases: ["Prices and invoices", "Dates and calendars", "Certificates"],
+    },
+    "khotot-dima": {
+      title: "Dima Arabic fonts",
+      description: "Download the Dima Arabic font collection: over 30 fonts in Naskh, Thuluth, Nastaliq and display styles, with a live preview before download.",
+      useCases: ["Headings", "Designs", "Invitations"],
+    },
     "khotot-capcut": {
       title: "Arabic fonts for CapCut",
       description: "Arabic fonts for CapCut titles and captions. Download a font file, import it in CapCut's text settings, then type your Arabic text.",
@@ -134,6 +149,21 @@ export const localizedCollections: Record<SiteLocale, Record<string, LocalizedCo
       title: "Polices arabes pour iPhone",
       description: "Des polices arabes gratuites proches de l'aspect de l'iPhone : alternatives libres à SF Arabic, avec ce qu'iOS permet ou non de changer.",
       useCases: ["Designs façon iPhone", "Interfaces d'applications", "Titres vidéo"],
+    },
+    "khotot-droid": {
+      title: "Polices arabes Droid",
+      description: "Téléchargez les polices arabes Droid livrées avec Android : Droid Arabic Kufi, Droid Naskh et Droid Sans Arabic, en TTF avec aperçu en direct.",
+      useCases: ["Designs façon Android", "Texte arabe lisible", "Titres simples"],
+    },
+    "khotot-arqam": {
+      title: "Polices arabes avec chiffres arabes",
+      description: "Des polices arabes qui gèrent à la fois les chiffres arabes orientaux (١٢٣) et occidentaux (123), en TTF, pour prix, dates, certificats et créations.",
+      useCases: ["Prix et factures", "Dates et calendriers", "Certificats"],
+    },
+    "khotot-dima": {
+      title: "Polices arabes Dima",
+      description: "Téléchargez la collection de polices arabes Dima : plus de 30 polices en naskh, thuluth, nastaliq et styles d'affichage, avec aperçu en direct.",
+      useCases: ["Titres", "Créations", "Invitations"],
     },
     "khotot-capcut": {
       title: "Polices arabes pour CapCut",

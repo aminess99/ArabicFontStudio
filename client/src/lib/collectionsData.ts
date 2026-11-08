@@ -264,13 +264,63 @@ export const collections: CollectionData[] = [
       { question: "هل يمكن استخدام هذه الخطوط تجارياً؟", answer: "أغلبها منشور بترخيص SIL Open Font License الذي يسمح بالاستخدام التجاري، لكن راجع ترخيص كل خط في صفحته." },
     ],
   },
+  {
+    slug: "khotot-droid",
+    titleArabic: "خطوط درويد العربية — Droid Arabic Kufi وNaskh",
+    title: "خطوط درويد العربية — تحميل Droid Arabic Kufi وDroid Naskh",
+    description: "تحميل خطوط Droid العربية: Droid Arabic Kufi وDroid Arabic Naskh وDroid Sans Arabic، الخطوط التي رافقت أندرويد، بصيغة TTF مع معاينة مباشرة.",
+    longDescription: "خطوط Droid هي خطوط أندرويد العربية القديمة التي صممتها Google ضمن مشروع Android مفتوح المصدر: كوفي بسيط ونسخ واضح وسانس نظيف. حمّلها بصيغة TTF وعاين نصك بكل خط. تنبيه: لا تحتوي هذه الخطوط على الحروف اللاتينية، فاستخدم معها خطاً آخر للنص الإنجليزي.",
+    categories: ["كوفي", "نسخ", "فوتوشوب"],
+    fontNames: ["droidkufi", "droidnaskh", "droidsansarabic"],
+    keywords: ["droid arabic kufi", "droid arabic naskh", "خط درويد", "خطوط اندرويد القديمة", "droid sans arabic"],
+    useCases: ["تطبيقات أندرويد", "النصوص العربية الواضحة", "عناوين بسيطة", "تصاميم بطابع أندرويد"],
+    faqs: [
+      { question: "ما هو خط Droid Arabic Kufi؟", answer: "هو خط كوفي بسيط ضمن عائلة Droid التي رافقت نظام أندرويد في إصداراته القديمة. حروفه واضحة وهندسية بلا زخرفة." },
+      { question: "هل خطوط Droid مجانية؟", answer: "نُشرت خطوط Droid ضمن مشروع Android مفتوح المصدر، لكن راجع الترخيص المذكور في صفحة كل خط قبل الاستخدام التجاري." },
+      { question: "هل تدعم خطوط Droid الحروف الإنجليزية؟", answer: "لا، ملفات Droid العربية هنا لا تحتوي الحروف اللاتينية. استخدم خطاً آخر للنص الإنجليزي أو اختر خطاً حديثاً مثل Noto Sans Arabic لنص ثنائي اللغة." },
+    ],
+  },
+  {
+    slug: "khotot-arqam",
+    titleArabic: "خطوط أرقام عربية ١٢٣ و123",
+    title: "خطوط أرقام عربية — خطوط تدعم الأرقام ١٢٣ و123 مجاناً",
+    description: "خطوط عربية تدعم الأرقام العربية المشرقية (١٢٣) والغربية (123) معاً، بصيغة TTF، للأسعار والتواريخ والشهادات والتصاميم.",
+    longDescription: "اخترنا لك خطوطاً تحتوي على نوعي الأرقام: الأرقام العربية المشرقية ١٢٣ التي يعتاد عليها قارئ مصر والخليج والشام، والأرقام الغربية 123 المستخدمة في المغرب العربي وفي الأسعار والأرقام التقنية. تأكدنا من وجود النوعين في ملف كل خط. اكتب أرقامك في الأعلى لتعاينها.",
+    categories: ["كوفي", "نسخ", "تصميم", "فوتوشوب"],
+    fontNames: ["cairo", "tajawal", "almarai", "ibmplexsansarabic", "notosansarabic", "readex", "mada", "alexandria"],
+    keywords: ["خطوط ارقام", "خطوط الارقام العربية", "خطوط أرقام عربية", "خط ارقام عربية", "خطوط ارقام هندية"],
+    useCases: ["الأسعار والفواتير", "التواريخ والتقاويم", "الشهادات", "تصاميم الأرقام"],
+    callout: { text: "تعرف الفرق بين ١٢٣ و123 وكيف تحول بينهما؟ اقرأ الدليل.", href: "/blog/khotot-alarqam-alarabiya", label: "دليل خطوط الأرقام العربية" },
+    faqs: [
+      { question: "ما الفرق بين الأرقام ١٢٣ و123؟", answer: "١٢٣ هي الأرقام العربية المشرقية (الهندية) وتُستخدم في مصر والخليج والشام، و123 هي الأرقام الغربية وتُستخدم في المغرب العربي وفي الأسعار والأرقام التقنية. الخطوط المعروضة تحتوي النوعين." },
+      { question: "كيف أكتب الأرقام العربية ١٢٣ بلوحة المفاتيح؟", answer: "أضف لوحة المفاتيح العربية، أو استخدم الكيبورد العربي الإلكتروني في موقعنا وانسخ الأرقام، ثم الصقها في تصميمك." },
+      { question: "هل كل الخطوط تعرض الأرقام ١٢٣؟", answer: "لا، بعض الخطوط الزخرفية لا تحتوي الأرقام المشرقية أو تحتوي أشكالاً مختلفة. لذلك اخترنا لك خطوطاً تحققنا من وجود النوعين فيها." },
+    ],
+  },
+  {
+    slug: "khotot-dima",
+    titleArabic: "خطوط ديمة — مجموعة خطوط Dima العربية",
+    title: "خطوط ديمة Dima — تحميل مجموعة خطوط Dima العربية",
+    description: "تحميل خطوط ديمة (Dima) العربية: أكثر من 30 خطاً بأساليب مختلفة من النسخ والثلث والنستعليق والتصميم، مع معاينة مباشرة قبل التحميل.",
+    longDescription: "مجموعة خطوط ديمة (Dima) في مكان واحد: نسخ وثلث ونستعليق وخطوط تصميم وعناوين بأسماء مختلفة. اكتب نصك لتعاينه بكل خط، ثم افتح صفحة الخط وراجع الصيغة والترخيص قبل الاستخدام التجاري.",
+    categories: ["تصميم", "ثلث", "خطوط الحرة", "فوتوشوب", "نستعليق"],
+    fontNames: ["dima", "badiefontdima"],
+    keywords: ["dima font", "خط ديمة", "خطوط ديمة", "تحميل خطوط ديمة", "dima arabic font"],
+    useCases: ["العناوين", "التصاميم", "الدعوات", "الشعارات"],
+    faqs: [
+      { question: "ما هي خطوط ديمة؟", answer: "ديمة (Dima) مجموعة خطوط عربية بأساليب كثيرة، منها نسخ وثلث ونستعليق وخطوط تصميم وعناوين. اختر من القائمة بحسب أسلوب مشروعك." },
+      { question: "هل خطوط ديمة مجانية للاستخدام التجاري؟", answer: "التحميل مجاني، لكن ترخيص الاستخدام التجاري لم يُتحقق منه لأغلب هذه الملفات. راجع الترخيص في صفحة كل خط، وتواصل مع المصمم قبل الاستخدام التجاري." },
+      { question: "أي خط من ديمة يناسب العناوين؟", answer: "جرّب خطوط العرض الثقيلة مثل Dima Expo وDima Classic، وللنصوص الأطول اختر خط نسخ واضحاً مثل Dima Naskh." },
+    ],
+  },
 ];
 
 const familyKey = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 // The fonts that belong to a collection.
-export function collectionFonts<T extends { category: string; name: string }>(collection: CollectionData, fonts: T[]): T[] {
-  return fonts.filter((font) => collection.categories.includes(font.category)
+export function collectionFonts<T extends { category: string; name: string; duplicateOf?: string | null }>(collection: CollectionData, fonts: T[]): T[] {
+  // A duplicate copy lives in another category under its own slug; list the primary only.
+  return fonts.filter((font) => !font.duplicateOf && collection.categories.includes(font.category)
     && (!collection.fontNames || collection.fontNames.some((prefix) => familyKey(font.name).startsWith(prefix))));
 }
 
