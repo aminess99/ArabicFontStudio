@@ -80,6 +80,9 @@ export const homeCollections = {
     { name: "خطوط كاب كات", slug: "khotot-capcut", desc: "لتطبيق CapCut" },
     { name: "خطوط أندرويد", slug: "khotot-android", desc: "للجوال" },
     { name: "خطوط الآيفون", slug: "khotot-iphone", desc: "بدائل SF Arabic" },
+    { name: "خطوط أرقام", slug: "khotot-arqam", desc: "١٢٣ و123" },
+    { name: "خطوط ديمة", slug: "khotot-dima", desc: "مجموعة Dima" },
+    { name: "خطوط درويد", slug: "khotot-droid", desc: "خطوط أندرويد القديمة" },
   ],
 };
 
