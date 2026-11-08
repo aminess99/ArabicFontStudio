@@ -557,4 +557,90 @@ Tapez les chiffres depuis le clavier arabe pour obtenir ١٢٣, ou depuis le cla
 Ne mélangez pas les deux séries dans un même visuel, et utilisez celle qu'attend votre public : ١٢٣ pour le Golfe, l'Égypte et le Levant, 123 pour le Maghreb, les prix et les chiffres techniques.`,
     },
   },
+  "taghyeer-khat-alhatif-android-iphone": {
+    en: {
+      title: "Change Your Phone Font to an Arabic Font: What Works on iPhone and Android",
+      excerpt: "Can you change the iPhone or Android system font to an Arabic font you like? An honest guide to what each system allows, and the practical way to use a font in your apps.",
+      content: `Can you change your phone's font to an Arabic font you like? The answer differs between iPhone and Android, and between brands. This guide explains what is really possible and what is not, without promising what cannot be done.
+
+## iPhone: the system font is fixed
+
+iOS does not let you change the system font itself. What you can change is the text size and weight: Settings → Display & Brightness → Text Size, or turn on Bold Text. The iPhone's Arabic font is Apple's SF Arabic, which is not published for public download, so we suggest [free alternatives with a similar look](/en/alternative/sf-arabic).
+
+What is possible is using an external font inside apps that support it. Since iOS 13, fonts can be installed through dedicated apps and then appear in apps such as Pages and Keynote, and video apps like InShot and CapCut accept a font file imported from the Files app.
+
+## Android: it depends on the brand
+
+- **Samsung:** Settings → Display → Font size and style → Font style, where you can download fonts from the Galaxy Store. Names may differ between interface versions.
+- **Xiaomi, Huawei, Oppo and others:** they usually offer fonts through the brand's theme store.
+- **Stock Android:** it normally does not let you import a font file as the system font without special tools. Avoid apps that ask for root or broad permissions, since they can harm the device.
+
+## The practical way: use the font inside the app
+
+The easiest and safest way is to download the font file and import it into the app you write in:
+
+1. Download the font and save it in Downloads or the Files app.
+2. If it is a ZIP, unzip it first.
+3. In InShot or CapCut, open the text settings and choose to import a font.
+4. For Canva and Word, see [how to add an Arabic font to Canva and Word](/en/blog/add-arabic-font-to-canva-word).
+
+## If you only need to send text in a certain font
+
+Type the text in the [Arabic font generator](/en/arabic-font-generator) and download it as a transparent image, then send or post it in any app without installing a font. For text that can be copied as characters, use [fancy text](/en/arabic-fancy-text).
+
+## Fonts that suit phones
+
+We picked two collections: [Arabic fonts for Android](/en/collection/khotot-android) and [Arabic fonts for iPhone](/en/collection/khotot-iphone). All are TTF, and most are under the SIL Open Font License, which allows commercial use; check the license on each font's page.
+
+## Common questions
+
+**Can I change the iPhone font?** No, the system font is fixed. You can use external fonts inside apps.
+
+**Is changing the font on Android safe?** The official routes through phone settings or the brand's store are safe. Avoid any tool that asks for root access.
+
+**Why do Arabic letters appear separated in some app?** It happens when the app or the font does not support Arabic letter shaping. Try another font or update the app.`,
+    },
+    fr: {
+      title: "Changer la police du téléphone en police arabe : ce qui marche sur iPhone et Android",
+      excerpt: "Peut-on changer la police système de l'iPhone ou d'Android pour une police arabe ? Un guide honnête de ce que chaque système permet, et la méthode pratique pour utiliser une police dans vos applications.",
+      content: `Peut-on changer la police de son téléphone pour une police arabe qu'on aime ? La réponse diffère entre iPhone et Android, et d'une marque à l'autre. Ce guide explique ce qui est vraiment possible, sans promettre l'impossible.
+
+## iPhone : la police système est fixe
+
+iOS ne permet pas de changer la police système elle-même. On peut modifier la taille et l'épaisseur du texte : Réglages → Affichage et luminosité → Taille du texte, ou activer le texte en gras. La police arabe de l'iPhone est SF Arabic d'Apple, qui n'est pas distribuée au public ; nous proposons donc des [alternatives gratuites au style proche](/fr/alternative/sf-arabic).
+
+Ce qui est possible, c'est d'utiliser une police externe dans les applications qui l'acceptent. Depuis iOS 13, des polices peuvent être installées via des applications dédiées et apparaissent dans Pages ou Keynote ; les applications vidéo comme InShot et CapCut acceptent l'import d'un fichier depuis l'app Fichiers.
+
+## Android : cela dépend de la marque
+
+- **Samsung :** Réglages → Affichage → Taille et style de police → Style de police, avec téléchargement de polices depuis le Galaxy Store. Les intitulés peuvent varier selon la version de l'interface.
+- **Xiaomi, Huawei, Oppo et autres :** elles proposent généralement des polices via la boutique de thèmes de la marque.
+- **Android standard :** il ne permet normalement pas d'importer un fichier de police comme police système sans outils spéciaux. Évitez les applications qui demandent le root ou de larges autorisations, car elles peuvent endommager l'appareil.
+
+## La méthode pratique : utiliser la police dans l'application
+
+Le moyen le plus simple et le plus sûr est de télécharger le fichier de police et de l'importer dans l'application où vous écrivez :
+
+1. Téléchargez la police et enregistrez-la dans Téléchargements ou dans l'app Fichiers.
+2. Si c'est un ZIP, décompressez-le d'abord.
+3. Dans InShot ou CapCut, ouvrez les réglages du texte et choisissez d'importer une police.
+4. Pour Canva et Word, voyez [comment ajouter une police arabe à Canva et Word](/fr/blog/ajouter-police-arabe-canva-word).
+
+## Pour envoyer un texte dans une police précise
+
+Écrivez le texte dans le [générateur de police arabe](/fr/generateur-police-arabe) et téléchargez-le en image transparente, puis envoyez-le dans n'importe quelle application sans installer de police. Pour un texte copiable en caractères, utilisez le [texte arabe stylisé](/fr/texte-arabe-stylise).
+
+## Des polices adaptées aux téléphones
+
+Nous avons retenu deux collections : [polices arabes pour Android](/fr/collection/khotot-android) et [polices arabes pour iPhone](/fr/collection/khotot-iphone). Toutes sont en TTF et la plupart sont sous licence SIL Open Font License, qui autorise l'usage commercial ; vérifiez la licence sur la page de chaque police.
+
+## Questions fréquentes
+
+**Peut-on changer la police de l'iPhone ?** Non, la police système est fixe. Vous pouvez utiliser des polices externes dans les applications.
+
+**Changer la police sur Android est-il sûr ?** Les voies officielles, par les réglages ou la boutique de la marque, sont sûres. Évitez tout outil qui demande l'accès root.
+
+**Pourquoi les lettres arabes apparaissent-elles séparées dans une application ?** Cela arrive quand l'application ou la police ne gère pas la liaison des lettres arabes. Essayez une autre police ou mettez l'application à jour.`,
+    },
+  },
 };

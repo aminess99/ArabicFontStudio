@@ -24,6 +24,7 @@ const SLUGS: Record<string, { en: string; fr: string }> = {
   "idafat-khat-arabi-ila-canva-wa-word": { en: "add-arabic-font-to-canva-word", fr: "ajouter-police-arabe-canva-word" },
   "anwa-alkhotot-alarabiya": { en: "types-of-arabic-calligraphy", fr: "types-de-calligraphie-arabe" },
   "khotot-alarqam-alarabiya": { en: "arabic-numerals-fonts", fr: "chiffres-arabes-polices" },
+  "taghyeer-khat-alhatif-android-iphone": { en: "change-phone-font-arabic", fr: "changer-police-telephone-arabe" },
 };
 
 const ORIGINAL: Record<"en" | "fr", Map<string, string>> = {
