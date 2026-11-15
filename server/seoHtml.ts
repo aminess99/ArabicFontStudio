@@ -437,6 +437,10 @@ function resolveCollection(locale: Locale, slug: string, fonts: Font[]): SeoPage
   };
 }
 
+// Fonts named only by a file number ("4", "4 0") have nothing to search for,
+// so their pages stay reachable but out of the index and the sitemap.
+const hasSearchableName = (font: { name: string }) => /[A-Za-z]{3}|[\u0600-\u06FF]/.test(font.name);
+
 function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
   const categorySlug = englishCategories.find((item) => item.arabicCategory === font.category)?.slug;
   const category = categoryLabel(locale, categorySlug || font.category);
@@ -543,6 +547,7 @@ function resolveFont(locale: Locale, font: Font, fonts: Font[]): SeoPage {
     heading,
     imagePath,
     bodyHtml,
+    noindex: !hasSearchableName(font),
     alternates: pageAlternates(`/font/${font.duplicateOf || font.slug}`),
     canonicalPath: font.duplicateOf ? primaryPath : undefined,
     jsonLd: [
@@ -1630,7 +1635,7 @@ async function renderDynamicSitemap(res: Response): Promise<void> {
   // Font pages also list their character-map preview, so the images can show in Google Images.
   const pageImages = new Map<string, string>();
   for (const font of fonts) {
-    if (font.duplicateOf) continue;
+    if (font.duplicateOf || !hasSearchableName(font)) continue;
     const cleanPath = `/font/${font.slug}`;
     const lastmod = dateToIso(font.addedAt);
     add(cleanPath, lastmod);
